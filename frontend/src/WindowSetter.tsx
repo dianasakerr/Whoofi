@@ -10,12 +10,13 @@ const WindowSetter = () => {
         setCurrentWindow("Signup");
     }
 
-    switch (currentWindow) {
-        case "Login":
-            return (<Login onGoToSignup={onGoToSignup}/>);
-        case "Signup":
-            return (<SignupProccess/>);
-    }
+    return (
+        <>
+        {currentWindow === 'Login' && <Login onGoToSignup={onGoToSignup}/>}
+        {currentWindow === 'Signup' && <SignupProccess/>}
+        </>
+    )
+
 }
 
 export default WindowSetter

@@ -9,8 +9,8 @@ interface Props {
 const SubmitPage = ({name, email, onSubmit,setEmail,setName}: Props) =>  {
   return (
     <>
-    <h3 onClick={() => setName("")}>Name: {name}</h3>
-    <h3 onClick={() => setEmail("")}>Email: {email}</h3>
+    <h3 >Name: {name} <button onClick={() => setName("")}>Change name</button></h3>
+    <h3>Email: {email} <button onClick={() => setEmail("")}>Change email</button></h3>
     <button onClick={onSubmit}>Sign up</button>
     </>
   )
