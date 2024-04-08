@@ -6,7 +6,11 @@ import SetName from './SignupProcessComponents/SetName';
 import SubmitPage from './SignupProcessComponents/SubmitPage';
 import Construction from './Construction';
 
-function SignupProccess() {
+interface Props {
+  setCurrentWindow: (window: string) => void;
+}
+
+function SignupProccess({setCurrentWindow}: Props) {
 
   const [name,setName] = useState<string>("");
   const [accountType, setAcountType] = useState<string>("");
@@ -20,7 +24,9 @@ function SignupProccess() {
       email: email,
       password: password})
 
-    // In here we'll replace the console log with requests to the server and the appropriate behavior according to it's response
+      // In here we'll replace the console log with requests to the server and the appropriate behavior according to it's response
+
+      setTimeout(() => setCurrentWindow("Scroller"), 1000);
   }
 
   return (
