@@ -2,37 +2,41 @@ import { useRef, useState } from "react";
 
 interface Props {
     onGoToSignup: () => void
+    setCurrentWindow: (window: string) => void
 }
 
-const Login = ({onGoToSignup} : Props) => {
+const Login = ({onGoToSignup,setCurrentWindow} : Props) => {
 
-  const username = useRef<HTMLInputElement>(null);
+  const email = useRef<HTMLInputElement>(null);
   const [password, setPassword] = useState<string>("");
 
 
   const handleSignup = (event: React.FormEvent) => {
     event.preventDefault();
-    console.log(username.current?.value);
+
+    // replace console logs with requests to the server
+    console.log(email.current?.value);
     console.log(password);
+
+    // change according to server request
+    setCurrentWindow("Scroller");
   }
 
   return (
     <>
     <h1 className="title">Woofi</h1>
-        <div className="card">
+        <div>
       <form onSubmit={handleSignup}>
-        <label >Choose username
-          <br/>
+        <label >Email: 
           <input 
             type='text' 
             id="usernameField" 
-            placeholder='Enter username' 
-            ref={username}>
+            placeholder='Enter email' 
+            ref={email}>
           </input>
         </label>
         <br/>
-        <label >Choose Password
-        <br/>
+        <label >Password: 
         <input 
           type='password'
           id="passwordField"
@@ -42,7 +46,6 @@ const Login = ({onGoToSignup} : Props) => {
         </label>
         <br/>
         <input
-          className='subButton'
           type="submit" 
           onSubmit={handleSignup} 
           value="Log in">

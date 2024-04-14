@@ -25,9 +25,8 @@ const SearchProvider = () => {
           .catch(error => {
             console.error('Error fetching profiles:', error);
             setLoading(false);
-          })
-
-    
+          })    
+          
       }, []);
 
 
