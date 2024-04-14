@@ -1,56 +1,45 @@
 
 .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+    margin: 2vw;
     text-align: center; 
+    align-items: center; 
   }
   
   .dog-walker-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 columns with equal width */
+    gap: 1rem;
   }
+
+@media all and (min-width: 769) {
+  .dog-walker-list {
+    grid-template-columns: repeat(5, 1fr); /* 3 columns with equal width */
+  }
+}
   
   .dog-walker-card {
-    flex: 0 0 calc(16.666% - 10px); /* Four cards per row */
     background-color: #f9f9f9;
     border-radius: 8px;
-    padding: 20px;
+    padding: 2vh;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    align-items: center; 
   }
+  
   .search-options {
     display: flex;
     align-items: center; 
-    justify-content: center;
     margin-bottom: 20px; 
   }
+
   .search-bar {
   width: 300px; 
   height: 40px; 
   padding: 8px 12px; 
-  border: 1px solid #ccc; 
   border-radius: 4px;
-  font-size: 16px; 
-  margin-right: 10px; 
 }
-
-.search-criteria {
-  height: 40px; 
-  font-size: 16px; 
-}
-  .dog-walker-card:hover {
-    transform: translateY(-5px);
-  }
   
   .dog-walker-card img {
     width: 100%;
-    max-width: 250px; 
+    max-width: 4vw; 
     height: auto; 
     border-radius: 8px;
     margin-bottom: 10px;

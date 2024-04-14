@@ -1,9 +1,7 @@
 import { useState } from 'react';
 import Login from './Login'
 import SignupProccess from './SignupProcess';
-import SearchProvider from './searchProvider';
 import DogWalkersSearchPage from './DogWalkersSearchPage'
-import DogWalkerProfile from './DogWalkerProfile';
 
 const WindowSetter = () => {
 
