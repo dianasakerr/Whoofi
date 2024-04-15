@@ -105,6 +105,7 @@ class DogWalker(User):
 async def read_root():
     return {"message": "Welcome to the Whoofi API"}
 
+
 class CustomForm(BaseModel):
     user_type: str
     user_data: Dict
