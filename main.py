@@ -1,11 +1,13 @@
 # main.py
 import webbrowser
 import uvicorn
-from fastapi import FastAPI, HTTPException, Form
-from pydantic import BaseModel, Field, field_validator
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, field_validator
 from typing import List
 from pymongo import MongoClient
 from abc import abstractmethod
+from fastapi.param_functions import Depends
+from typing import Dict
 
 app = FastAPI()
 users = []
@@ -32,9 +34,9 @@ class User(BaseModel):
     class Config:
         from_attributes = True
 
-    @classmethod
-    def __init__(cls, **values):
-        super().__init__(**values)
+    # @classmethod
+    # def __init__(cls, **values):
+    #     super().__init__(**values)
 
     @field_validator("email")
     def email_must_contain_at(cls, v):
@@ -58,7 +60,7 @@ class DogOwner(User):
         super().__init__(**values)
         self.save_user()
 
-    @field_validator("dogs")
+    @field_validator("dog_name")
     def dog_name_must_not_be_empty(cls, v):
         if not v.strip():
             raise ValueError("dog name cannot be empty")
@@ -103,9 +105,15 @@ class DogWalker(User):
 async def read_root():
     return {"message": "Welcome to the Whoofi API"}
 
+class CustomForm(BaseModel):
+    user_type: str
+    user_data: Dict
+
 
 @app.post("/create_user/")
-async def create_user(user_type: str = Form(...), user_data: dict = Form(...)):
+async def create_user(form_data: CustomForm = Depends()):
+    user_type = form_data.user_type
+    user_data = form_data.user_data
     if user_type.lower() == 'dogowner':
         user = DogOwner(**user_data)
     elif user_type.lower() == 'dogwalker':
