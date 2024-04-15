@@ -3,11 +3,10 @@ import webbrowser
 import uvicorn
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, field_validator
-from typing import List
+from typing import List, Dict
 from pymongo import MongoClient
 from abc import abstractmethod
 from fastapi.param_functions import Depends
-from typing import Dict
 
 app = FastAPI()
 users = []
