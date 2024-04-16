@@ -17,16 +17,43 @@ function SignupProccess({setCurrentWindow}: Props) {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
-  const onSubmit = () => {
-    console.log({
-      accountType: accountType,
-      name: name,
-      email: email,
-      password: password})
+  const onSubmit = async () => {
 
-      // In here we'll replace the console log with requests to the server and the appropriate behavior according to it's response
+    const newUserData = {
+      "id": 10,
+      "username": "didi",
+      "email": "bla@gmail.com",
+      "city": "Daliat ElCarmel",
+      "region": "Haifa",
+      "user_type": "dogowner",
+      "dog_name": "pepsi",
+      "dog_birth_date": "2022-04-16",
+      "dog_type": "Labrador",
+      "dogs": [
+          "dog1",
+          "dog2"
+      ]
+  }
 
-      setTimeout(() => setCurrentWindow("Scroller"), 1000);
+    fetch('http://localhost:8000/create_user/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newUserData)
+    }).then(res => {
+      if (res.ok) {
+        console.log(res);
+      }
+      else {
+        console.log("EROOR");
+        console.log(res.body);
+      }
+    })
+
+    newUserData
+
+      // setTimeout(() => setCurrentWindow("Scroller"), 1000);
   }
 
   return (
