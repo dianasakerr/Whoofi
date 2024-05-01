@@ -12,11 +12,11 @@ interface Props {
 }
 
 function SignupProccess({setCurrentWindow}: Props) {
-
   const [name,setName] = useState<string>("");
   const [accountType, setAcountType] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [location, setLocation] = useState(null);
 
   const onSubmit = async () => {
 
@@ -57,7 +57,6 @@ function SignupProccess({setCurrentWindow}: Props) {
       // setTimeout(() => setCurrentWindow("Scroller"), 1000);
   }
 
-  return (<SetLocation/>)
   return (
     <>
     <h1 className="title">Woofi signup process</h1>
@@ -94,8 +93,15 @@ function SignupProccess({setCurrentWindow}: Props) {
       email !== "" &&
       password !== "" &&
       name !== "" &&
-      <SubmitPage name={name} email={email} onSubmit={onSubmit} setEmail={setEmail} setName={setName}/>
+      ! location &&
+      <SetLocation location={location} setLocation={setLocation}/>
     }
+
+    { email !== "" &&
+    password !== "" &&
+    name !== "" && 
+    location && 
+    <SubmitPage name={name} email={email} onSubmit={onSubmit} setEmail={setEmail} setName={setName}/>}
     </>
   )
 }

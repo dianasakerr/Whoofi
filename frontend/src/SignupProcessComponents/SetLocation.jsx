@@ -1,34 +1,20 @@
-import React, { useState } from 'react'
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
+import { useState, useEffect } from 'react'
 import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
-import L from 'leaflet';
 import 'leaflet-control-geocoder';
+import LocationInputMap from './LocationInputMap';
+import AddressSearchBar from './AddressSearchBar';
 
 
-const SetLocation = () => {
-    const [latitude, setLatitude] = useState(null);
-    const [longitude, setLongitude] = useState(null);
+const SetLocation = ({location, setLocation}) => {
+    // default location - tel aviv
     const [error, setError] = useState(null);
     const [showMap, setShowMap] = useState(false);
     const [selectedLocation, setSelectedLocation] = useState(null);
-  
-    const [position, setPosition] = useState([51.505, -0.09]);
-  const [searchQuery, setSearchQuery] = useState('');
 
-  const handleMapClick = (e) => {
-    setPosition(e.latlng);
-  };
-
-  const handleSearch = () => {
-    const geocoder = L.Control.Geocoder.nominatim();
-    geocoder.geocode(searchQuery, (results) => {
-      if (results && results.length > 0) {
-        const latlng = [results[0].center.lat, results[0].center.lng];
-        setPosition(latlng);
-      }
-    });
-  };
+    // set default location as TLV on startup
+    useEffect(() => {
+      setLocation();
+    },[])
 
     // for automatic device location
     const getLocation = () => {
@@ -36,8 +22,7 @@ const SetLocation = () => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
               (position) => {
-                setLatitude(position.coords.latitude);
-                setLongitude(position.coords.longitude);
+                setLocation({lat: position.coords.latitude, lng: position.coords.longitude});
               },
               (error) => {
                 setError(error.message);
@@ -48,7 +33,7 @@ const SetLocation = () => {
           }
         };
     
-    const tel_aviv_position = { lat: 32.109333, lng: 34.855499}
+    
     
 
   return (
@@ -57,28 +42,12 @@ const SetLocation = () => {
     <button onClick={() => setShowMap(!showMap)}>enter location manualy</button>
     { showMap &&
     <>
-      <h1>map</h1>
-      <div style={{ height: '600px' }}>
-      <div style={{ marginBottom: '10px' }}>
-        <input
-          type="text"
-          placeholder="Search location..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-        <button onClick={handleSearch}>Search</button>
-      </div>
-      <Map center={position} zoom={13} onClick={handleMapClick}>
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        />
-        <Marker position={position}>
-          <Popup>Your location</Popup>
-        </Marker>
-      </Map>
-    </div>
+    <AddressSearchBar setLocation={setLocation}/>
+    <LocationInputMap location={location} setLocation={setLocation}/>
     </>
+    }
+    {location && 
+    <h3>lat: {location.lat.toFixed(4)} long: {location.lng.toFixed(4)} </h3>
     }
     </>
 )
