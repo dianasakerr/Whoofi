@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
+import AddressSearchBar from './AddressSearchBar';
 import 'leaflet/dist/leaflet.css';
 
 function LocationMarker({ setLocation }) {
@@ -12,10 +13,12 @@ function LocationMarker({ setLocation }) {
   return null;
 }
 
-function LocationInputMap({ location, setLocation }) {
+function LocationInputMap({ setFinalLocation }) {
   const [map, setMap] = useState(null);
-
+  const [location, setLocation] = useState(null);
   const defaultLocation = { lat: 32.109333, lng: 34.855499} // set to TLV
+
+  
 
   useEffect(() => {
     if (map && location) {
@@ -27,11 +30,17 @@ function LocationInputMap({ location, setLocation }) {
 }, [map, location]);
 
   return (
-    <MapContainer center={[location.lat, location.lng] ? location : [defaultLocation.lat,defaultLocation.lng]} zoom={13} style={{ height: '400px', width: '100%' }} ref={setMap}>
+    <>
+    <AddressSearchBar setLocation={setLocation}/>
+    <MapContainer center={location ? [location.lat, location.lng] : [defaultLocation.lat,defaultLocation.lng]} zoom={13} style={{ height: '400px', width: '100%' }} ref={setMap}>
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
       {location && <Marker position={location} />}
       <LocationMarker setLocation={setLocation} />
     </MapContainer>
+
+    <button onClick={() => setFinalLocation(location)}>Confirm location</button>
+    </>
+
   );
 }
 

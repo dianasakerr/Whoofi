@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
 import 'leaflet-control-geocoder';
 import LocationInputMap from './LocationInputMap';
-import AddressSearchBar from './AddressSearchBar';
 
 
 const SetLocation = ({location, setLocation}) => {
@@ -42,7 +41,6 @@ const SetLocation = ({location, setLocation}) => {
     <button onClick={() => setShowMap(!showMap)}>enter location manualy</button>
     { showMap &&
     <>
-    <AddressSearchBar setLocation={setLocation}/>
     <LocationInputMap location={location} setLocation={setLocation}/>
     </>
     }
