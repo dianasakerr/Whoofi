@@ -4,6 +4,7 @@ import EnterEmail from './SignupProcessComponents/EnterEmail';
 import SetPassword from './SignupProcessComponents/SetPassword';
 import SetName from './SignupProcessComponents/SetName';
 import SubmitPage from './SignupProcessComponents/SubmitPage';
+import SetLocation from './SignupProcessComponents/SetLocation';
 import Construction from './Construction';
 
 interface Props {
@@ -56,6 +57,7 @@ function SignupProccess({setCurrentWindow}: Props) {
       // setTimeout(() => setCurrentWindow("Scroller"), 1000);
   }
 
+  return (<SetLocation/>)
   return (
     <>
     <h1 className="title">Woofi signup process</h1>
