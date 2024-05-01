@@ -4,16 +4,10 @@ import 'leaflet-control-geocoder';
 import LocationInputMap from './LocationInputMap';
 
 
-const SetLocation = ({location, setLocation}) => {
-    // default location - tel aviv
+const SetLocation = (setFinalLocation) => {
     const [error, setError] = useState(null);
     const [showMap, setShowMap] = useState(false);
-    const [selectedLocation, setSelectedLocation] = useState(null);
-
-    // set default location as TLV on startup
-    useEffect(() => {
-      setLocation();
-    },[])
+    const [location, setLocation] = useState(null);
 
     // for automatic device location
     const getLocation = () => {
@@ -41,11 +35,14 @@ const SetLocation = ({location, setLocation}) => {
     <button onClick={() => setShowMap(!showMap)}>enter location manualy</button>
     { showMap &&
     <>
-    <LocationInputMap location={location} setLocation={setLocation}/>
+    <LocationInputMap setLocation={setLocation}/>
     </>
     }
     {location && 
+    <>
     <h3>lat: {location.lat.toFixed(4)} long: {location.lng.toFixed(4)} </h3>
+    <button onClick={() => setFinalLocation(location)}>Confirm location</button>
+    </>
     }
     </>
 )

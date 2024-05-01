@@ -94,7 +94,7 @@ function SignupProccess({setCurrentWindow}: Props) {
       password !== "" &&
       name !== "" &&
       ! location &&
-      <SetLocation location={location} setLocation={setLocation}/>
+      <SetLocation setLocation={setLocation}/>
     }
 
     { email !== "" &&
