@@ -4,6 +4,7 @@ import EnterEmail from './SignupProcessComponents/EnterEmail';
 import SetPassword from './SignupProcessComponents/SetPassword';
 import SetName from './SignupProcessComponents/SetName';
 import SubmitPage from './SignupProcessComponents/SubmitPage';
+import SetLocation from './SignupProcessComponents/SetLocation';
 import Construction from './Construction';
 
 interface Props {
@@ -11,11 +12,11 @@ interface Props {
 }
 
 function SignupProccess({setCurrentWindow}: Props) {
-
   const [name,setName] = useState<string>("");
   const [accountType, setAcountType] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [location, setLocation] = useState(null);
 
   const onSubmit = async () => {
     const newUserData = {
@@ -89,8 +90,15 @@ function SignupProccess({setCurrentWindow}: Props) {
       email !== "" &&
       password !== "" &&
       name !== "" &&
-      <SubmitPage name={name} email={email} onSubmit={onSubmit} setEmail={setEmail} setName={setName}/>
+      ! location &&
+      <SetLocation setLocation={setLocation}/>
     }
+
+    { email !== "" &&
+    password !== "" &&
+    name !== "" && 
+    location && 
+    <SubmitPage name={name} email={email} onSubmit={onSubmit} setEmail={setEmail} setName={setName}/>}
     </>
   )
 }
