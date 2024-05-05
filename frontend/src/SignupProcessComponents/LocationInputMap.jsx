@@ -37,6 +37,7 @@ function LocationInputMap({ setFinalLocation }) {
       {location && <Marker position={location} />}
       <LocationMarker setLocation={setLocation} />
     </MapContainer>
+    <button onClick={() => setFinalLocation(location)}>confirm manual choice</button>
     </>
 
   );

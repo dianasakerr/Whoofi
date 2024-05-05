@@ -6,12 +6,13 @@ import SetName from './SignupProcessComponents/SetName';
 import SubmitPage from './SignupProcessComponents/SubmitPage';
 import SetLocation from './SignupProcessComponents/SetLocation';
 import Construction from './Construction';
+import './styles/SignupProcess.css'
 
 interface Props {
-  setCurrentWindow: (window: string) => void;
+  onSuccessfulSignup: () => void;
 }
 
-function SignupProccess({setCurrentWindow}: Props) {
+function SignupProccess({onSuccessfulSignup}: Props) {
   const [name,setName] = useState<string>("");
   const [accountType, setAcountType] = useState<string>("");
   const [email, setEmail] = useState<string>("");
@@ -20,14 +21,15 @@ function SignupProccess({setCurrentWindow}: Props) {
 
   const onSubmit = async () => {
     const newUserData = {
-        id: "undefined",
+        id: -1,
         username: name,
         email: email,
         password: password,
-        address: "undefined",
+        address: JSON.stringify(location),
         city: "undefined",
         region: "undefined",
-        phone_number: "undefined"
+        phone_number: -1,
+        dogs: ['dog1','dog2']
     }
 
     fetch('http://localhost:8000/create_user/', {
@@ -49,13 +51,14 @@ function SignupProccess({setCurrentWindow}: Props) {
         }
     }).then(data => {
         console.log(data);
+        onSuccessfulSignup();
     }).catch(err => {
-        console.error("Error:", err);
+        console.error("my error log:", err);
     });
 }
 
   return (
-    <>
+    <div className='signup-container'>
     <h1 className="title">Woofi signup process</h1>
     
     {
@@ -90,8 +93,8 @@ function SignupProccess({setCurrentWindow}: Props) {
       email !== "" &&
       password !== "" &&
       name !== "" &&
-      ! location &&
-      <SetLocation setLocation={setLocation}/>
+      !location &&
+      <SetLocation setFinalLocation={setLocation}/>
     }
 
     { email !== "" &&
@@ -99,7 +102,7 @@ function SignupProccess({setCurrentWindow}: Props) {
     name !== "" && 
     location && 
     <SubmitPage name={name} email={email} onSubmit={onSubmit} setEmail={setEmail} setName={setName}/>}
-    </>
+    </div>
   )
 }
 

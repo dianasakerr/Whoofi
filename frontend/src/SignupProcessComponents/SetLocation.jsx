@@ -4,7 +4,7 @@ import 'leaflet-control-geocoder';
 import LocationInputMap from './LocationInputMap';
 
 
-const SetLocation = (setFinalLocation) => {
+const SetLocation = ({setFinalLocation}) => {
     const [error, setError] = useState(null);
     const [showMap, setShowMap] = useState(false);
     const [location, setLocation] = useState(null);
@@ -35,7 +35,7 @@ const SetLocation = (setFinalLocation) => {
     <button onClick={() => setShowMap(!showMap)}>enter location manualy</button>
     { showMap &&
     <>
-    <LocationInputMap setLocation={setLocation}/>
+    <LocationInputMap setFinalLocation={setLocation}/>
     </>
     }
     {location && 

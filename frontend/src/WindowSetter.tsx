@@ -17,6 +17,10 @@ const WindowSetter = () => {
         setCurrentWindow("Scroller");
         setBackgroundClass(backgroundClass + ' animate');
     }
+
+    const onSuccessfulSignup = () => {
+        setCurrentWindow('Scroller');
+    }
     
     return (
         <>
@@ -25,7 +29,7 @@ const WindowSetter = () => {
         <div className={backgroundClass}>
         {currentWindow === 'Login' && <Login onGoToSignup={onGoToSignup} onSuccessfulLogin={onSuccessfulLogin}/>}
         </div>
-        {currentWindow === 'Signup' && <SignupProccess setCurrentWindow={setCurrentWindow}/>}
+        {currentWindow === 'Signup' && <SignupProccess onSuccessfulSignup={onSuccessfulSignup}/>}
         {currentWindow === 'Scroller' && <DogWalkersSearchPage/>}
         </div>
         </>
