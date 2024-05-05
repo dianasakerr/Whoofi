@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import fakeDogWalkers from './FakeData';
-import './styles.css'; // Import your CSS styles
+import './styles/styles.css'; // Import your CSS styles
 
 
 const DogWalkerProfile = ({id, setCurrentDogWalker}) => {

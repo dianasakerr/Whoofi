@@ -16,7 +16,7 @@ function LocationMarker({ setLocation }) {
 function LocationInputMap({ setFinalLocation }) {
   const [map, setMap] = useState(null);
   const [location, setLocation] = useState(null);
-  const defaultLocation = { lat: 32.109333, lng: 34.855499} // set to TLV
+  const defaultLocation = { lat: 32.077976, lng: 34.774220} // set to TLV's dizingof squere
 
   
 
@@ -37,8 +37,6 @@ function LocationInputMap({ setFinalLocation }) {
       {location && <Marker position={location} />}
       <LocationMarker setLocation={setLocation} />
     </MapContainer>
-
-    <button onClick={() => setFinalLocation(location)}>Confirm location</button>
     </>
 
   );

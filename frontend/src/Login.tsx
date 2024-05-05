@@ -1,11 +1,12 @@
 import { useRef, useState } from "react";
+import "./styles/login.css"
 
 interface Props {
     onGoToSignup: () => void
-    setCurrentWindow: (window: string) => void
+    onSuccessfulLogin: () => void
 }
 
-const Login = ({onGoToSignup,setCurrentWindow} : Props) => {
+const Login = ({onGoToSignup,onSuccessfulLogin} : Props) => {
 
   const email = useRef<HTMLInputElement>(null);
   const [password, setPassword] = useState<string>("");
@@ -19,41 +20,42 @@ const Login = ({onGoToSignup,setCurrentWindow} : Props) => {
     console.log(password);
 
     // change according to server request
-    setCurrentWindow("Scroller");
+    onSuccessfulLogin();
   }
 
   return (
-    <>
-    <h1 className="title">Woofi</h1>
-        <div>
+      <div className="login-container">
+        <div className="login-center"> 
+        <h2> Log in</h2>
       <form onSubmit={handleSignup}>
-        <label >Email: 
           <input 
+            className="login-input"
             type='text' 
             id="usernameField" 
-            placeholder='Enter email' 
+            placeholder='Email' 
             ref={email}>
           </input>
-        </label>
         <br/>
-        <label >Password: 
         <input 
+          className="login-input"
           type='password'
           id="passwordField"
-          placeholder='Enter password' 
+          placeholder='Password' 
           onChange={(e) => setPassword(e.target.value)}>
         </input>
-        </label>
         <br/>
         <input
+          className="login-btn"
           type="submit" 
           onSubmit={handleSignup} 
           value="Log in">
         </input>
       </form>
-      <button onClick={onGoToSignup}>Sign up</button>
+      <button 
+        className="login-btn"
+        onClick={onGoToSignup}>Sign up</button>
+      </div>
     </div>
-    </>
   )
 }
 
