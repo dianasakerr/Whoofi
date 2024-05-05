@@ -19,43 +19,40 @@ function SignupProccess({setCurrentWindow}: Props) {
   const [location, setLocation] = useState(null);
 
   const onSubmit = async () => {
-
     const newUserData = {
-      "id": 10,
-      "username": "didi",
-      "email": "bla@gmail.com",
-      "city": "Daliat ElCarmel",
-      "region": "Haifa",
-      "user_type": "dogowner",
-      "dog_name": "pepsi",
-      "dog_birth_date": "2022-04-16",
-      "dog_type": "Labrador",
-      "dogs": [
-          "dog1",
-          "dog2"
-      ]
-  }
+        id: "undefined",
+        username: name,
+        email: email,
+        password: password,
+        address: "undefined",
+        city: "undefined",
+        region: "undefined",
+        phone_number: "undefined"
+    }
 
     fetch('http://localhost:8000/create_user/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newUserData)
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            user_type: accountType, // Make sure this is directly under the root of the JSON body
+            user_data: newUserData
+        })
     }).then(res => {
-      if (res.ok) {
-        console.log(res);
-      }
-      else {
-        console.log("EROOR");
-        console.log(res.body);
-      }
-    })
-
-    newUserData
-
-      // setTimeout(() => setCurrentWindow("Scroller"), 1000);
-  }
+        if (res.ok) {
+            console.log("User created successfully");
+            return res.json();
+        } else {
+            console.log("Error creating user");
+            return res.text().then(text => { throw new Error(text) });
+        }
+    }).then(data => {
+        console.log(data);
+    }).catch(err => {
+        console.error("Error:", err);
+    });
+}
 
   return (
     <>
