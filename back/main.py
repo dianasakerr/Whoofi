@@ -1,4 +1,5 @@
 # main.py
+import re
 import webbrowser
 import uvicorn
 from fastapi import FastAPI, HTTPException
@@ -176,6 +177,32 @@ async def create_dog(form_data: DogCustomForm):
     dog = Dog(**dog_data)
     # TODO:  add the dog to user dogs list
     return {"message": f"Hello {dog.name}, your data is: {dog_data}"}
+
+
+@app.post("/get_dog_walkers/")
+async def create_dog(name: str = None, location: str = None, min_experience: float = None):
+    key, value = None, None
+    if name:
+        key = 'name'
+        # if the string is partially match regardless of case then it will return it means not full match only
+        pattern = re.compile(name, re.IGNORECASE)
+        value = {"$regex": pattern}
+    elif location:
+        key = 'address'
+        # if the string is partially match regardless of case then it will return it means not full match only
+        pattern = re.compile(location, re.IGNORECASE)
+        value = {"$regex": pattern}
+    elif min_experience:
+        key = 'years_of_experience'
+        value = {"$gte": min_experience}  # return all dog_walkers that has min experience and above
+    filter_by = {} if key is None else {key: value}
+
+    # check if owner_id exists in dog_owner collection
+    collection, cluster = get_collction_from_db(DOG_WALKER)
+    walkers = list(collection.find(filter_by))
+    cluster.close()
+    return walkers
+
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="localhost", port=8000, reload=True, log_level="info")
