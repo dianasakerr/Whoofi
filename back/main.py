@@ -32,13 +32,6 @@ app.add_middleware(
 def get_collction_from_db(collection_name):
     # Create a new client and connect to the server
     cluster = MongoClient(CONN_STR)
-    # Send a ping to confirm a successful connection
-    try:
-        cluster.admin.command('ping')
-        print("Pinged your deployment. You successfully connected to MongoDB!")
-    except Exception as e:
-        print(e)
-
     db = cluster[DB_NAME]
     return db[collection_name], cluster
 
