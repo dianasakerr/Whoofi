@@ -173,7 +173,7 @@ async def create_dog(form_data: DogCustomForm):
 
 
 @app.post("/get_dog_walkers/")
-async def create_dog(name: str = None, location: str = None, min_experience: float = None):
+async def get_dog_walkers(name: str = None, location: str = None, min_experience: float = None):
     key, value = None, None
     if name:
         key = 'name'
