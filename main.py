@@ -2,7 +2,7 @@
 import webbrowser
 import uvicorn
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, validator
 from typing import List, Dict
 from pymongo import MongoClient
 from abc import abstractmethod
@@ -37,7 +37,7 @@ class User(BaseModel):
     # def __init__(cls, **values):
     #     super().__init__(**values)
 
-    @field_validator("email")
+    @validator("email")
     def email_must_contain_at(cls, v):
         if "@" not in v:
             raise ValueError("must contain a valid email address")
@@ -59,7 +59,7 @@ class DogOwner(User):
         super().__init__(**values)
         self.save_user()
 
-    @field_validator("dog_name")
+    @validator("dog_name")
     def dog_name_must_not_be_empty(cls, v):
         if not v.strip():
             raise ValueError("dog name cannot be empty")
@@ -85,7 +85,7 @@ class DogWalker(User):
         super().__init__(**values)
         self.save_user()
 
-    @field_validator("hourly_rate")
+    @validator("hourly_rate")
     def rate_must_be_positive(cls, v):
         if v <= 0:
             raise ValueError("hourly rate must be positive")
@@ -125,6 +125,12 @@ async def create_user(form_data: CustomForm = Depends()):
     return {"message": f"Hello {user.username}, your data is: {user.dict()}"}
 
 
-if __name__ == "__main__":
-    uvicorn.run("main:app", host="localhost", port=8000, reload=True, log_level="info")
+import threading
+import webbrowser
+
+def open_browser():
     webbrowser.open("http://localhost:8000")
+
+if __name__ == "__main__":
+    threading.Thread(target=open_browser).start()
+    uvicorn.run("main:app", host="localhost", port=8000, reload=True, log_level="info")
