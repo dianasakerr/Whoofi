@@ -57,6 +57,8 @@ function SignupProccess({onSuccessfulSignup}: Props) {
     });
 }
 
+
+
   return (
     <div className='signup-container'>
     <h1 className="title">Woofi signup process</h1>
