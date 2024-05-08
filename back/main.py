@@ -197,6 +197,7 @@ async def get_dog_walkers(name: str = None, location: str = None, min_experience
     return walkers
 
 
+
 if __name__ == "__main__":
     uvicorn.run("main:app", host="localhost", port=8000, reload=True, log_level="info")
     webbrowser.open("http://localhost:8000")
