@@ -1,0 +1,12 @@
+.header {
+    position: fixed; /* Fixed position to keep it at the top */
+    top: 0; /* Stick it to the top */
+    left: 0;
+    width: 100%; /* Take full width of the viewport */
+    height: 5vh;
+    background-color: wheat;
+    color: #000000; /* Example text color */
+    padding: 10px; /* Adjust padding as needed */
+    z-index: 1000; /* Set a high z-index to ensure it's above other elements */
+    text-align: center;
+}
