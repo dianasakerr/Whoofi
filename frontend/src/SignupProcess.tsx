@@ -14,10 +14,38 @@ interface Props {
 
 function SignupProccess({onSuccessfulSignup}: Props) {
   const [name,setName] = useState<string>("");
-  const [accountType, setAcountType] = useState<string>("");
+  const [accountType, setAccountType] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [location, setLocation] = useState(null);
+
+  const handleBackToEmail = () => {
+    setEmail("");
+  };
+
+  const handleBackToAccountType = () => {
+    setAccountType("");
+  };
+
+  const handleBackToPassword = () => {
+    setPassword("");
+  };
+
+  const handleBackToSetPassword = () => {
+  // Reset the password state
+  setPassword("");
+};
+
+const handleBackToSetName = () => {
+  // Reset the name state
+  setName("");
+};
+
+const handleBackToSetLocation = () => {
+  // Reset the location state
+  setLocation(null);
+};
+
 
   const onSubmit = async () => {
     const newUserData = {
@@ -65,7 +93,7 @@ function SignupProccess({onSuccessfulSignup}: Props) {
     
     {
       (accountType === "") &&
-      <ChooseAccountType setAccountType={setAcountType}/>
+      <ChooseAccountType setAccountType={setAccountType}/>
     }
     
     {
@@ -76,19 +104,19 @@ function SignupProccess({onSuccessfulSignup}: Props) {
     { 
       accountType === "owner" &&
       email === "" &&
-     <EnterEmail setEmail={setEmail}/>
+     <EnterEmail setEmail={setEmail}
+     onBack={handleBackToAccountType} />
     }
 
-    { email !== "" &&
-      password === "" &&
-      <SetPassword setPassword={setPassword}/>
-    }
+    { email !== "" && password === "" && <SetPassword setPassword={setPassword} onBack={handleBackToEmail} />}
+
 
     {
       email !== "" &&
       password !== "" &&
       name === "" &&
-      <SetName setName={setName}/>
+      <SetName setName={setName}
+      onBack={handleBackToSetPassword} />
     }
 
     {
@@ -96,14 +124,15 @@ function SignupProccess({onSuccessfulSignup}: Props) {
       password !== "" &&
       name !== "" &&
       !location &&
-      <SetLocation setFinalLocation={setLocation}/>
+      <SetLocation setFinalLocation={setLocation}
+      onBack={handleBackToSetName} />
     }
 
     { email !== "" &&
     password !== "" &&
     name !== "" && 
     location && 
-    <SubmitPage name={name} email={email} onSubmit={onSubmit} setEmail={setEmail} setName={setName}/>}
+    <SubmitPage name={name} email={email} onSubmit={onSubmit} setEmail={setEmail} setName={setName} onBack={handleBackToSetLocation}/>}
     </div>
   )
 }

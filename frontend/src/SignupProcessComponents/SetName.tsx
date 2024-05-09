@@ -2,9 +2,10 @@ import { useRef, useState } from "react";
 
 interface Props {
     setName: (name:string) => void
+    onBack: () => void;
 }
 
-const SetName = ({setName}:Props) => {
+const SetName = ({setName,onBack}:Props) => {
 
   const nameRef = useRef<HTMLInputElement>(null);
   const [showAlert, setShowAlert] = useState<boolean>(false);
@@ -25,6 +26,8 @@ const SetName = ({setName}:Props) => {
     <label>Name
     <input type="text" name="" id="" placeholder="Enter your name" ref={nameRef}/>
     </label>
+    <button onClick={onBack}>Back</button>
+
     <button onClick={handleNext}>next</button>
     {showAlert && <p>name field can't be empty</p>}
     </>
