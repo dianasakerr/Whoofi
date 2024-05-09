@@ -4,10 +4,12 @@ import 'leaflet-control-geocoder';
 import LocationInputMap from './LocationInputMap';
 
 
-const SetLocation = ({setFinalLocation}) => {
+
+const SetLocation = ({ setFinalLocation}) => {
     const [error, setError] = useState(null);
     const [showMap, setShowMap] = useState(false);
     const [location, setLocation] = useState(null);
+    // onBack: () => void;
 
     // for automatic device location
     const getLocation = () => {
@@ -25,9 +27,9 @@ const SetLocation = ({setFinalLocation}) => {
             setError('Geolocation is not supported by this browser.');
           }
         };
-    
-    
-    
+
+
+
 
   return (
     <>
@@ -38,10 +40,11 @@ const SetLocation = ({setFinalLocation}) => {
     <LocationInputMap setFinalLocation={setLocation}/>
     </>
     }
-    {location && 
+    {location &&
     <>
     <h3>lat: {location.lat.toFixed(4)} long: {location.lng.toFixed(4)} </h3>
     <button onClick={() => setFinalLocation(location)}>Confirm location</button>
+    <button>Back</button> // not working
     </>
     }
     </>

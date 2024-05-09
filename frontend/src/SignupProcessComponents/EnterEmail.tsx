@@ -1,12 +1,17 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
+import { Redirect } from 'react-router-dom';
+import BackButton from './BackButton';
+import { useHistory } from 'react-router-dom';
 
 interface Props {
-    setEmail: (email: string) => void
+    setEmail: (email: string | undefined) => void
+    onBack: () => void;
 }
 
-const EnterEmail = ({setEmail}: Props) => {
+const EnterEmail = ({setEmail,onBack}: Props) => {
 
     const emailRef = useRef<HTMLInputElement>(null)
+    // const history = useHistory();
 
     const handleNext = () => {
       if (emailRef.current?.value !== undefined) {
@@ -15,12 +20,13 @@ const EnterEmail = ({setEmail}: Props) => {
       }
     }
 
-  return (
+    return (
     <>
     <label>what's your email?
         <input type='text' placeholder='Enter email' ref={emailRef}></input>
     </label>
-    <button onClick={handleNext}>next</button>
+    <button onClick={handleNext}>Next</button>
+    <button onClick={onBack}>Back</button>
     </>
   )
 }
