@@ -21,6 +21,9 @@ const WindowSetter = () => {
     const onSuccessfulSignup = () => {
         setCurrentWindow('Scroller');
     }
+    const handleBackBtn = () => {
+        setCurrentWindow('Login');
+    };
     
     return (
         <>
@@ -32,6 +35,7 @@ const WindowSetter = () => {
         {currentWindow === 'Signup' && <SignupProccess onSuccessfulSignup={onSuccessfulSignup}/>}
         {currentWindow === 'Scroller' && <DogWalkersSearchPage/>}
         </div>
+        <button onClick={handleBackBtn}>Back</button>
         </>
     )
 
