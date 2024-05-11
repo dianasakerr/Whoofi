@@ -8,7 +8,7 @@ const DogWalkersSearchPage = () => {
   const dogWalkers = fakeDogWalkers;
   const [currentDogWalker, setCurrentDogWalker] = useState(-1);
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchCriteria, setSearchCriteria] = useState('name'); 
+  const [searchCriteria, setSearchCriteria] = useState('name');
 
   // Function to calculate age from date of birth
   const calculateAge = (dateOfBirth) => {
@@ -48,7 +48,6 @@ const DogWalkersSearchPage = () => {
         return true;
     }
   });
-
 
 
 
