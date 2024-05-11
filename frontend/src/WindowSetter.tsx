@@ -35,7 +35,9 @@ const WindowSetter = () => {
         {currentWindow === 'Signup' && <SignupProccess onSuccessfulSignup={onSuccessfulSignup}/>}
         {currentWindow === 'Scroller' && <DogWalkersSearchPage/>}
         </div>
-        <button onClick={handleBackBtn}>Back</button>
+        <>
+            <button onClick={handleBackBtn}>Back to Log In</button>
+        </>
         </>
     )
 
