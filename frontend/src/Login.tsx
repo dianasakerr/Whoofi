@@ -1,33 +1,28 @@
 import { useRef, useState } from "react";
 import "./styles/login.css"
+import { Link } from "react-router-dom";
 
-interface Props {
-    onGoToSignup: () => void
-    onSuccessfulLogin: () => void
-}
 
-const Login = ({onGoToSignup,onSuccessfulLogin} : Props) => {
+
+const Login = () => {
 
   const email = useRef<HTMLInputElement>(null);
   const [password, setPassword] = useState<string>("");
 
 
-  const handleSignup = (event: React.FormEvent) => {
+  const handleLogin = (event: React.FormEvent) => {
     event.preventDefault();
-
-    // replace console logs with requests to the server
-    console.log(email.current?.value);
-    console.log(password);
+    console.log({email: email,password:password});
+    // Add login request to the server
 
     // change according to server request
-    onSuccessfulLogin();
   }
 
   return (
       <div className="login-container">
         <div className="login-center"> 
         <h2> Log in</h2>
-      <form onSubmit={handleSignup}>
+      <form onSubmit={handleLogin}>
           <input 
             className="login-input"
             type='text' 
@@ -47,13 +42,13 @@ const Login = ({onGoToSignup,onSuccessfulLogin} : Props) => {
         <input
           className="login-btn"
           type="submit" 
-          onSubmit={handleSignup} 
+          onSubmit={handleLogin} 
           value="Log in">
         </input>
       </form>
-      <button 
-        className="login-btn"
-        onClick={onGoToSignup}>Sign up</button>
+      <Link to="/Signup" className="login-btn">
+        Sign up
+      </Link>
       </div>
     </div>
   )

@@ -37,9 +37,10 @@ def get_collction_from_db(collection_name):
 
 
 class User(BaseModel):
-    id: int
+    id: str
     username: str
     email: str
+    location: str # as latitude, longitude
     address: str
     city: str
     region: str
@@ -172,7 +173,7 @@ async def create_dog(form_data: DogCustomForm):
     return {"message": f"Hello {dog.name}, your data is: {dog_data}"}
 
 
-@app.post("/get_dog_walkers/")
+@app.get("/get_dog_walkers/")
 async def get_dog_walkers(name: str = None, location: str = None, min_experience: float = None):
     key, value = None, None
     if name:
