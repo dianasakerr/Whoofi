@@ -1,20 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import fakeDogWalkers from './FakeData';
 import './styles/styles.css'; // Import your CSS styles
 
 
-const DogWalkerProfile = ({id, setCurrentDogWalker}) => {
-  const [dogWalker, setDogWalker] = useState(null); // State to store the dog walker profile
+const DogWalkerProfile = ({dogWalker, setCurrentDogWalker}) => {
 
-  // Effect to fetch the dog walker profile when the component mounts
-  useEffect(() => {
-    // Find the dog walker with the matching id
-    const foundDogWalker = fakeDogWalkers.find(walker => walker.id === id);
-    // Set the dog walker state
-    setDogWalker(foundDogWalker);
-  }, []); // Run the effect whenever the id parameter changes
-
-  const resetDogWalker = () => setCurrentDogWalker(-1)
+  const resetDogWalker = () => setCurrentDogWalker(null)
 
   return (
     <div className="container">
@@ -24,8 +14,8 @@ const DogWalkerProfile = ({id, setCurrentDogWalker}) => {
       <div className="profile">
         <img src={dogWalker.photo} alt={dogWalker.name} className="profile-img" height="300" width="300"/>
         <div className="details">
-          <h2>{dogWalker.name}</h2>
-          <p>Location: {dogWalker.location}</p>
+          <h2>{dogWalker.username}</h2>
+          <p>Location: {}</p>
           <p>Experience: {dogWalker.experience} years</p>
           <p>Price: ${dogWalker.price} per hour</p>
           <p>Phone: {dogWalker.phoneNumber}</p>
