@@ -19,6 +19,7 @@ DOG = 'dog'
 
 origins = ["http://localhost", "http://localhost:5173"]
 
+
 # Add CORS middleware to your FastAPI application
 app.add_middleware(
     CORSMiddleware,
