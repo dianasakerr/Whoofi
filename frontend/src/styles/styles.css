@@ -1,0 +1,93 @@
+
+.container {
+    margin: 2vw;
+    text-align: center; 
+    align-items: center; 
+  }
+  
+  .dog-walker-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 columns with equal width */
+    gap: 1rem;
+  }
+
+@media all and (min-width: 769) {
+  .dog-walker-list {
+    grid-template-columns: repeat(5, 1fr); /* 3 columns with equal width */
+  }
+}
+  
+  .dog-walker-card {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 2vh;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .search-options {
+    display: flex;
+    align-items: center; 
+    margin-bottom: 20px; 
+  }
+
+  .search-bar {
+  width: 300px; 
+  height: 40px; 
+  padding: 8px 12px; 
+  border-radius: 4px;
+}
+  
+  .dog-walker-card img {
+    width: 100%;
+    max-width: 4vw; 
+    height: auto; 
+    border-radius: 8px;
+    margin-bottom: 10px;
+  }
+  
+  .details {
+    text-align: center;
+  }
+  
+  .details h2 {
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+  }
+  
+  .details p {
+    font-size: 1rem;
+    color: #666;
+  }
+  h1 {
+    font-size: 3rem; 
+    color: #333; 
+    margin-bottom: 20px; 
+    text-align: center; 
+
+  }
+
+.search-bar {
+    width: 300px; 
+    height: 40px; 
+    padding: 8px 12px; 
+    border: 1px solid #ccc; 
+    border-radius: 4px; 
+    font-size: 16px; 
+    margin-right: 10px; 
+  }
+  
+  .search-criteria {
+    height: 40px; 
+    font-size: 16px; 
+  }
+  .paw-container {
+    display: flex; 
+    width: 30px; 
+    height: 30px;
+  }
+  
+  .paw-img {
+    width: 30px; 
+    height: 30px; 
+    margin-right: 5px; 
+  }
