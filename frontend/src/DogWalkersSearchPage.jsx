@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import fakeDogWalkers from './FakeData';
 import DogWalkerProfile from './DogWalkerProfile';
-import './styles/styles.css';
+import './styles/DogWalkersSearchPage.css';
 
 const DogWalkersSearchPage = () => {
   // State to store dog walker profiles
