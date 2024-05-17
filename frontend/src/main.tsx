@@ -42,9 +42,9 @@ import { BrowserRouter as Router } from 'react-router-dom'; // Import BrowserRou
 import WindowSetter from './WindowSetter.tsx';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <Router>
     <React.StrictMode>
-      <WindowSetter />
+        <Router>
+            <WindowSetter />
+        </Router>
     </React.StrictMode>
-  </Router>,
 );
