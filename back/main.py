@@ -37,12 +37,10 @@ def get_collction_from_db(collection_name):
 
 
 class User(BaseModel):
-    id: int
+    id: str
     username: str
     email: str
-    address: str
-    city: str
-    region: str
+    coordinates: list[float]
     phone_number: int
 
     class Config:
@@ -50,8 +48,7 @@ class User(BaseModel):
 
     @abstractmethod
     def save_user(self):
-        return {'_id': self.id, 'username': self.username, 'email': self.email, 'address': self.address,
-                'city': self.city, 'region': self.region, 'phone_number': self.phone_number}
+        return {'_id': self.id, 'username': self.username, 'email': self.email, 'coordinates' :self.coordinates, 'phone_number': self.phone_number}
 
 
 class Dog(BaseModel):
@@ -73,12 +70,6 @@ class Dog(BaseModel):
         if self.weight <= 25:
             return 'medium'
         return 'big'
-
-    # @field_validator("name")
-    # def dog_name_must_not_be_empty(cls, v):
-    #     if not v.strip():
-    #         raise ValueError("dog name cannot be empty")
-    #     return v
 
     def save_user(self):
         # check if owner_id exists in dog_owner collection
@@ -172,7 +163,7 @@ async def create_dog(form_data: DogCustomForm):
     return {"message": f"Hello {dog.name}, your data is: {dog_data}"}
 
 
-@app.post("/get_dog_walkers/")
+@app.get("/get_dog_walkers/")
 async def get_dog_walkers(name: str = None, location: str = None, min_experience: float = None):
     key, value = None, None
     if name:
@@ -195,6 +186,8 @@ async def get_dog_walkers(name: str = None, location: str = None, min_experience
     walkers = list(collection.find(filter_by))
     cluster.close()
     return walkers
+
+#def __get_people_nearby(coordinates):
 
 
 
