@@ -8,6 +8,7 @@ from typing import Dict, Optional
 from pymongo import MongoClient
 from abc import abstractmethod
 from fastapi.middleware.cors import CORSMiddleware
+import bcrypt
 
 app = FastAPI()
 users = []
@@ -141,6 +142,11 @@ class UserCustomForm(BaseModel):
 async def create_user(form_data: UserCustomForm):
     user_type = form_data.user_type.lower()
     user_data = form_data.user_data
+
+    # Hash the password before saving
+    user_data["password"] = bcrypt.hashpw(user_data["password"].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+    # Determine the user type and create the appropriate user object
     if user_type == 'owner':
         user = DogOwner(**user_data)
     elif user_type == 'walker':
@@ -148,8 +154,44 @@ async def create_user(form_data: UserCustomForm):
     else:
         raise HTTPException(status_code=400, detail="Invalid user type. Please specify 'owner' or 'walker'.")
 
-    users.append(user)
+    # Connect to the MongoDB collection
+    collection, client = get_collection_from_db("USERS")
+
+    # Check if the email already exists in the database
+    existing_user = collection.find_one({"email": user.email})
+    if existing_user:
+        client.close()
+        raise HTTPException(status_code=400, detail="Email already exists. Please sign in.")
+
+    # Insert the new user into the database
+    try:
+        collection.insert_one(user.dict())
+    except errors.DuplicateKeyError:
+        client.close()
+        raise HTTPException(status_code=400, detail="Please try in.")
+
+    client.close()
     return {"message": f"Hello {user.username}, your data is: {user.dict()}"}
+
+
+@app.post("/sign_in/")
+async def sign_in(email: str, password: str):
+    # Connect to the MongoDB collection
+    collection, client = get_collection_from_db("USERS")
+
+    # Find the user by email
+    user = collection.find_one({"email": email})
+    if not user:
+        client.close()
+        raise HTTPException(status_code=400, detail="Invalid email or password.")
+
+    # Verify the password
+    if not bcrypt.checkpw(password.encode('utf-8'), user["password"].encode('utf-8')):
+        client.close()
+        raise HTTPException(status_code=400, detail="Invalid email or password.")
+
+    client.close()
+    return {"message": f"Welcome back, {user['username']}!"}
 
 
 class DogCustomForm(BaseModel):
@@ -165,25 +207,57 @@ async def create_dog(form_data: DogCustomForm):
 
 
 @app.get("/get_dog_walkers/")
-async def get_dog_walkers(name: str = None, location: str = None, min_experience: float = None):
-    key, value = None, None
-    if name:
-        key = 'name'
-        # if the string is partially match regardless of case then it will return it means not full match only
-        pattern = re.compile(name, re.IGNORECASE)
-        value = {"$regex": pattern}
-    elif location:
-        key = 'address'
-        # if the string is partially match regardless of case then it will return it means not full match only
-        pattern = re.compile(location, re.IGNORECASE)
-        value = {"$regex": pattern}
-    elif min_experience:
-        key = 'years_of_experience'
-        value = {"$gte": min_experience}  # return all dog_walkers that has min experience and above
-    filter_by = {} if key is None else {key: value}
+async def get_dog_walkers(
+        name: str = None,
+        location_radius_km: float = None,
+        #take the coordinates from the DB
+        coordinates: list[float] = None,
+        min_experience: float = None,
+        min_price: float = None,
+        max_price: float = None,
+        min_age: int = None,
+        max_age: int = None
+):
+    # Initialize an empty dictionary to hold the filters
+    filter_by = {}
 
-    # check if owner_id exists in dog_owner collection
-    collection, cluster = get_collection_from_db(DOG_WALKER)
+    # Filter by name using a case-insensitive regex pattern
+    if name:
+        pattern = re.compile(name, re.IGNORECASE)
+        filter_by['name'] = {"$regex": pattern}
+
+    # Filter by location within a certain radius using geospatial queries
+    if coordinates and location_radius_km:
+        filter_by['coordinates'] = {
+            "$geoWithin": {
+                "$centerSphere": [coordinates, location_radius_km / 6378.1]  # Convert radius to radians
+            }
+        }
+
+    # Filter by minimum years of experience
+    if min_experience:
+        filter_by['years_of_experience'] = {"$gte": min_experience}
+
+    # Filter by price range
+    if min_price or max_price:
+        price_filter = {}
+        if min_price:
+            price_filter["$gte"] = min_price
+        if max_price:
+            price_filter["$lte"] = max_price
+        filter_by['price'] = price_filter
+
+    # Filter by age range
+    if min_age or max_age:
+        age_filter = {}
+        if min_age:
+            age_filter["$gte"] = min_age
+        if max_age:
+            age_filter["$lte"] = max_age
+        filter_by['age'] = age_filter
+
+    # Query the database with the combined filters and return the results
+    collection, cluster = get_collection_from_db("DOG_WALKER")
     walkers = list(collection.find(filter_by))
     cluster.close()
     return walkers
@@ -191,6 +265,6 @@ async def get_dog_walkers(name: str = None, location: str = None, min_experience
 
 # def __get_people_nearby(coordinates):
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     uvicorn.run("main:app", host="localhost", port=8000, reload=True, log_level="info")
     webbrowser.open("http://localhost:8000")
