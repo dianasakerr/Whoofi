@@ -17,7 +17,9 @@ DOG_OWNER = 'dog_owner'
 DOG_WALKER = 'dog_walker'
 DOG = 'dog'
 
-origins = ["http://localhost", "http://localhost:5173"]
+origins = ["http://localhost:5173",
+           "http://localhost:5173/signup",
+           "http://localhost:5173/Login"]
 
 # Add CORS middleware to your FastAPI application
 app.add_middleware(
@@ -28,7 +30,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
+ 
 def get_collection_from_db(collection_name):
     # Create a new client and connect to the server
     cluster = MongoClient(CONN_STR)
@@ -191,6 +193,6 @@ async def get_dog_walkers(name: str = None, location: str = None, min_experience
 
 # def __get_people_nearby(coordinates):
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     uvicorn.run("main:app", host="localhost", port=8000, reload=True, log_level="info")
     webbrowser.open("http://localhost:8000")
