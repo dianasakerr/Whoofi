@@ -53,7 +53,6 @@ const handleBackToSetLocation = () => {
         body: JSON.stringify({
             user_type: accountType, // Make sure this is directly under the root of the JSON body
             user_data: accountType === 'owner' ? {
-              id: uuidv4(),
               username: name,
               email: email,
               password: password,
@@ -64,7 +63,6 @@ const handleBackToSetLocation = () => {
               phone_number: -1,
               dogs: ['dog1','dog2']
             } : {
-              id: uuidv4(),
               username: name,
               email: email,
               password: password,
