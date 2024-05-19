@@ -69,7 +69,7 @@ body {
 }
 
 .login-btn:hover {
-    *background-color: var(--maroon);
+    background-color: var(--maroon);
 }
 @media only screen and (max-width: 2600px) {
     .login-container {

@@ -29,12 +29,7 @@ function SignupProccess() {
     setAccountType("");
   };
 
-  const handleBackToPassword = () => {
-    setPassword("");
-  };
-
   const handleBackToSetPassword = () => {
-  // Reset the password state
   setPassword("");
 };
 
@@ -50,7 +45,7 @@ const handleBackToSetLocation = () => {
 
 
   const onSubmit = async () => {
-    fetch('http://localhost:8000/create_user/', {
+    fetch(import.meta.env.VITE_API_URL + 'create_user/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -78,11 +73,10 @@ const handleBackToSetLocation = () => {
               city: "undefined",
               region: "undefined",
               phone_number: -1,
-              hourly_rate: 35.2,
+              hourly_rate: -1,
               years_of_experience: 3,
               age: "17"
             }
-
         })
     }).then(res => {
         if (res.ok) {
@@ -116,7 +110,9 @@ const handleBackToSetLocation = () => {
      onBack={handleBackToAccountType} />
     }
 
-    { email !== "" && password === "" && <SetPassword setPassword={setPassword} onBack={handleBackToEmail} />}
+    { email !== "" && 
+    password === "" &&
+    <SetPassword setPassword={setPassword} onBack={handleBackToEmail} />}
 
 
     {
@@ -133,6 +129,7 @@ const handleBackToSetLocation = () => {
       name !== "" &&
       !location &&
       <SetLocation setFinalLocation={setLocation}
+     setFinalAddress={setAddress}
       onBack={handleBackToSetName} />
     }
 

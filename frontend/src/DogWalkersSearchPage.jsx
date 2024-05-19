@@ -18,7 +18,7 @@ const DogWalkersSearchPage = () => {
 
   // fetch dog walkers from API
   useEffect(() => {
-    fetch('http://localhost:8000/get_dog_walkers/' + new URLSearchParams({
+    fetch(import.meta.env.VITE_API_URL + 'get_dog_walkers/' + new URLSearchParams({
       distance: distanceFilter,
       small: sizeFilter.small,
       mid: sizeFilter.mid,
