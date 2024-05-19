@@ -1,12 +1,13 @@
-import React from 'react';
+import Login from "./Login"
 
-const HomePage: React.FC = () => {
+const HomePage = () => {
   return (
     <div className="home-page">
       <h1>Welcome to the Home Page!</h1>
-      {/* Add your content here */}
+      <div></div>
+      <Login/>
     </div>
-  );
-};
+  )
+}
 
-export default HomePage;
+export default HomePage

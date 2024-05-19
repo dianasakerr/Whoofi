@@ -1,17 +1,13 @@
-import { useRef, useState } from 'react'
-import { Redirect } from 'react-router-dom';
-import BackButton from './BackButton';
-import { useHistory } from 'react-router-dom';
+import { useRef } from 'react'
 
 interface Props {
-    setEmail: (email: string | undefined) => void
+    setEmail: (email: string) => void
     onBack: () => void;
 }
 
 const EnterEmail = ({setEmail,onBack}: Props) => {
 
     const emailRef = useRef<HTMLInputElement>(null)
-    // const history = useHistory();
 
     const handleNext = () => {
       if (emailRef.current?.value !== undefined) {
