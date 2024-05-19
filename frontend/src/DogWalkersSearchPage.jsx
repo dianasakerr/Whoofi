@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import DogWalkerProfile from './DogWalkerProfile';
-import './styles/styles.css';
+import './styles/DogWalkersSearchPage.css';
 
 const DogWalkersSearchPage = () => {
   // State to store dog walker profiles
@@ -18,7 +18,7 @@ const DogWalkersSearchPage = () => {
 
   // fetch dog walkers from API
   useEffect(() => {
-    fetch('http://localhost:8000/get_dog_walkers/' + new URLSearchParams({
+    fetch(import.meta.env.VITE_API_URL + 'get_dog_walkers/' + new URLSearchParams({
       distance: distanceFilter,
       small: sizeFilter.small,
       mid: sizeFilter.mid,
