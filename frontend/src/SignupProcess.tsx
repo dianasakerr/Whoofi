@@ -89,7 +89,8 @@ function SignupProccess() {
               username: name,
               email: email,
               password: password,
-              address: JSON.stringify(location),
+              address: address,
+              location: JSON.stringify(location),
               city: "undefined",
               region: "undefined",
               phone_number: -1,
@@ -113,8 +114,6 @@ function SignupProccess() {
         console.error("my error log:", err);
     });
 }
-
-
 
   return (
     <div className='signup-container'>
