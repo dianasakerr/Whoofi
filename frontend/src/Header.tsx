@@ -10,7 +10,7 @@ const Header = () => {
       <nav className="navbar">
         <ul className="nav-list">
           <li><Link to="/profile" className="nav-link">My Profile</Link></li>
-          <li><Link to="/signup" className="nav-link">SignUp</Link></li>
+          <li><Link to="/Login" className="nav-link">Login</Link></li>
           <li><Link to="/" className="nav-link">Home Page</Link></li>
           <li><Link to="/search" className="nav-link">Look for a Dog Walker</Link></li>
           <li><a href="#" className="nav-link" onClick={() => { /* Handle Exit */ }}>Exit</a></li>

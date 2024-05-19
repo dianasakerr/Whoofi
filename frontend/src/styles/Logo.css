@@ -2,7 +2,7 @@
 :root {
     --dusty-rose: #D8B1A0;
     --offwhite: #f9f3b9;
-    --maroon: #854B50;
+    --maroon: #fff;
     --desert-sun: #BB8A50;
 }
 
@@ -12,7 +12,7 @@ body {
 }
 .logo-container {
   position: fixed;
-  top: 13px;
+  top: 7px;
   left: 15px;
 }
 

@@ -1,5 +1,11 @@
+:root {
+    --dusty-rose: #D8B1A0;
+    --offwhite: #f9f3b9;
+    --maroon: #fff;
+    --desert-sun: #BB8A50;
+}
 .header {
-    background-color: brown;
+    background-color: mediumseagreen;
     padding: 10px 20px;
     color: white;
 }

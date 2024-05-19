@@ -1,137 +1,59 @@
-/* Color Palette */
-:root {
-    --dusty-rose: #D8B1A0;
-    --offwhite: #f9f3b9;
-    --maroon: #854B50;
-    --desert-sun: #BB8A50;
-}
+/* DogWalkersSearchPage.css */
 
-/* Fonts */
-body {
-    font-family: 'Neucha', sans-serif;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    /*align-items: center;*/
-    /*min-height: 0vh;*/
-}
-
-.container {
-    /*display: flex;*/
-    /*justify-content: center;*/
-    /*align-items: center;*/
-    /*min-height: 100vh;*/
-    /*background-color: var(--dusty-rose);*/
+.container1 {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
 .dog-walker-list {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr); /* 3 columns with equal width */
-    gap: 1rem;
-}
-
-@media all and (min-width: 769px) {
-    .dog-walker-list {
-        grid-template-columns: repeat(5, 1fr); /* 5 columns with equal width */
-    }
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
 }
 
 .dog-walker-card {
-    background-color: var(--offwhite);
-    border-radius: 8px;
-    padding: 2vh;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 20px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
 }
 
-.search-options {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
-    font-family: 'Neucha', sans-serif;
-}
-
-.search-bar {
-    width: 300px;
-    height: 40px;
-    padding: 8px 12px;
-    border-radius: 4px;
-    border: 1px solid var(--desert-sun);
-    font-size: 16px;
-    font-family: 'Neucha', sans-serif;
-    margin-right: 10px;
-}
-
-
-.dog-walker-card img {
-    width: 100%;
-    max-width: 4vw;
-    height: auto;
-    border-radius: 8px;
-    margin-bottom: 10px;
+.dog-walker-card:hover {
+  transform: translateY(-5px);
 }
 
 .details {
-    text-align: center;
+  text-align: center;
 }
 
 .details h2 {
-    font-size: 1.2rem;
-    margin-bottom: 5px;
+  margin-bottom: 5px;
+  color: #333;
 }
 
 .details p {
-    font-size: 1rem;
-    color: #666;
+  margin-bottom: 10px;
+  color: #666;
 }
 
-h1 {
-    font-size: 3rem;
-    color: var(--maroon);
-    margin-bottom: 20px;
-    text-align: center;
+.experience {
+  display: flex;
+  align-items: center;
 }
 
-h2 {
-    font-family: 'Neucha', sans-serif;
-}
-
-.search-criteria {
-    height: 40px;
-    font-size: 16px;
-    font-family: 'Neucha', sans-serif;
+.experience p {
+  margin-right: 5px;
+  font-weight: bold;
 }
 
 .paw-container {
-    display: flex;
-    width: 30px;
-    height: 30px;
+  display: flex;
 }
 
 .paw-img {
-    width: 30px;
-    height: 30px;
-    margin-right: 5px;
-}
-
-.login-btn {
-    margin-top: 1vw;
-    border-radius: 10px;
-    width: 10vw;
-    height: max(3vw, 30px); /* Adjust height */
-    text-align: center;
-    font-family: 'Neucha', sans-serif;;
-    background-color: var(--desert-sun); /* Green background color */
-    border: 10px;
-    color: var(--offwhite); /* White text color */
-    padding: 1px 2px; /* Padding */ /* Center text */
-    text-decoration: none; /* Remove underline */
-    display: inline-block;
-    font-size: 20px; /* Font size */
-    cursor: pointer; /* Cursor on hover */
-    transition-duration: 0.4s; /* Transition duration */
-}
-
-.login-btn:hover {
-    background-color: var(--maroon); /* Darker green on hover */
+  width: 20px;
+  height: auto;
+  margin-right: 3px;
 }

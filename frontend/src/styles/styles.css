@@ -16,6 +16,7 @@ body {
     background-color: var(--dusty-rose);
     height: 100vh;
     width: 100vw;
+    margin: 0;
 }
 
 .background-image-container {
@@ -42,7 +43,7 @@ body {
 }
 
 .login-center {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 .login-input {

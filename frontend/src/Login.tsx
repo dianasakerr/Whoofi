@@ -1,25 +1,21 @@
 import { useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import "./styles/login.css";
-import { Link } from "react-router-dom";
 
-interface Props {
-  onGoToSignup: () => void;
-  onSuccessfulLogin: () => void;
-}
-
-const Login = ({ onGoToSignup, onSuccessfulLogin }: Props) => {
+const Login = () => {
   const email = useRef<HTMLInputElement>(null);
   const [password, setPassword] = useState<string>("");
+  const navigate = useNavigate();
 
-  const handleSignup = (event: React.FormEvent) => {
+  const handleLogin = (event: React.FormEvent) => {
     event.preventDefault();
 
-    // replace console logs with requests to the server
+    // Replace console logs with requests to the server
     console.log(email.current?.value);
     console.log(password);
 
-    // change according to server request
-    onSuccessfulLogin();
+    // After successful login, navigate to the home page or any other page
+    navigate("/search");
   };
 
   return (
@@ -28,7 +24,7 @@ const Login = ({ onGoToSignup, onSuccessfulLogin }: Props) => {
         <div className="login-container">
           <div className="login-center">
             <h2>Log in</h2>
-            <form onSubmit={handleSignup}>
+            <form onSubmit={handleLogin}>
               <input
                 className="login-input"
                 type="text"
@@ -53,7 +49,7 @@ const Login = ({ onGoToSignup, onSuccessfulLogin }: Props) => {
             </form>
             <button
               className="login-btn"
-              onClick={onGoToSignup}
+              onClick={() => navigate("/signup")}
             >
               Sign up
             </button>

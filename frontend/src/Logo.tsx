@@ -6,7 +6,7 @@ import logo from "../public/logosAndIcons/dogPaw.svg";
 const Logo = () => {
   return (
     <div className="logo-container">
-    <Link to="./HomePage"> {/*change to the right link*/}
+    <Link to="/"> {/*change to the right link*/}
       <img src={logo} alt="Logo" className="logo-img" />
     </Link>
     </div>

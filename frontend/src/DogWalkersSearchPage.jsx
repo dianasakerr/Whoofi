@@ -42,7 +42,7 @@ const DogWalkersSearchPage = () => {
     <>
     {currentDogWalker && <DogWalkerProfile dogWalker={currentDogWalker} setCurrentDogWalker={setCurrentDogWalker}/>}
     {!currentDogWalker && 
-    <div className="container">
+    <div className="container1">
       <h1>Dog Walkers Search</h1>
       
       <div className="dog-walker-list">
