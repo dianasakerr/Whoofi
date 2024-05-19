@@ -6,7 +6,7 @@ import axios from 'axios';
 
 
 
-const SetLocation = ({setFinalLocation,setFinalAddress}) => {
+const SetLocation = ({setFinalLocation,setFinalAddress, onBack}) => {
     const [address, setAddress] = useState("");
     const [error, setError] = useState(null);
     const [showMap, setShowMap] = useState(false);
@@ -51,6 +51,8 @@ const SetLocation = ({setFinalLocation,setFinalAddress}) => {
     <>
     <button onClick={getLocation}>get my location</button>
     <button onClick={() => setShowMap(!showMap)}>enter location manualy</button>
+    <button onClick={onBack}>back</button>
+
     { showMap &&
     <>
     <LocationInputMap setFinalLocation={setLocation}/>

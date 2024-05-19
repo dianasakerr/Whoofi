@@ -2,9 +2,10 @@ import { useRef } from 'react'
 
 interface Props {
     setEmail: (email: string) => void
+    onBack: () => void;
 }
 
-const EnterEmail = ({setEmail}: Props) => {
+const EnterEmail = ({setEmail,onBack}: Props) => {
 
     const emailRef = useRef<HTMLInputElement>(null)
 
@@ -15,12 +16,13 @@ const EnterEmail = ({setEmail}: Props) => {
       }
     }
 
-  return (
+    return (
     <>
     <label>what's your email?
         <input type='text' placeholder='Enter email' ref={emailRef}></input>
     </label>
-    <button onClick={handleNext}>next</button>
+    <button onClick={handleNext}>Next</button>
+    <button onClick={onBack}>Back</button>
     </>
   )
 }

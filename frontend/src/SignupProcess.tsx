@@ -15,16 +15,37 @@ interface Location {
 
 function SignupProccess() {
   const [name,setName] = useState<string>("");
-  const [accountType, setAcountType] = useState<string>("");
+  const [accountType, setAccountType] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [address, setAddress] = useState<string>("");
   const [location, setLocation] = useState<Location | null>(null);
 
-  
+  const handleBackToEmail = () => {
+    setEmail("");
+  };
+
+  const handleBackToAccountType = () => {
+    setAccountType("");
+  };
+
+  const handleBackToSetPassword = () => {
+  setPassword("");
+};
+
+const handleBackToSetName = () => {
+  // Reset the name state
+  setName("");
+};
+
+const handleBackToSetLocation = () => {
+  // Reset the location state
+  setLocation(null);
+};
+
 
   const onSubmit = async () => {
-    fetch('http://localhost:8000/create_user/', {
+    fetch(import.meta.env.VITE_API_URL + 'create_user/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -52,11 +73,10 @@ function SignupProccess() {
               city: "undefined",
               region: "undefined",
               phone_number: -1,
-              hourly_rate: 35.2,
+              hourly_rate: -1,
               years_of_experience: 3,
               age: "17"
             }
-
         })
     }).then(res => {
         if (res.ok) {
@@ -79,26 +99,28 @@ function SignupProccess() {
     
     {
       (accountType === "") &&
-      <ChooseAccountType setAccountType={setAcountType}/>
+      <ChooseAccountType setAccountType={setAccountType}/>
     }
     
 
     { 
       accountType !== "" &&
       email === "" &&
-     <EnterEmail setEmail={setEmail}/>
+     <EnterEmail setEmail={setEmail}
+     onBack={handleBackToAccountType} />
     }
 
-    { email !== "" &&
-      password === "" &&
-      <SetPassword setPassword={setPassword}/>
-    }
+    { email !== "" && 
+    password === "" &&
+    <SetPassword setPassword={setPassword} onBack={handleBackToEmail} />}
+
 
     {
       email !== "" &&
       password !== "" &&
       name === "" &&
-      <SetName setName={setName}/>
+      <SetName setName={setName}
+      onBack={handleBackToSetPassword} />
     }
 
     {
@@ -106,14 +128,16 @@ function SignupProccess() {
       password !== "" &&
       name !== "" &&
       !location &&
-      <SetLocation setFinalLocation={setLocation} setFinalAddress={setAddress}/>
+      <SetLocation setFinalLocation={setLocation}
+     setFinalAddress={setAddress}
+      onBack={handleBackToSetName} />
     }
 
     { email !== "" &&
     password !== "" &&
     name !== "" && 
     location && 
-    <SubmitPage name={name} email={email} onSubmit={onSubmit} setEmail={setEmail} setName={setName}/>}
+    <SubmitPage name={name} email={email} onSubmit={onSubmit} setEmail={setEmail} setName={setName} onBack={handleBackToSetLocation}/>}
     </div>
   )
 }
