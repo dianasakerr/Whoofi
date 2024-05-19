@@ -1,40 +1,23 @@
-import { useState } from 'react';
-import Login from './Login'
-import SignupProccess from './SignupProcess';
-import DogWalkersSearchPage from './DogWalkersSearchPage'
+import { Route, Routes } from "react-router-dom";
+import HomePage from './HomePage'; // Import the home page component
+import Login from './Login';
+import SignupProcess from './SignupProcess';
+import DogWalkersSearchPage from './DogWalkersSearchPage';
 import Header from './Header';
+import OpeningPage from './OpeningPage';
 
 const WindowSetter = () => {
-    const [backgroundClass,setBackgroundClass] = useState<string>('background-image-container');
-    const [currentWindow, setCurrentWindow] = useState<string>("Login");
+  return (
+    <div>
+      <Header />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignupProcess />} />
+        <Route path="/search" element={<DogWalkersSearchPage />} />
+      </Routes>
+    </div>
+  );
+};
 
-    const onGoToSignup = () => {
-        setCurrentWindow("Signup");
-        setBackgroundClass(backgroundClass + ' animate');
-    }
-
-    const onSuccessfulLogin = () => {
-        setCurrentWindow("Scroller");
-        setBackgroundClass(backgroundClass + ' animate');
-    }
-
-    const onSuccessfulSignup = () => {
-        setCurrentWindow('Scroller');
-    }
-    
-    return (
-        <>
-        <Header/>
-        <div className="background-container">
-        <div className={backgroundClass}>
-        {currentWindow === 'Login' && <Login onGoToSignup={onGoToSignup} onSuccessfulLogin={onSuccessfulLogin}/>}
-        </div>
-        {currentWindow === 'Signup' && <SignupProccess onSuccessfulSignup={onSuccessfulSignup}/>}
-        {currentWindow === 'Scroller' && <DogWalkersSearchPage/>}
-        </div>
-        </>
-    )
-
-}
-
-export default WindowSetter
+export default WindowSetter;

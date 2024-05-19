@@ -1,93 +1,82 @@
-
-.container {
-    margin: 2vw;
-    text-align: center; 
-    align-items: center; 
-  }
-  
-  .dog-walker-list {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 columns with equal width */
-    gap: 1rem;
-  }
-
-@media all and (min-width: 769) {
-  .dog-walker-list {
-    grid-template-columns: repeat(5, 1fr); /* 3 columns with equal width */
-  }
+/* Color Palette */
+:root {
+    --dusty-rose: #D8B1A0;
+    --offwhite: #f3c7a5;
+    --maroon: #854B50;
+    --desert-sun: #BB8A50;
 }
-  
-  .dog-walker-card {
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    padding: 2vh;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .search-options {
+
+/* Fonts */
+body {
+    font-family: 'Myriad Regular', sans-serif;
+}
+
+.background-container {
     display: flex;
-    align-items: center; 
-    margin-bottom: 20px; 
-  }
-
-  .search-bar {
-  width: 300px; 
-  height: 40px; 
-  padding: 8px 12px; 
-  border-radius: 4px;
+    background-color: var(--dusty-rose);
+    height: 100vh;
+    width: 100vw;
 }
-  
-  .dog-walker-card img {
-    width: 100%;
-    max-width: 4vw; 
-    height: auto; 
-    border-radius: 8px;
-    margin-bottom: 10px;
-  }
-  
-  .details {
+
+.background-image-container {
+    background-image: url('your-background-image.jpg'); /* Add your background image here */
+    background-size: cover;
+    background-position: center;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-container {
+    background-color: var(--offwhite);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    padding: 20px;
+    border-radius: 10px;
     text-align: center;
-  }
-  
-  .details h2 {
-    font-size: 1.2rem;
-    margin-bottom: 5px;
-  }
-  
-  .details p {
-    font-size: 1rem;
-    color: #666;
-  }
-  h1 {
-    font-size: 3rem; 
-    color: #333; 
-    margin-bottom: 20px; 
-    text-align: center; 
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
 
-  }
+.login-center {
+    margin-bottom: 20px;
+}
 
-.search-bar {
-    width: 300px; 
-    height: 40px; 
-    padding: 8px 12px; 
-    border: 1px solid #ccc; 
-    border-radius: 4px; 
-    font-size: 16px; 
-    margin-right: 10px; 
+.login-input {
+    border: 1px solid var(--maroon);
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 250px;
+    box-sizing: border-box;
+}
+
+.login-input:focus {
+    outline: none;
+}
+
+.login-btn {
+    background-color: var(--desert-sun);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.login-btn:hover {
+    background-color: var(--maroon);
+}
+
+/* Media Queries */
+@media only screen and (max-width: 600px) {
+  .login-container {
+    width: 90%;
+    max-width: none;
   }
-  
-  .search-criteria {
-    height: 40px; 
-    font-size: 16px; 
-  }
-  .paw-container {
-    display: flex; 
-    width: 30px; 
-    height: 30px;
-  }
-  
-  .paw-img {
-    width: 30px; 
-    height: 30px; 
-    margin-right: 5px; 
-  }
+}
