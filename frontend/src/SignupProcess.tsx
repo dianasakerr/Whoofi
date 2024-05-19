@@ -21,49 +21,33 @@ function SignupProccess() {
   const [address, setAddress] = useState<string>("");
   const [location, setLocation] = useState<Location | null>(null);
 
-// <<<<<<< HEAD
-//   const handleBackToEmail = () => {
-//     setEmail("");
-//   };
-//
-//   const handleBackToAccountType = () => {
-//     setAccountType("");
-//   };
-//
-//   const handleBackToPassword = () => {
-//     setPassword("");
-//   };
-//
-//   const handleBackToSetPassword = () => {
-//   // Reset the password state
-//   setPassword("");
-// };
-//
-// const handleBackToSetName = () => {
-//   // Reset the name state
-//   setName("");
-// };
-//
-// const handleBackToSetLocation = () => {
-//   // Reset the location state
-//   setLocation(null);
-// };
-//
-//
-//   const onSubmit = async () => {
-//     const newUserData = {
-//         id: -1,
-//         username: name,
-//         email: email,
-//         password: password,
-//         address: JSON.stringify(location),
-//         city: "undefined",
-//         region: "undefined",
-//         phone_number: -1,
-//         dogs: ['dog1','dog2']
-//     }
-// =======
-//
+  const handleBackToEmail = () => {
+    setEmail("");
+  };
+
+  const handleBackToAccountType = () => {
+    setAccountType("");
+  };
+
+  const handleBackToPassword = () => {
+    setPassword("");
+  };
+
+  const handleBackToSetPassword = () => {
+  // Reset the password state
+  setPassword("");
+};
+
+const handleBackToSetName = () => {
+  // Reset the name state
+  setName("");
+};
+
+const handleBackToSetLocation = () => {
+  // Reset the location state
+  setLocation(null);
+};
+
 
   const onSubmit = async () => {
     fetch('http://localhost:8000/create_user/', {
