@@ -4,8 +4,6 @@ import 'leaflet-control-geocoder';
 import LocationInputMap from './LocationInputMap';
 import axios from 'axios';
 
-
-
 const SetLocation = ({setFinalLocation,setFinalAddress, onBack}) => {
     const [address, setAddress] = useState("");
     const [error, setError] = useState(null);
@@ -18,8 +16,7 @@ const SetLocation = ({setFinalLocation,setFinalAddress, onBack}) => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
               (position) => {
-                setLocation({lat: position.coords.latitude, lng: position.coords.longitude});
-                console.log(location);
+                setLocation([position.coords.latitude, position.coords.longitude]);
               },
               (error) => {
                 setError(error.message);
@@ -43,7 +40,7 @@ const SetLocation = ({setFinalLocation,setFinalAddress, onBack}) => {
       
     useEffect(() => {
       if (location) {
-      reverseGeocode(location.lat,location.lng);
+      reverseGeocode(location[0],location[1]);
     }
     },[location])
 
@@ -60,7 +57,7 @@ const SetLocation = ({setFinalLocation,setFinalAddress, onBack}) => {
     }
     {location && 
     <>
-    <h3>lat: {location.lat.toFixed(4)} long: {location.lng.toFixed(4)} </h3>
+    <h3>lat: {location[0].toFixed(4)} long: {location[0].toFixed(4)} </h3>
     <button onClick={() => {setFinalLocation(location); setFinalAddress(address);}}>Confirm location</button>
     </>
     }

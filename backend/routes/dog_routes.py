@@ -1,6 +1,6 @@
 # routes/dog_routes.py
 from fastapi import APIRouter, HTTPException
-from backend.models.dog import Dog
+from models.dog import Dog
 from pydantic import BaseModel
 from typing import Dict
 

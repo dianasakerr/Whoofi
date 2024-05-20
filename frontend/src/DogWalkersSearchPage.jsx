@@ -17,9 +17,9 @@ const DogWalkersSearchPage = () => {
 
 
   // fetch dog walkers from API
-  useEffect(() => {
-    fetch(import.meta.env.VITE_API_URL + 'get_dog_walkers/' + new URLSearchParams({
-      distance: distanceFilter,
+  const handleFilter = () => {
+    fetch(import.meta.env.VITE_API_URL + 'get_dog_walkers/?' + new URLSearchParams({
+      location_radius_km: distanceFilter,
       small: sizeFilter.small,
       mid: sizeFilter.mid,
       big: sizeFilter.big
@@ -34,7 +34,7 @@ const DogWalkersSearchPage = () => {
         console.log('fetched: ', data, "type: " ,typeof(data));
         setDogWalkers(data);
       }).catch(err => console.log(err))
-  },[distanceFilter,sizeFilter]);
+  };
 
   const handleProfileClick = (walker) => {
     setCurrentDogWalker(walker);
@@ -88,7 +88,7 @@ const DogWalkersSearchPage = () => {
         <label>small
           <input type="checkbox" value="small" onChange={handleSizeCheck}></input>
         </label>
-
+      <button onClick={handleFilter}>filter</button>
       </div>
       
       <div className="dog-walker-list">
