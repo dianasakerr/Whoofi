@@ -1,10 +1,10 @@
 # routes/user_routes.py
 from fastapi import APIRouter, HTTPException
-from backend.models.user import DogOwner, DogWalker
+from models.user import DogOwner, DogWalker
 from pydantic import BaseModel, Field
 import bcrypt
 from typing import List
-from backend.database import *
+from database import *
 from pymongo.errors import *
 user_router = APIRouter()
 
@@ -13,6 +13,9 @@ class UserCustomForm(BaseModel):
     user_type: str
     user_data: dict
 
+class SignInReq(BaseModel):
+    email: str
+    password: str
 
 @user_router.post("/create_user/")
 async def create_user(form_data: UserCustomForm):
@@ -35,12 +38,12 @@ async def create_user(form_data: UserCustomForm):
 
 
 @user_router.post("/sign_in/")
-async def sign_in(email: str, password: str):
+async def sign_in(sign_in_data: SignInReq):
 
     def check_if_user_exists(col):
         # Find the user by email
-        user = col.find({"email": email})
-        if user and bcrypt.checkpw(password.encode('utf-8'), user["password"].encode('utf-8')):
+        user = col.find_one({"email": sign_in_data.email})
+        if user and bcrypt.checkpw(sign_in_data.password.encode('utf-8'), user["password"].encode('utf-8')):
             return user
 
     # Connect to the MongoDB collection

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
+import { useNavigate } from 'react-router-dom';
 import ChooseAccountType from './SignupProcessComponents/ChooseAccountType';
 import EnterEmail from './SignupProcessComponents/EnterEmail';
 import SetPassword from './SignupProcessComponents/SetPassword';
@@ -8,10 +8,7 @@ import SubmitPage from './SignupProcessComponents/SubmitPage';
 import SetLocation from './SignupProcessComponents/SetLocation';
 import './styles/SignupProcess.css'
 
-interface Location {
-  lat: number;
-  lng: number;
-}
+
 
 function SignupProccess() {
   const [name,setName] = useState<string>("");
@@ -19,7 +16,9 @@ function SignupProccess() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [address, setAddress] = useState<string>("");
-  const [location, setLocation] = useState<Location | null>(null);
+  const [location, setLocation] = useState<Array<number> | null>(null);
+  const navigate = useNavigate();
+
 
   const handleBackToEmail = () => {
     setEmail("");
@@ -55,29 +54,26 @@ const handleBackToSetLocation = () => {
             user_data: accountType === 'owner' ? {
               username: name,
               email: email,
+              phone_number: "0545356002",
+              coordinates: location,
               password: password,
-              location: JSON.stringify(location),
               address: address,
-              city: "undefined",
-              region: "undefined",
-              phone_number: -1,
-              dogs: ['dog1','dog2']
+              dogs: []
             } : {
               username: name,
               email: email,
               password: password,
+              coordinates: location,
               address: address,
-              location: JSON.stringify(location),
-              city: "undefined",
-              region: "undefined",
-              phone_number: -1,
+              phone_number:  "0545356002",
               hourly_rate: -1,
               years_of_experience: 3,
-              age: "17"
+              age: 17
             }
         })
     }).then(res => {
         if (res.ok) {
+            navigate('/profile');
             console.log("User created successfully");
             return res.json();
         } else {

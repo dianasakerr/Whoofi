@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import "./styles/login.css"
 import { Link } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
 
-  const email = useRef<HTMLInputElement>(null);
+  const [email,setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [loginFailed, setLoginFailed] = useState<boolean>(false);
   const navigate = useNavigate();
@@ -14,18 +14,20 @@ const Login = () => {
   const handleLogin = (event: React.FormEvent) => {
     event.preventDefault();
     console.log({email: email,password:password});
-    fetch(import.meta.env.VITE_API_URL + 'sign_in',{
+    fetch(import.meta.env.VITE_API_URL + 'sign_in/',{
       method: 'POST',
       headers: {
           'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         password: password,
-        email: email.current?.value
+        email: email
       })
   }).then(res => {
     if (res.ok) {
-      localStorage.setItem('token', "placeholder_token"); // work on recieving token from server
+      const token = localStorage.getItem('token');
+
+      localStorage.setItem('token', "placeholder" ); // work on recieving token from server
       navigate('/search');
     }
     else {
@@ -50,7 +52,7 @@ const Login = () => {
             type='text' 
             id="usernameField" 
             placeholder='Email' 
-            ref={email}>
+            onChange={(e) => setEmail(e.target.value)}>
           </input>
         <br/>
         <input 
