@@ -18,7 +18,7 @@ async def get_dog_walkers(name: str = None,
                           max_price: float = None,
                           min_age: float = None
                           ):
-
+    
     dog_walkers_collection, dog_walkers_cluster = get_collection(DOG_WALKER)
 
     filter_by = {}

@@ -12,11 +12,10 @@ const SetLocation = ({setFinalLocation,setFinalAddress, onBack}) => {
 
     // for automatic device location
     const getLocation = () => {
-      console.log()
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
               (position) => {
-                setLocation([position.coords.latitude, position.coords.longitude]);
+                setLocation({lat: position.coords.latitude, lng: position.coords.longitude});
               },
               (error) => {
                 setError(error.message);
@@ -39,31 +38,32 @@ const SetLocation = ({setFinalLocation,setFinalAddress, onBack}) => {
         };
       
     useEffect(() => {
+      getLocation();
+    },[]);
+
+    useEffect(() => {
       if (location) {
-      reverseGeocode(location[0],location[1]);
+      reverseGeocode(location.lat,location.lng);
     }
     },[location])
 
   return (
     <>
-    <button onClick={getLocation}>get my location</button>
     <button onClick={() => setShowMap(!showMap)}>enter location manualy</button>
     <button onClick={onBack}>back</button>
 
     { showMap &&
     <>
-    <LocationInputMap setFinalLocation={setLocation}/>
+    <LocationInputMap setFinalLocation={setLocation} curLocation={location}/>
     </>
     }
     {location && 
     <>
-    <h3>lat: {location[0].toFixed(4)} long: {location[0].toFixed(4)} </h3>
-    <button onClick={() => {setFinalLocation(location); setFinalAddress(address);}}>Confirm location</button>
+      {address && <div>{address}</div>}
+      <button onClick={() => {setFinalLocation(location); setFinalAddress(address);}}>Confirm location</button>
     </>
     }
 
-    {address && <div>{address}</div>
-    }
     </>
 )
 

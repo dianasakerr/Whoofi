@@ -35,7 +35,7 @@ const Header = () => {
             <li><Link to="/profile" className="nav-link">My Profile</Link></li> :
             <li><Link to="/login" className="nav-link">Sign in</Link></li>
           }
-          <li><Link to="/signup" className="nav-link">SignUp</Link></li>
+          <li><Link to="/signup" className="nav-link">Sign Up</Link></li>
           <li><Link to="/" className="nav-link">Home Page</Link></li>
           <li><Link to="/search" className="nav-link">Look for a Dog Walker</Link></li>
           <li><a className="nav-link" onClick={() => {localStorage.removeItem('token'); window.dispatchEvent(new Event('storage'));}}>Exit</a></li>

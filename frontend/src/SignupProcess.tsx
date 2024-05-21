@@ -8,7 +8,10 @@ import SubmitPage from './SignupProcessComponents/SubmitPage';
 import SetLocation from './SignupProcessComponents/SetLocation';
 import './styles/SignupProcess.css'
 
-
+interface Location {
+  lat: number,
+  lng: number
+};
 
 function SignupProccess() {
   const [name,setName] = useState<string>("");
@@ -16,7 +19,7 @@ function SignupProccess() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [address, setAddress] = useState<string>("");
-  const [location, setLocation] = useState<Array<number> | null>(null);
+  const [location, setLocation] = useState<Location | undefined>(undefined);
   const navigate = useNavigate();
 
 
@@ -39,7 +42,7 @@ const handleBackToSetName = () => {
 
 const handleBackToSetLocation = () => {
   // Reset the location state
-  setLocation(null);
+  setLocation(undefined);
 };
 
 
@@ -55,7 +58,7 @@ const handleBackToSetLocation = () => {
               username: name,
               email: email,
               phone_number: "0545356002",
-              coordinates: location,
+              coordinates: [location?.lat,location?.lng],
               password: password,
               address: address,
               dogs: []
@@ -63,7 +66,7 @@ const handleBackToSetLocation = () => {
               username: name,
               email: email,
               password: password,
-              coordinates: location,
+              coordinates: [location?.lat,location?.lng],
               address: address,
               phone_number:  "0545356002",
               hourly_rate: -1,
@@ -74,6 +77,7 @@ const handleBackToSetLocation = () => {
     }).then(res => {
         if (res.ok) {
             localStorage.setItem("token", email);
+            window.dispatchEvent(new Event('storage'));
             navigate('/profile');
             console.log("User created successfully");
             return res.json();
@@ -124,9 +128,11 @@ const handleBackToSetLocation = () => {
       password !== "" &&
       name !== "" &&
       !location &&
-      <SetLocation setFinalLocation={setLocation}
-     setFinalAddress={setAddress}
-      onBack={handleBackToSetName} />
+      <SetLocation 
+      setFinalLocation={setLocation}
+      setFinalAddress={setAddress}
+      onBack={handleBackToSetName}
+      />
     }
 
     { email !== "" &&
