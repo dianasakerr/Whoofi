@@ -20,6 +20,8 @@ frontend/*.ntvs*
 frontend/*.njsproj
 frontend/*.sln
 frontend/*.sw?
+backend/*/__pycache__
 backend/__pycache__
+
 *node_modules
 *env

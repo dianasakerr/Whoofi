@@ -73,6 +73,7 @@ const handleBackToSetLocation = () => {
         })
     }).then(res => {
         if (res.ok) {
+            localStorage.setItem("token", email);
             navigate('/profile');
             console.log("User created successfully");
             return res.json();
@@ -81,6 +82,7 @@ const handleBackToSetLocation = () => {
             return res.text().then(text => { throw new Error(text) });
         }
     }).then(data => {
+        localStorage.setItem("token", email);
         console.log(data);
     }).catch(err => {
         console.error("my error log:", err);
