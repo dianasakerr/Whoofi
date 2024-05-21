@@ -13,12 +13,15 @@ function LocationMarker({ setLocation }) {
   return null;
 }
 
-function LocationInputMap({ setFinalLocation }) {
+function LocationInputMap({ setFinalLocation, curLocation }) {
   const [map, setMap] = useState(null);
   const [location, setLocation] = useState(null);
   const defaultLocation = { lat: 32.077976, lng: 34.774220} // set to TLV's dizingof squere
 
-  
+  useEffect(() => {
+    console.log(curLocation);
+    setLocation(curLocation);
+  },[]);
 
   useEffect(() => {
     if (map && location) {
