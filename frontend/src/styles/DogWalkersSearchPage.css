@@ -17,12 +17,8 @@ body {
     /*min-height: 0vh;*/
 }
 
-.container {
-    /*display: flex;*/
-    /*justify-content: center;*/
-    /*align-items: center;*/
-    /*min-height: 100vh;*/
-    /*background-color: var(--dusty-rose);*/
+.search-filter {
+    text-align: center;
 }
 
 .dog-walker-list {

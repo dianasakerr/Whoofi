@@ -21,8 +21,8 @@ const EnterEmail = ({setEmail,onBack}: Props) => {
     <label>what's your email?
         <input type='text' placeholder='Enter email' ref={emailRef}></input>
     </label>
-    <button onClick={handleNext}>Next</button>
     <button onClick={onBack}>Back</button>
+    <button onClick={handleNext}>Next</button>
     </>
   )
 }
