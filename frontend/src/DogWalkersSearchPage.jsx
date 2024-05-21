@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import DogWalkerProfile from './DogWalkerProfile';
+import dogPaw from './logosAndIcons/dogPaw.svg';
 import './styles/DogWalkersSearchPage.css';
 
 const DogWalkersSearchPage = () => {
@@ -15,14 +16,27 @@ const DogWalkersSearchPage = () => {
     big: true
   });
 
-
+  useEffect(() => {
+    fetch(import.meta.env.VITE_API_URL + 'get_dog_walkers/?')
+    .then(
+      res => {
+        if (!res.ok) {
+          throw new Error('Failed to fetch dogwalkers');
+        }
+        return res.json();
+      }).then(data => {
+        setDogWalkers(data);
+      }).catch(err => console.log(err))
+  },[])
   // fetch dog walkers from API
   const handleFilter = () => {
     fetch(import.meta.env.VITE_API_URL + 'get_dog_walkers/?' + new URLSearchParams({
       location_radius_km: distanceFilter,
       small: sizeFilter.small,
       mid: sizeFilter.mid,
-      big: sizeFilter.big
+      big: sizeFilter.big,
+      latitude: 32.109333,
+      longitude: 34.855434
     })).then(
       res => {
         if (!res.ok) {
@@ -31,7 +45,6 @@ const DogWalkersSearchPage = () => {
 
         return res.json();
       }).then(data => {
-        console.log('fetched: ', data, "type: " ,typeof(data));
         setDogWalkers(data);
       }).catch(err => console.log(err))
   };
@@ -44,7 +57,7 @@ const DogWalkersSearchPage = () => {
     return (
       <div className="paw-container">
         {[...Array(experience)].map((_, index) => (
-          <img key={index} src="./logosAndIcons/dogPaw.svg" alt="Paw" className="paw-img" />
+          <img key={index} src={dogPaw} alt="Paw" className="paw-img" />
         ))}
       </div>
     );
@@ -56,7 +69,6 @@ const DogWalkersSearchPage = () => {
 
   const handleSizeCheck = (event) => {
     const { value, checked } = event.target;
-    console.log(value,checked);
     setSizeFilter((prevCheckboxes) => ({
       ...prevCheckboxes,
       [value]: checked,
@@ -70,7 +82,7 @@ const DogWalkersSearchPage = () => {
     <div className="container">
       <h1>Dog Walkers Search</h1>
 
-      <div>
+      <div className="search-filter">
         <h3>filter search</h3>
         <label> dog walkers in a {distanceFilter}Km radius near your
         <br/>
@@ -88,8 +100,9 @@ const DogWalkersSearchPage = () => {
         <label>small
           <input type="checkbox" value="small" onChange={handleSizeCheck}></input>
         </label>
+        <br/>
       <button onClick={handleFilter}>filter</button>
-      </div>
+    </div>
       
       <div className="dog-walker-list">
         {dogWalkers ? dogWalkers.map(dogWalker => (
