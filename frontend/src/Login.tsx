@@ -25,9 +25,9 @@ const Login = () => {
       })
   }).then(res => {
     if (res.ok) {
-      const token = localStorage.getItem('token');
-
-      localStorage.setItem('token', "placeholder" ); // work on recieving token from server
+      localStorage.setItem("token", email ); // work on recieving token from server
+      window.dispatchEvent(new Event('storage'));
+      console.log("in Login:", localStorage.getItem('token'));
       navigate('/search');
     }
     else {
@@ -64,12 +64,13 @@ const Login = () => {
         </input>
         {loginFailed && <p>email or password incorrect</p>}
         <br/>
-        <input
+        <button
           className="login-btn"
           type="submit" 
           onSubmit={handleLogin} 
           value="Log in">
-        </input>
+            Log in
+        </button>
       </form>
       <Link to="/Signup" className="login-btn">
         Sign up
