@@ -2,14 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="dbb76671-eeb8-4d09-bb81-dc7378b3c81f" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/backend/database.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/models/dog.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/models/user.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/routes/dog_routes.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/routes/user_routes.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/routes/walker_routes.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/utils/constants.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/database.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/models/dog.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/models/dog.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/models/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/models/user.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/routes/dog_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/routes/dog_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/routes/user_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/routes/user_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/routes/walker_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/routes/walker_routes.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,12 +35,12 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Whoofi" />
@@ -96,8 +96,8 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/backend/routes/user_routes.py</url>
-          <line>90</line>
-          <option name="timeStamp" value="17" />
+          <line>81</line>
+          <option name="timeStamp" value="23" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

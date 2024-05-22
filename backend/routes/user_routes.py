@@ -1,10 +1,9 @@
 # routes/user_routes.py
 from fastapi import APIRouter, HTTPException
-from models.user import DogOwner, DogWalker
-from pydantic import BaseModel, Field
+from backend.models.user import DogOwner, DogWalker
+from pydantic import BaseModel
 import bcrypt
-from typing import List
-from database import *
+from backend.database import *
 from pymongo.errors import *
 user_router = APIRouter()
 
@@ -13,9 +12,11 @@ class UserCustomForm(BaseModel):
     user_type: str
     user_data: dict
 
+
 class SignInReq(BaseModel):
     email: str
     password: str
+
 
 @user_router.post("/create_user/")
 async def create_user(form_data: UserCustomForm):
@@ -23,43 +24,47 @@ async def create_user(form_data: UserCustomForm):
     user_data = form_data.user_data
 
     # Hash the password before saving
-    user_data["password"] = bcrypt.hashpw(user_data["password"].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    user_data[PASSWORD] = bcrypt.hashpw(user_data[PASSWORD].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
     # Determine the user type and create the appropriate user object
-    if user_type == 'owner':
+    if user_type == OWNER:
         user = DogOwner(**user_data)
-    elif user_type == 'walker':
+    elif user_type == WALKER:
         user = DogWalker(**user_data)
     else:
         raise HTTPException(status_code=400, detail="Invalid user type. Please specify 'owner' or 'walker'.")
 
-    del user_data["password"]
+    del user_data[PASSWORD]
     return {"message": f"Hello {user.username}, your data is: {user_data}"}
 
 
 @user_router.post("/sign_in/")
 async def sign_in(sign_in_data: SignInReq):
 
-    def check_if_user_exists(col):
-        # Find the user by email
-        user = col.find_one({"email": sign_in_data.email})
-        if user and bcrypt.checkpw(sign_in_data.password.encode('utf-8'), user["password"].encode('utf-8')):
-            return user
+    dog_owner = __get_user(sign_in_data.email, OWNER, password=True)
+    dog_walker = __get_user(sign_in_data.email, WALKER, password=True)
 
-    # Connect to the MongoDB collection
-    dog_walker_collection, dog_walker_cluster = get_collection(DOG_WALKER)
-    dog_owner_collection, dog_owner_cluster = get_collection(DOG_OWNER)
-
-    dog_walker = check_if_user_exists(dog_walker_collection)
-    dog_owner = check_if_user_exists(dog_owner_collection)
-    if dog_owner:
-        print(f"message Welcome back, {dog_owner['username']}!")
+    if dog_owner and bcrypt.checkpw(sign_in_data.password.encode('utf-8'), dog_owner[PASSWORD].encode('utf-8')):
+        print(f"message Welcome back, {dog_owner[USERNAME]}!")
         return True
-    if dog_walker:
-        print(f"message Welcome back, {dog_walker['username']}!")
+    elif dog_walker and bcrypt.checkpw(sign_in_data.password.encode('utf-8'), dog_walker[PASSWORD].encode('utf-8')):
+        print(f"message Welcome back, {dog_walker[USERNAME]}!")
         return True
 
-    raise Exception("Email or Password is incorrect, please try again")
+    return "Email or Password isn`t correct, please try again"
+
+
+@user_router.get("/get_user/")
+def get_user(email: str, user_type: str):
+    return __get_user(email, user_type)
+
+
+def __get_user(email: str, user_type: str, password: bool = False):
+    collection, _ = get_collection_by_user_type(user_type)
+
+    # Find the user by email
+    filters = {ID: False} if password else {ID: False, PASSWORD: False}
+    return collection.find_one({EMAIL: email}, filters)
 
 
 @user_router.put("/edit_user/{email}")
@@ -74,46 +79,35 @@ async def edit_user(email: str,
                     years_of_experience: float = None
                     ):
 
-    def check_if_user_exists(col):
-        # Find the user by email
-        usr = col.find({"email": email})
-        if usr:
-            return usr
-
-    if user_type == 'walker':
-        collection_name = DOG_WALKER
-    elif user_type == 'owner':
-        collection_name = DOG_OWNER
-    else:
-        raise ValueError(f"user type isn`t correct")
-
-    # Connect to the MongoDB collection
-    collection, client = get_collection(collection_name)
-
-    # Find the existing user by email
-    user = check_if_user_exists(collection)
-
+    collection, cluster = get_collection_by_user_type(user_type)
+    # Find the user by email
+    user = collection.find_one({EMAIL: email}, {ID: False, PASSWORD: False})
     if not user:
-        client.close()
+        cluster.close()
         raise HTTPException(status_code=404, detail="User not found")
 
+    if longitude or latitude:
+        longitude = longitude if longitude else user[COORDINATES][0]
+        latitude = latitude if latitude else user[COORDINATES][1]
+        coordinates = [longitude, latitude]
+    else:
+        coordinates = None
+
     # Convert the MongoDB result to a dictionary
-    user_data = list(user)[0]
-    data = {'username': username, 'longitude': longitude, 'latitude': latitude, 'phone_number': phone_number,
-            'age': age, 'hourly_rate': hourly_rate, 'years_of_experience': years_of_experience}
+    data = {USERNAME: username, COORDINATES: coordinates, PHONE_NUMBER: phone_number, AGE: age,
+            HOURLY_RATE: hourly_rate, YEARS_OF_EXPERIENCE: years_of_experience}
     result = {}
     for key, value in data.items():
-        if key in user_data and value:
+        if key in user.keys() and value:
             result[key] = value
 
     # Update the user document in MongoDB
     try:
-        print(f"user_data = {data}")
         if result:
-            collection.update_many({"email": email}, {"$set": result})
+            collection.update_many({EMAIL: email}, {"$set": result})
     except PyMongoError as e:
-        client.close()
+        cluster.close()
         raise HTTPException(status_code=500, detail=f"Database update error: {str(e)}")
 
-    client.close()
-    return {"message": f"User {user_data['username']} updated successfully"}
+    cluster.close()
+    return {"message": f"User {user[USERNAME]} updated successfully"}
