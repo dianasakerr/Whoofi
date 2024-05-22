@@ -1,14 +1,15 @@
 # models/user.py
 from pydantic import BaseModel
 from abc import abstractmethod
-from database import *
+from backend.database import *
 from fastapi import HTTPException
+from backend.utils.constants import *
 
 
 class User(BaseModel):
     username: str
     email: str
-    coordinates: list[float]  # [longitude, latitude]
+    coordinates: list  # [longitude, latitude]
     phone_number: str
     password: str
 
@@ -17,13 +18,13 @@ class User(BaseModel):
 
     @abstractmethod
     def save_user(self):
-        return {'username': self.username, 'email': self.email, 'coordinates': self.coordinates,
-                'phone_number': self.phone_number, 'password': self.password}
+        return {USERNAME: self.username, EMAIL: self.email, COORDINATES: self.coordinates,
+                PHONE_NUMBER: self.phone_number, PASSWORD: self.password}
 
     def check_email_uniqueness(self, collection_name):
         collection, cluster = get_collection(collection_name)
         # Check if the email already exists in the database
-        existing = collection.find_one({"email": self.email})
+        existing = collection.find_one({EMAIL: self.email})
 
         if existing:
             cluster.close()
@@ -32,7 +33,7 @@ class User(BaseModel):
 
 
 class DogOwner(User):
-    dogs: list[str] = []
+    dogs: list = []
 
     def __init__(self, **values):
         super().__init__(**values)
@@ -41,7 +42,7 @@ class DogOwner(User):
     def save_user(self):
         self.check_email_uniqueness(DOG_OWNER)
         data = super().save_user()
-        data['dogs'] = self.dogs
+        data[DOGS] = self.dogs
         collection, cluster = get_collection(DOG_OWNER)
         try:
             # Insert the new user into the database
@@ -64,9 +65,9 @@ class DogWalker(User):
     def save_user(self):
         self.check_email_uniqueness(DOG_WALKER)
         data = super().save_user()
-        data['age'] = self.age
-        data['years_of_experience'] = self.years_of_experience
-        data['hourly_rate'] = self.hourly_rate
+        data[AGE] = self.age
+        data[YEARS_OF_EXPERIENCE] = self.years_of_experience
+        data[HOURLY_RATE] = self.hourly_rate
         collection, cluster = get_collection(DOG_WALKER)
         try:
             # Insert the new user into the database
