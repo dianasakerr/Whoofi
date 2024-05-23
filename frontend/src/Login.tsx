@@ -25,9 +25,9 @@ const Login = () => {
       })
   }).then(res => {
     if (res.ok) {
+      res.json().then((response) => localStorage.setItem('userType',response));
       localStorage.setItem("token", email ); // work on recieving token from server
       window.dispatchEvent(new Event('storage'));
-      console.log("in Login:", localStorage.getItem('token'));
       navigate('/search');
     }
     else {

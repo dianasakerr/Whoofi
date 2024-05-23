@@ -1,6 +1,6 @@
 # routes/walker_routes.py
 from fastapi import APIRouter
-from backend.database import *
+from database import *
 from pymongo import GEOSPHERE
 import re
 from typing import List

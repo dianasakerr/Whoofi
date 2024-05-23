@@ -8,6 +8,7 @@ import SubmitPage from './SignupProcessComponents/SubmitPage';
 import SetLocation from './SignupProcessComponents/SetLocation';
 import './styles/SignupProcess.css'
 
+
 interface Location {
   lat: number,
   lng: number
@@ -76,6 +77,7 @@ const handleBackToSetLocation = () => {
         })
     }).then(res => {
         if (res.ok) {
+            localStorage.setItem('userType',accountType);
             localStorage.setItem("token", email);
             window.dispatchEvent(new Event('storage'));
             navigate('/profile');
