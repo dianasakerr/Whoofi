@@ -1,9 +1,9 @@
 # routes/user_routes.py
 from fastapi import APIRouter, HTTPException
-from backend.models.user import DogOwner, DogWalker
+from models.user import DogOwner, DogWalker
 from pydantic import BaseModel
 import bcrypt
-from backend.database import *
+from database import *
 from pymongo.errors import *
 user_router = APIRouter()
 
@@ -46,10 +46,10 @@ async def sign_in(sign_in_data: SignInReq):
 
     if dog_owner and bcrypt.checkpw(sign_in_data.password.encode('utf-8'), dog_owner[PASSWORD].encode('utf-8')):
         print(f"message Welcome back, {dog_owner[USERNAME]}!")
-        return True
+        return 'owner'
     elif dog_walker and bcrypt.checkpw(sign_in_data.password.encode('utf-8'), dog_walker[PASSWORD].encode('utf-8')):
         print(f"message Welcome back, {dog_walker[USERNAME]}!")
-        return True
+        return 'walker'
 
     return "Email or Password isn`t correct, please try again"
 
@@ -61,7 +61,7 @@ def get_user(email: str, user_type: str):
 
 def __get_user(email: str, user_type: str, password: bool = False):
     collection, _ = get_collection_by_user_type(user_type)
-
+    print(email,user_type)
     # Find the user by email
     filters = {ID: False} if password else {ID: False, PASSWORD: False}
     return collection.find_one({EMAIL: email}, filters)

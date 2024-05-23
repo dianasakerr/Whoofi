@@ -1,9 +1,9 @@
 # models/user.py
 from pydantic import BaseModel
 from abc import abstractmethod
-from backend.database import *
+from database import *
 from fastapi import HTTPException
-from backend.utils.constants import *
+from utils.constants import *
 
 
 class User(BaseModel):

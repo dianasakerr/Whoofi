@@ -28,26 +28,36 @@ const DogWalkersSearchPage = () => {
         setDogWalkers(data);
       }).catch(err => console.log(err))
   },[])
+
   // fetch dog walkers from API
   const handleFilter = () => {
-    fetch(import.meta.env.VITE_API_URL + 'get_dog_walkers/?' + new URLSearchParams({
-      location_radius_km: distanceFilter,
-      small: sizeFilter.small,
-      mid: sizeFilter.mid,
-      big: sizeFilter.big,
-      latitude: 32.109333,
-      longitude: 34.855434
-    })).then(
-      res => {
-        if (!res.ok) {
-          throw new Error('Failed to fetch dogwalkers');
-        }
-
-        return res.json();
-      }).then(data => {
-        setDogWalkers(data);
-      }).catch(err => console.log(err))
-  };
+    console.log(localStorage.getItem('token'),localStorage.getItem('userType'))
+    fetch(import.meta.env.VITE_API_URL + "get_user/?" + new URLSearchParams({
+      email: localStorage.getItem('token'),
+      user_type: localStorage.getItem('userType')
+    })).then(res => {
+      res.json().then((body) => {
+        return body.coordinates;
+      }).then((myCoordinates) => fetch(import.meta.env.VITE_API_URL + 'get_dog_walkers/?' + new URLSearchParams({
+        location_radius_km: distanceFilter,
+        small: sizeFilter.small,
+        mid: sizeFilter.mid,
+        big: sizeFilter.big,
+        longitude: myCoordinates[0],
+        latitude: myCoordinates[1]
+      })).then(
+        res => {
+          if (!res.ok) {
+            throw new Error('Failed to fetch dogwalkers');
+          }
+  
+          return res.json();
+        }).then(data => {
+          setDogWalkers(data);
+        }).catch(err => console.log(err)))
+      }
+    )
+  }
 
   const handleProfileClick = (walker) => {
     setCurrentDogWalker(walker);
