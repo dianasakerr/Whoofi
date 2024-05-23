@@ -61,7 +61,6 @@ def get_user(email: str, user_type: str):
 
 def __get_user(email: str, user_type: str, password: bool = False):
     collection, _ = get_collection_by_user_type(user_type)
-    print(email,user_type)
     # Find the user by email
     filters = {ID: False} if password else {ID: False, PASSWORD: False}
     return collection.find_one({EMAIL: email}, filters)

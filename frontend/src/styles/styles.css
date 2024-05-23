@@ -87,3 +87,7 @@ body {
     margin-right: auto;
     width: 50%;
 }
+
+.details {
+    align-items: center;
+}
