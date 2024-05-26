@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { TextField, Button, Typography, Container, CssBaseline, Alert, Box } from "@mui/material";
+import { TextField, Button , Typography, Container, CssBaseline, Alert, Box } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
 import { Link } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 
@@ -9,11 +10,13 @@ const Login = () => {
   const [email,setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [loginFailed, setLoginFailed] = useState<boolean>(false);
+  const [loading,setLoading] = useState<boolean>(false)
   const navigate = useNavigate();
 
   const handleLogin = (event: React.FormEvent) => {
     event.preventDefault();
-    console.log({email: email,password:password});
+    setLoading(true);
+    console.log(loading)
     fetch(import.meta.env.VITE_API_URL + 'sign_in/',{
       method: 'POST',
       headers: {
@@ -34,7 +37,7 @@ const Login = () => {
       handleFailedLogin();
     }
 
-  }).catch(handleFailedLogin)
+  }).catch(handleFailedLogin).finally(() => setLoading(false));
   }
 
   const handleFailedLogin = () => {
@@ -80,14 +83,15 @@ const Login = () => {
           onChange={(e) => setPassword(e.target.value)}
         />
         {loginFailed && <Alert severity="error">Email or password incorrect</Alert>}
-        <Button
+        <LoadingButton
+          loading={loading}
           type="submit"
           fullWidth
           variant="contained"
-          sx={{ mt: 3, mb: 2 }}
+          sx={{ mt: 3, mb: 2 , height: 40}}
         >
-          Log In
-        </Button>
+          {!loading && "Log In"}
+        </LoadingButton>
         <Button
           fullWidth
           variant="outlined"
