@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { Box, Button, TextField, Typography, Container, Alert } from '@mui/material';
 
 interface Props {
     setName: (name:string) => void
@@ -22,16 +23,46 @@ const SetName = ({setName,onBack}:Props) => {
   }
 
   return (
-    <>
-    <label>Name
-    <input type="text" name="" id="" placeholder="Enter your name" ref={nameRef}/>
-    </label>
-    <button onClick={onBack}>Back</button>
-
-    <button onClick={handleNext}>next</button>
-    {showAlert && <p>name field can't be empty</p>}
-    </>
-  )
+    <Container component="main" maxWidth="xs">
+      <Box
+        sx={{
+          marginTop: 8,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+        <Typography component="h1" variant="h5" gutterBottom>
+          Name
+        </Typography>
+        {showAlert && (
+          <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
+            Name field can't be empty
+          </Alert>
+        )}
+        <TextField
+          variant="outlined"
+          margin="normal"
+          required
+          fullWidth
+          id="name"
+          label="Enter your name"
+          name="name"
+          autoComplete="name"
+          autoFocus
+          inputRef={nameRef}
+        />
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', mt: 2 }}>
+          <Button variant="contained" onClick={onBack}>
+            Back
+          </Button>
+          <Button variant="contained" color="primary" onClick={handleNext}>
+            Next
+          </Button>
+        </Box>
+      </Box>
+    </Container>
+  );
 }
 
 export default SetName

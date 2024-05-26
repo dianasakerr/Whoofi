@@ -1,4 +1,5 @@
 import { useRef } from 'react'
+import { Box, Button, TextField, Typography, Container } from '@mui/material';
 
 interface Props {
     setEmail: (email: string) => void
@@ -17,14 +18,48 @@ const EnterEmail = ({setEmail,onBack}: Props) => {
     }
 
     return (
-    <>
-    <label>what's your email?
-        <input type='text' placeholder='Enter email' ref={emailRef}></input>
-    </label>
-    <button onClick={onBack}>Back</button>
-    <button onClick={handleNext}>Next</button>
-    </>
-  )
+      <Container component="main" maxWidth="xs">
+        <Box
+          sx={{
+            marginTop: 8,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
+          <Typography component="h1" variant="h5" gutterBottom>
+            What's your email?
+          </Typography>
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            label="Enter email"
+            name="email"
+            autoComplete="email"
+            autoFocus
+            inputRef={emailRef}
+          />
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', mt: 2 }}>
+            <Button
+              variant="contained"
+              onClick={onBack}
+            >
+              Back
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleNext}
+            >
+              Next
+            </Button>
+          </Box>
+        </Box>
+      </Container>
+    );
 }
 
 export default EnterEmail
