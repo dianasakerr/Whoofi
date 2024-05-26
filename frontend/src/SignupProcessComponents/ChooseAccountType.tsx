@@ -1,4 +1,4 @@
-import '../styles/ChooseAccountType.css'
+import { Box, Button, Typography, Container } from '@mui/material';
 
 interface Props {
     setAccountType: (accountType: string) => void
@@ -6,12 +6,39 @@ interface Props {
 
 const ChooseAccountType = ({setAccountType}: Props) => {
   return (
-    <div className='container'>
-    <h1>Sign up as a</h1>
-    <button className='btn' onClick={() => setAccountType("owner")}>Dog owner</button>
-    <button className='btn' onClick={() => setAccountType("walker")}>Dog walker</button>
-    </div>
-  )
+    <Container component="main" maxWidth="xs">
+      <Box
+        sx={{
+          marginTop: 8,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+        <Typography component="h1" variant="h5" gutterBottom>
+          Sign up as a
+        </Typography>
+        <Box sx={{ mt: 3 }}>
+          <Button
+            variant="contained"
+            fullWidth
+            sx={{ mb: 2 }}
+            onClick={() => setAccountType("owner")}
+          >
+            Dog Owner
+          </Button>
+          <Button
+            variant="contained"
+            fullWidth
+            onClick={() => setAccountType("walker")}
+          >
+            Dog Walker
+          </Button>
+        </Box>
+      </Box>
+    </Container>
+  );
+
 }
 
 export default ChooseAccountType
