@@ -5,7 +5,7 @@ import { useState } from 'react';
 interface Props {
     name: string
     email: string
-    onSubmit: () => Promise<boolean>
+    onSubmit: () => Promise<boolean> | void
     setEmail: (email: string) => void
     setName: (name: string) => void
     onBack: () => void;
@@ -17,7 +17,7 @@ const SubmitPage = ({name, email, onSubmit,setEmail,setName,onBack}: Props) =>  
 
   const handleSubmit = async () => {
     setLoading(true);
-    onSubmit().then(res => {
+    onSubmit()?.then(res => {
       if (res) {
         setLoading(false);
       }

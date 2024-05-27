@@ -34,7 +34,7 @@ const Header = () => {
   return (
     <AppBar position="sticky">
       <Toolbar>
-        <Box display="flex" justifyContent="space-between">
+        <Box display="flex" justifyContent="space-between" width={"100vw"}>
           <Button color="inherit" component={Link} to="/">
             Home Page
           </Button>
