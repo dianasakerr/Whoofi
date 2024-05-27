@@ -4,6 +4,8 @@ import woofiLogo from './logosAndIcons/woofiLogo.jpeg'
 import backArrow from './logosAndIcons/back-arrow.svg'
 import whatsappLogo from './logosAndIcons/whatsapp logo.png'
 import axios from 'axios';
+import { Box, Button, Typography, Card, CardContent, CardMedia, IconButton } from '@mui/material';
+
 
 
 
@@ -34,25 +36,47 @@ const DogWalkerProfile = ({dogWalker, setCurrentDogWalker}) => {
     window.open("https://wa.me/" + internetional);
   }
 
-  return (
-    <div className="container">
-      {!dogWalker && <p>Dog walker not found</p>}
-      <h1>Dog Walker Profile</h1>
-      {dogWalker && 
-      <div className="profile">
-        <img src={woofiLogo} alt={dogWalker.name} className='profile-image' height="300" width="300"/>
-        <div className="details">
-          <h2>{dogWalker.username}</h2>
-          <p>Location: {address.city || address.town}, {address.road} {address.house_number}</p>
-          <p>Experience: {dogWalker.years_of_experience} years</p>
-          <p>Price: ${dogWalker.hourly_rate} per hour</p>
-          <p>Phone: {dogWalker.phone_number} <img src={whatsappLogo} alt="" onClick={gotoWhatsap} height="30" width="30"/></p>
-          <p>Rating: {dogWalker.rating}</p>
-        </div>
-      </div>}
-      <img src={backArrow} alt="" className="src" onClick={resetDogWalker} height="30" width="30"/>
-    </div>
-  );
+    return (
+      <Container>
+        <IconButton onClick={resetDogWalker} sx={{ mt: 2 }}>
+          <ArrowBack />
+        </IconButton>
+        <Card sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 4 }}>
+          <CardMedia
+            component="img"
+            height="300"
+            image={woofiLogo}
+            alt={dogWalker.name}
+            sx={{ width: '300px', borderRadius: '50%' }}
+          />
+          <CardContent>
+            <Typography variant="h4" component="div" gutterBottom>
+              {dogWalker.username}
+            </Typography>
+            <Typography variant="body1" color="textSecondary">
+              Location: {address.city || address.town}, {address.road} {address.house_number}
+            </Typography>
+            <Typography variant="body1" color="textSecondary">
+              Experience: {dogWalker.years_of_experience} years
+            </Typography>
+            <Typography variant="body1" color="textSecondary">
+              Price: ${dogWalker.hourly_rate} per hour
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
+              <Typography variant="body1" color="textSecondary" sx={{ mr: 1 }}>
+                Phone: {dogWalker.phone_number}
+              </Typography>
+              <IconButton color="primary" onClick={gotoWhatsApp}>
+                <WhatsApp />
+              </IconButton>
+            </Box>
+            <Typography variant="body1" color="textSecondary">
+              Rating: {dogWalker.rating}
+            </Typography>
+          </CardContent>
+        </Card>
+      </Container>
+    );
 };
 
 export default DogWalkerProfile;

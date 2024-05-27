@@ -3,6 +3,7 @@ import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
 import 'leaflet-control-geocoder';
 import LocationInputMap from './LocationInputMap';
 import axios from 'axios';
+import { Box, Button, Typography, Container, Alert } from '@mui/material';
 
 const SetLocation = ({setFinalLocation,setFinalAddress, onBack}) => {
     const [address, setAddress] = useState("");
@@ -47,25 +48,49 @@ const SetLocation = ({setFinalLocation,setFinalAddress, onBack}) => {
     }
     },[location])
 
-  return (
-    <>
-    <button onClick={() => setShowMap(!showMap)}>enter location manualy</button>
-    <button onClick={onBack}>back</button>
-
-    { showMap &&
-    <>
-    <LocationInputMap setFinalLocation={setLocation} curLocation={location}/>
-    </>
-    }
-    {location && 
-    <>
-      {address && <div>{address}</div>}
-      <button onClick={() => {setFinalLocation(location); setFinalAddress(address);}}>Confirm location</button>
-    </>
-    }
-
-    </>
-)
+    return (
+      <Container component="main" maxWidth="sm">
+        <Box sx={{ mt: 4 }}>
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+            <Button variant="contained" onClick={() => setShowMap(!showMap)}>
+              Enter Location Manually
+            </Button>
+            <Button variant="outlined" onClick={onBack}>
+              Back
+            </Button>
+          </Box>
+  
+          {showMap && (
+            <LocationInputMap setFinalLocation={setLocation} curLocation={location} />
+          )}
+  
+          {location && (
+            <>
+              <Typography variant="body1" sx={{ mt: 2 }}>
+                {address || 'Address not found'}
+              </Typography>
+              <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => {
+                    setFinalLocation(location);
+                    setFinalAddress(address);
+                  }}
+                >
+                  Confirm Location
+                </Button>
+              </Box>
+            </>
+          )}
+        </Box>
+      </Container>
+    );
 
 }
 export default SetLocation

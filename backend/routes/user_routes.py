@@ -1,5 +1,5 @@
 # routes/user_routes.py
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, status
 from models.user import DogOwner, DogWalker
 from pydantic import BaseModel
 import bcrypt
@@ -51,7 +51,7 @@ async def sign_in(sign_in_data: SignInReq):
         print(f"message Welcome back, {dog_walker[USERNAME]}!")
         return 'walker'
 
-    return "Email or Password isn`t correct, please try again"
+    raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE,detail="email or password are incorrect")
 
 
 @user_router.get("/get_user/")
