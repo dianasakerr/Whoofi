@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
+import { Box, TextField, Button, Typography } from '@mui/material';
 
 const AddressSearchBar = ({setLocation}) => {
     const [address, setAddress] = useState('');
@@ -22,15 +23,33 @@ const AddressSearchBar = ({setLocation}) => {
         }
     };
 
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter') {
+          handleSearch();
+        }
+      };
+
     return (
-        <div>
-            <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} />
-            <button onClick={handleSearch}>Search</button>
-            {latitude && longitude && (
-                <p>Latitude: {latitude}, Longitude: {longitude}</p>
-            )}
-        </div>
-    );
+        <Box sx={{ mb: 2 }}>
+          <TextField
+            label="Enter address"
+            variant="outlined"
+            fullWidth
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            onKeyDown={handleKeyDown}
+            sx={{ mb: 2 }}
+          />
+          <Button variant="contained" color="primary" onClick={handleSearch} >
+            Search
+          </Button>
+          {latitude && longitude && (
+            <Typography variant="body2" sx={{ mt: 2 }}>
+              Latitude: {latitude}, Longitude: {longitude}
+            </Typography>
+          )}
+        </Box>
+      );
 };
 
 export default AddressSearchBar;

@@ -1,10 +1,15 @@
+import { Container, Typography, Box } from '@mui/material';
 
 const HomePage = () => {
   return (
-    <div className="home-page">
-      <h1>Welcome to the Home Page!</h1>
-    </div>
-  )
-}
+    <Container>
+      <Box sx={{ my: 4 }}>
+        <Typography variant="h3" component="h1" gutterBottom>
+          Welcome to the Home Page!
+        </Typography>
+      </Box>
+    </Container>
+  );
+};
 
-export default HomePage
+export default HomePage;
