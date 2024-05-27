@@ -1,57 +1,8 @@
-.container {
-    text-align: center;
-}
-
-
-
-
-
-
-
-
 .dog-walker-card img {
     width: 100%;
-    max-width: 4vw;
+    width: 4vw;
+    max-width: 30px;
     height: auto;
     border-radius: 8px;
     margin-bottom: 10px;
-}
-
-
-
-
-
-
-.paw-container {
-    display: flex;
-    width: 30px;
-    height: 30px;
-}
-
-.paw-img {
-    width: 30px;
-    height: 30px;
-    margin-right: 5px;
-}
-
-.login-btn {
-    margin-top: 1vw;
-    border-radius: 10px;
-    width: 10vw;
-    height: max(3vw, 30px); /* Adjust height */
-    text-align: center;
-    font-family: 'Neucha', sans-serif;;
-    background-color: var(--desert-sun); /* Green background color */
-    border: 10px;
-    color: var(--offwhite); /* White text color */
-    padding: 1px 2px; /* Padding */ /* Center text */
-    text-decoration: none; /* Remove underline */
-    display: inline-block;
-    font-size: 20px; /* Font size */
-    cursor: pointer; /* Cursor on hover */
-    transition-duration: 0.4s; /* Transition duration */
-}
-
-.login-btn:hover {
-    background-color: var(--maroon); /* Darker green on hover */
 }

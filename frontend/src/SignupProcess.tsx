@@ -46,9 +46,8 @@ const handleBackToSetLocation = () => {
   setLocation(undefined);
 };
 
-
   const onSubmit = async () => {
-    fetch(import.meta.env.VITE_API_URL + 'create_user/', {
+    return fetch(import.meta.env.VITE_API_URL + 'create_user/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -82,14 +81,11 @@ const handleBackToSetLocation = () => {
             window.dispatchEvent(new Event('storage'));
             navigate('/profile');
             console.log("User created successfully");
-            return res.json();
+            return true;
         } else {
             console.log("Error creating user");
-            return res.text().then(text => { throw new Error(text) });
+            return false;
         }
-    }).then(data => {
-        localStorage.setItem("token", email);
-        console.log(data);
     }).catch(err => {
         console.error("my error log:", err);
     });
