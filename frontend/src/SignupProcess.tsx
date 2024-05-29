@@ -6,7 +6,7 @@ import SetPassword from './SignupProcessComponents/SetPassword';
 import SetName from './SignupProcessComponents/SetName';
 import SubmitPage from './SignupProcessComponents/SubmitPage';
 import SetLocation from './SignupProcessComponents/SetLocation';
-import './styles/SignupProcess.css'
+import { Container, Typography, Box, CssBaseline } from '@mui/material';
 
 
 interface Location {
@@ -46,9 +46,8 @@ const handleBackToSetLocation = () => {
   setLocation(undefined);
 };
 
-
   const onSubmit = async () => {
-    fetch(import.meta.env.VITE_API_URL + 'create_user/', {
+    return fetch(import.meta.env.VITE_API_URL + 'create_user/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -82,68 +81,34 @@ const handleBackToSetLocation = () => {
             window.dispatchEvent(new Event('storage'));
             navigate('/profile');
             console.log("User created successfully");
-            return res.json();
+            return true;
         } else {
             console.log("Error creating user");
-            return res.text().then(text => { throw new Error(text) });
+            return false;
         }
-    }).then(data => {
-        localStorage.setItem("token", email);
-        console.log(data);
     }).catch(err => {
         console.error("my error log:", err);
     });
 }
 
-  return (
-    <div className='signup-container'>
-    <h1 className="title">Woofi signup process</h1>
-    
-    {
-      (accountType === "") &&
-      <ChooseAccountType setAccountType={setAccountType}/>
-    }
-    
-
-    { 
-      accountType !== "" &&
-      email === "" &&
-     <EnterEmail setEmail={setEmail}
-     onBack={handleBackToAccountType} />
-    }
-
-    { email !== "" && 
-    password === "" &&
-    <SetPassword setPassword={setPassword} onBack={handleBackToEmail} />}
-
-
-    {
-      email !== "" &&
-      password !== "" &&
-      name === "" &&
-      <SetName setName={setName}
-      onBack={handleBackToSetPassword} />
-    }
-
-    {
-      email !== "" &&
-      password !== "" &&
-      name !== "" &&
-      !location &&
-      <SetLocation 
-      setFinalLocation={setLocation}
-      setFinalAddress={setAddress}
-      onBack={handleBackToSetName}
-      />
-    }
-
-    { email !== "" &&
-    password !== "" &&
-    name !== "" && 
-    location && 
-    <SubmitPage name={name} email={email} onSubmit={onSubmit} setEmail={setEmail} setName={setName} onBack={handleBackToSetLocation}/>}
-    </div>
-  )
+return (
+  <Container component="main" maxWidth="sm">
+    <CssBaseline />
+    <Box sx={{ marginTop: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <Typography component="h1" variant="h5" className="title">
+        Woofi Signup Process
+      </Typography>
+      {accountType === "" && <ChooseAccountType setAccountType={setAccountType} />}
+      {accountType !== "" && email === "" && <EnterEmail setEmail={setEmail} onBack={handleBackToAccountType} />}
+      {email !== "" && password === "" && <SetPassword setPassword={setPassword} onBack={handleBackToEmail} />}
+      {email !== "" && password !== "" && name === "" && <SetName setName={setName} onBack={handleBackToSetPassword} />}
+      {email !== "" && password !== "" && name !== "" && !location && 
+        <SetLocation setFinalLocation={setLocation} setFinalAddress={setAddress} onBack={handleBackToSetName} />}
+      {email !== "" && password !== "" && name !== "" && location && 
+        <SubmitPage name={name} email={email} onSubmit={onSubmit} setEmail={setEmail} setName={setName} onBack={handleBackToSetLocation} />}
+    </Box>
+  </Container>
+)
 }
 
 export default SignupProccess;
