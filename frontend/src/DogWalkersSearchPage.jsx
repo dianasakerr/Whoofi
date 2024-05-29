@@ -1,137 +1,182 @@
 import React, { useState, useEffect } from 'react';
+import {
+  Box,
+  Button,
+  Container,
+  Card,
+  CardContent,
+  Typography,
+  Slider,
+  Checkbox,
+  FormControlLabel,
+  CircularProgress,
+  Grid
+} from '@mui/material';
 import DogWalkerProfile from './DogWalkerProfile';
 import dogPaw from './logosAndIcons/dogPaw.svg';
 import './styles/DogWalkersSearchPage.css';
 
 const DogWalkersSearchPage = () => {
-  // State to store dog walker profiles
-  const [dogWalkers,setDogWalkers] = useState([]);
+  const [dogWalkers, setDogWalkers] = useState([]);
   const [currentDogWalker, setCurrentDogWalker] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchCriteria, setSearchCriteria] = useState('name'); 
-  const [distanceFilter, setDistanceFilter] = useState(50);
+  const [searchCriteria, setSearchCriteria] = useState('name');
+  const [distanceFilter, setDistanceFilter] = useState(25);
   const [sizeFilter, setSizeFilter] = useState({
     small: true,
     mid: true,
     big: true
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const checkLogIn = () => {
+    setIsLoggedIn(localStorage.getItem('token') !== null && localStorage.getItem('userType') !== null)
+  }
 
   useEffect(() => {
-    fetch(import.meta.env.VITE_API_URL + 'get_dog_walkers/?')
-    .then(
-      res => {
-        if (!res.ok) {
-          throw new Error('Failed to fetch dogwalkers');
-        }
-        return res.json();
-      }).then(data => {
-        setDogWalkers(data);
-      }).catch(err => console.log(err))
-  },[])
+    fetchDogWalkers();
+    if (localStorage.getItem('token') !== null && localStorage.getItem('userType') !== null) {
+      setIsLoggedIn(true);
+    }
 
-  // fetch dog walkers from API
-  const handleFilter = () => {
-    console.log(localStorage.getItem('token'),localStorage.getItem('userType'))
-    fetch(import.meta.env.VITE_API_URL + "get_user/?" + new URLSearchParams({
-      email: localStorage.getItem('token'),
-      user_type: localStorage.getItem('userType')
-    })).then(res => {
-      res.json().then((body) => {
-        return body.coordinates;
-      }).then((myCoordinates) => fetch(import.meta.env.VITE_API_URL + 'get_dog_walkers/?' + new URLSearchParams({
+    window.addEventListener('storage', checkLogIn);
+
+    return () => {
+      window.removeEventListener('storage', checkLogIn);
+    };
+  }, []);
+
+  const fetchDogWalkers = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}get_dog_walkers/?`);
+      if (!response.ok) throw new Error('Failed to fetch dog walkers');
+      const data = await response.json();
+      setDogWalkers(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFilter = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}get_user/?` + new URLSearchParams({
+        email: localStorage.getItem('token'),
+        user_type: localStorage.getItem('userType')
+      }));
+      if (!response.ok) throw new Error('Failed to fetch user');
+      const user = await response.json();
+      const myCoordinates = user.coordinates;
+      const filterResponse = await fetch(`${import.meta.env.VITE_API_URL}get_dog_walkers/?` + new URLSearchParams({
         location_radius_km: distanceFilter,
         small: sizeFilter.small,
         mid: sizeFilter.mid,
         big: sizeFilter.big,
         longitude: myCoordinates[0],
         latitude: myCoordinates[1]
-      })).then(
-        res => {
-          if (!res.ok) {
-            throw new Error('Failed to fetch dogwalkers');
-          }
-  
-          return res.json();
-        }).then(data => {
-          setDogWalkers(data);
-        }).catch(err => console.log(err)))
-      }
-    )
-  }
+      }));
+      if (!filterResponse.ok) throw new Error('Failed to fetch dog walkers');
+      const data = await filterResponse.json();
+      setDogWalkers(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleProfileClick = (walker) => {
     setCurrentDogWalker(walker);
   };
 
-  const renderExperiencePaws = (experience) => {
-    return (
-      <div className="paw-container">
-        {[...Array(experience)].map((_, index) => (
-          <img key={index} src={dogPaw} alt="Paw" className="paw-img" />
-        ))}
-      </div>
-    );
-  };
+  const renderExperiencePaws = (experience) => (
+    <Box display="flex">
+      {[...Array(experience)].map((_, index) => (
+        <img key={index} src={dogPaw} alt="Paw" className="paw-img" />
+      ))}
+    </Box>
+  );
 
-  const handleDistanceChange = (event) => {
-    setTimeout(() => setDistanceFilter(event.target.value), 30);
+  const handleDistanceChange = (event, newValue) => {
+    setDistanceFilter(newValue);
   };
 
   const handleSizeCheck = (event) => {
     const { value, checked } = event.target;
-    setSizeFilter((prevCheckboxes) => ({
-      ...prevCheckboxes,
+    setSizeFilter((prev) => ({
+      ...prev,
       [value]: checked,
     }));
   };
 
   return (
     <>
-    {currentDogWalker && <DogWalkerProfile dogWalker={currentDogWalker} setCurrentDogWalker={setCurrentDogWalker}/>}
-    {!currentDogWalker && 
-    <div className="container">
-      <h1>Dog Walkers Search</h1>
+      {currentDogWalker ? (
+        <DogWalkerProfile dogWalker={currentDogWalker} setCurrentDogWalker={setCurrentDogWalker} />
+      ) : (
+        <Container className="container">
+          <Typography variant="h4" component="h1" gutterBottom>
+            Dog Walkers Search
+          </Typography>
 
-      <div className="search-filter">
-        <h3>filter search</h3>
-        <label> dog walkers in a {distanceFilter}Km radius near your
-        <br/>
-        <input type="range" min="0" max="150" onChange={handleDistanceChange}/>
-        </label>
+          <Box className="search-filter" mb={4}>
+            <Typography variant="h6">Filter Search</Typography>
+            <Typography>Dog walkers in a {distanceFilter} km radius near you</Typography>
+            <Slider
+              value={distanceFilter}
+              onChange={handleDistanceChange}
+              aria-labelledby="distance-slider"
+              min={0}
+              max={80}
+              valueLabelDisplay="auto"
+            />
+            <Typography>Dog walkers accepting dogs in sizes:</Typography>
+            <FormControlLabel
+              control={<Checkbox checked={sizeFilter.big} onChange={handleSizeCheck} value="big" />}
+              label="Big"
+            />
+            <FormControlLabel
+              control={<Checkbox checked={sizeFilter.mid} onChange={handleSizeCheck} value="mid" />}
+              label="Medium"
+            />
+            <FormControlLabel
+              control={<Checkbox checked={sizeFilter.small} onChange={handleSizeCheck} value="small" />}
+              label="Small"
+            />
+            <br/>
+            <Button disabled={!isLoggedIn} variant="contained" color="primary" onClick={handleFilter}>
+              {isLoggedIn ? "Filter" : "Sign in or Sign up to filter dog walkers search"}
+            </Button>
+          </Box>
 
-        <p>dog walkers accepting dogs in sizes:</p>
-        <label>big
-          <input type="checkbox" value="big" onChange={handleSizeCheck}></input>
-        </label>
-        <label>medium
-          <input type="checkbox" value="mid" onChange={handleSizeCheck}></input>
-        </label>
+          {loading && <CircularProgress />}
+          {error && <Typography color="error">{error}</Typography>}
 
-        <label>small
-          <input type="checkbox" value="small" onChange={handleSizeCheck}></input>
-        </label>
-        <br/>
-      <button onClick={handleFilter}>filter</button>
-    </div>
-      
-      <div className="dog-walker-list">
-        {dogWalkers ? dogWalkers.map(dogWalker => (
-          <div key={dogWalker.id} className="dog-walker-card" onClick={() => handleProfileClick(dogWalker)}>
-            <div className="details">
-              <h2>{dogWalker.username}</h2>
-              <p>{dogWalker.location}</p>
-              <p>Age: {dogWalker.age}</p>
-              <div className="experience">
-                <p>Experience:</p>
-                {renderExperiencePaws(dogWalker.experience)}
-              </div>
-            </div>
-          </div>
-        )) : <p>No dogwalkers in whoofi's system</p>}
-      </div>
-    </div>
-  }
-  </>
+          <Grid container spacing={3} className="dog-walker-list">
+              {dogWalkers.map((dogWalker) => (
+                <Grid item xs={12} sm={6} md={4} key={dogWalker.id}>
+                  <Card className="dog-walker-card" onClick={() => handleProfileClick(dogWalker)}>
+                    <CardContent>
+                      <Typography variant="h6">{dogWalker.username}</Typography>
+                      <Typography>{dogWalker.location}</Typography>
+                      <Typography>Age: {dogWalker.age}</Typography>
+                      <Box className="experience">
+                        <Typography>Experience:</Typography>
+                        {renderExperiencePaws(dogWalker.experience)}
+                      </Box>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+          </Grid>
+        </Container>
+      )}
+    </>
   );
 };
 
