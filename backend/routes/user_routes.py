@@ -1,10 +1,12 @@
 # routes/user_routes.py
 from fastapi import APIRouter, HTTPException, status
-from models.user import DogOwner, DogWalker
+from backend.security import verify_token
+from backend.models.user import DogOwner, DogWalker
 from pydantic import BaseModel
 import bcrypt
-from database import *
+from backend.database import *
 from pymongo.errors import *
+from backend.security import create_access_token
 user_router = APIRouter()
 
 
@@ -44,19 +46,30 @@ async def sign_in(sign_in_data: SignInReq):
     dog_owner = __get_user(sign_in_data.email, OWNER, password=True)
     dog_walker = __get_user(sign_in_data.email, WALKER, password=True)
 
-    if dog_owner and bcrypt.checkpw(sign_in_data.password.encode('utf-8'), dog_owner[PASSWORD].encode('utf-8')):
-        print(f"message Welcome back, {dog_owner[USERNAME]}!")
-        return 'owner'
-    elif dog_walker and bcrypt.checkpw(sign_in_data.password.encode('utf-8'), dog_walker[PASSWORD].encode('utf-8')):
-        print(f"message Welcome back, {dog_walker[USERNAME]}!")
-        return 'walker'
+    user = dog_owner if dog_owner else dog_walker
+    user_type = OWNER if dog_owner else WALKER
 
-    raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE,detail="email or password are incorrect")
+    if user and bcrypt.checkpw(sign_in_data.password.encode('utf-8'), user[PASSWORD].encode('utf-8')):
+        print(f"message Welcome back, {user[USERNAME]}!")
+        # create token access
+        user[USER_TYPE] = user_type
+        access_token = create_access_token(data=user)
+        return {"access_token": access_token, "user_type": user_type}
+
+    raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="email or password are incorrect",
+                        headers={"WWW-Authenticate": "Bearer"})
 
 
 @user_router.get("/get_user/")
-def get_user(email: str, user_type: str):
-    return __get_user(email, user_type)
+def get_user(token: str):
+    user = verify_token(token)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return user
 
 
 def __get_user(email: str, user_type: str, password: bool = False):
@@ -66,24 +79,15 @@ def __get_user(email: str, user_type: str, password: bool = False):
     return collection.find_one({EMAIL: email}, filters)
 
 
-@user_router.put("/edit_user/{email}")
-async def edit_user(email: str,
-                    user_type: str,
-                    username: str = None,
-                    longitude: float = None,
-                    latitude: float = None,
-                    phone_number: str = None,
-                    age: float = None,
-                    hourly_rate: float = None,
-                    years_of_experience: float = None
-                    ):
+@user_router.put("/edit_user/")
+async def edit_user(token: str, username: str = None, longitude: float = None, latitude: float = None,
+                    phone_number: str = None, age: float = None, hourly_rate: float = None,
+                    years_of_experience: float = None):
 
-    collection, cluster = get_collection_by_user_type(user_type)
-    # Find the user by email
-    user = collection.find_one({EMAIL: email}, {ID: False, PASSWORD: False})
-    if not user:
-        cluster.close()
-        raise HTTPException(status_code=404, detail="User not found")
+    user = verify_token(token)
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token",
+                            headers={"WWW-Authenticate": "Bearer"})
 
     if longitude or latitude:
         longitude = longitude if longitude else user[COORDINATES][0]
@@ -102,10 +106,11 @@ async def edit_user(email: str,
 
     # Update the user document in MongoDB
     try:
+        collection, cluster = get_collection_by_user_type(user[USER_TYPE])
         if result:
-            collection.update_many({EMAIL: email}, {"$set": result})
-    except PyMongoError as e:
+            collection.update_many({EMAIL: user[EMAIL]}, {"$set": result})
         cluster.close()
+    except PyMongoError as e:
         raise HTTPException(status_code=500, detail=f"Database update error: {str(e)}")
 
     cluster.close()
