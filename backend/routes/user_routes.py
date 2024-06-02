@@ -6,7 +6,7 @@ from pydantic import BaseModel
 import bcrypt
 from backend.database import *
 from pymongo.errors import *
-from backend.utils.user_utils import calculate_age
+from backend.utils.user_utils import calculate_age, generate_whatsapp_link
 from backend.security import create_access_token
 user_router = APIRouter()
 
@@ -64,10 +64,29 @@ async def sign_in(sign_in_data: SignInReq):
 
 
 def __get_user(email: str, user_type: str, password: bool = False):
-    collection, _ = get_collection_by_user_type(user_type)
-    # Find the user by email
-    filters = {ID: False} if password else {ID: False, PASSWORD: False}
-    return collection.find_one({EMAIL: email}, filters)
+    try:
+        collection, _ = get_collection_by_user_type(user_type)
+        # Find the user by email
+        filters = {ID: False} if password else {ID: False, PASSWORD: False}
+        user = collection.find_one({EMAIL: email}, filters)
+        if user:
+            return user
+        else:
+            print(f"No user found with email: {email}")
+            return None
+    except errors.PyMongoError as e:
+        print(f"Error finding user: {str(e)}")
+        raise
+
+
+@user_router.get("/get_whatsapp_link/")
+async def get_whatsapp_link(token: str):
+    user = verify_token(token)
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+
+    whatsapp_link = generate_whatsapp_link(user[PHONE_NUMBER])
+    return whatsapp_link
 
 
 @user_router.get("/get_user/")
