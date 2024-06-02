@@ -1,7 +1,7 @@
 # models/dog.py
 from pydantic import BaseModel
 from typing import Optional
-from database import *
+from backend.database import *
 
 
 class Dog(BaseModel):
