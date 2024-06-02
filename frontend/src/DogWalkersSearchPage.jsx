@@ -4,6 +4,7 @@ import {
   Button,
   Container,
   Card,
+  Collapse,
   CardContent,
   Typography,
   Slider,
@@ -30,6 +31,7 @@ const DogWalkersSearchPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isFiltering,setIsFiltering] = useState(false);
 
   const checkLogIn = () => {
     setIsLoggedIn(localStorage.getItem('token') !== null && localStorage.getItem('userType') !== null)
@@ -119,13 +121,14 @@ const DogWalkersSearchPage = () => {
       {currentDogWalker ? (
         <DogWalkerProfile dogWalker={currentDogWalker} setCurrentDogWalker={setCurrentDogWalker} />
       ) : (
-        <Container className="container">
-          <Typography variant="h4" component="h1" gutterBottom>
+        <Container className="container" >
+          <Typography variant="h4" component="h1" mt={2} gutterBottom>
             Dog Walkers Search
           </Typography>
 
-          <Box className="search-filter" mb={4}>
-            <Typography variant="h6">Filter Search</Typography>
+          <Box className="search-filter" mb={4} >
+            <Button  onClick={() => setIsFiltering(!isFiltering)}>Filter Search</Button>
+            <Collapse in={isFiltering} >
             <Typography>Dog walkers in a {distanceFilter} km radius near you</Typography>
             <Slider
               value={distanceFilter}
@@ -152,6 +155,7 @@ const DogWalkersSearchPage = () => {
             <Button disabled={!isLoggedIn} variant="contained" color="primary" onClick={handleFilter}>
               {isLoggedIn ? "Filter" : "Sign in or Sign up to filter dog walkers search"}
             </Button>
+            </Collapse>
           </Box>
 
           {loading && <CircularProgress />}
