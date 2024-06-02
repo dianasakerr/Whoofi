@@ -26,7 +26,7 @@ const ProfilePage = () => {
     // Example: setProfileData(fetchedData);
   }, []);
 
-  const handleChange = (e) => {
+  const handleChange = (e: any) => {
     const { name, value, type, checked } = e.target;
     if (type === 'checkbox') {
       setProfileData((prevData) => ({
@@ -52,7 +52,7 @@ const ProfilePage = () => {
   return (
     <ProfileContainer maxWidth="md">
       <Typography variant="h4" component="h1" gutterBottom>
-        {userType === 'dogOwner' ? 'Dog Owner Profile' : 'Dog Walker Profile'}
+        Edit {userType === 'dogOwner' ? 'Dog Owner Profile' : 'Dog Walker Profile'}
       </Typography>
       <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <TextField

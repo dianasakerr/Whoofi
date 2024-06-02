@@ -5,7 +5,7 @@ import { useState } from 'react';
 interface Props {
     name: string
     email: string
-    onSubmit: () => Promise<boolean> | void
+    onSubmit: () => Promise<boolean | void>
     setEmail: (email: string) => void
     setName: (name: string) => void
     onBack: () => void;

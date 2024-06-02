@@ -4,7 +4,7 @@ import woofiLogo from './logosAndIcons/woofiLogo.jpeg'
 import backArrow from './logosAndIcons/back-arrow.svg'
 import whatsappLogo from './logosAndIcons/whatsapp logo.png'
 import axios from 'axios';
-import { Box, Button, Typography, Card, CardContent, CardMedia, IconButton } from '@mui/material';
+import { Box, Button, Typography, Card, CardContent, CardMedia, IconButton, Container} from '@mui/material';
 
 
 
@@ -31,16 +31,14 @@ const DogWalkerProfile = ({dogWalker, setCurrentDogWalker}) => {
     console.log(dogWalker);
   },[]);
 
-  const gotoWhatsap = () => {
+  const gotoWhatsApp = () => {
     const internetional = "+972"+ dogWalker.phone_number.replace(/^0/, '');
     window.open("https://wa.me/" + internetional);
   }
 
     return (
       <Container>
-        <IconButton onClick={resetDogWalker} sx={{ mt: 2 }}>
-          <ArrowBack />
-        </IconButton>
+        
         <Card sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 4 }}>
           <CardMedia
             component="img"
@@ -66,14 +64,19 @@ const DogWalkerProfile = ({dogWalker, setCurrentDogWalker}) => {
               <Typography variant="body1" color="textSecondary" sx={{ mr: 1 }}>
                 Phone: {dogWalker.phone_number}
               </Typography>
-              <IconButton color="primary" onClick={gotoWhatsApp}>
-                <WhatsApp />
-              </IconButton>
+              
+              
             </Box>
+            <IconButton color="primary" onClick={gotoWhatsApp}>
+                <img src={whatsappLogo} width={40} height={40}/>
+              </IconButton>
             <Typography variant="body1" color="textSecondary">
               Rating: {dogWalker.rating}
             </Typography>
           </CardContent>
+          <IconButton onClick={resetDogWalker} sx={{ mt: 2 }}>
+          <img src={backArrow} width={20} height={20}/>
+        </IconButton>
         </Card>
       </Container>
     );
