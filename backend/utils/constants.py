@@ -24,6 +24,7 @@ RACE = 'race'
 OWNER_ID = 'owner_id'
 WEIGHT = 'weight'
 SIZE = 'size'
+DATE_OF_BIRTH = 'date_of_birth'
 
 # DOG SIZE
 SMALL = 'small'
