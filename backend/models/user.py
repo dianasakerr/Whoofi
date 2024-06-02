@@ -6,6 +6,7 @@ from abc import abstractmethod
 from backend.database import *
 from fastapi import HTTPException
 from backend.utils.constants import *
+from datetime import datetime
 
 
 class User(BaseModel):
@@ -14,14 +15,20 @@ class User(BaseModel):
     coordinates: list  # [longitude, latitude]
     phone_number: str
     password: str
+    date_of_birth: str
 
     class Config:
         from_attributes = True
 
     @abstractmethod
     def save_user(self):
+        # Convert date_of_birth from string to date object
+        try:
+            date_of_birth = datetime.strptime(self.date_of_birth, "%d-%m-%Y")
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid date format. Use DD-MM-YYYY.")
         return {USERNAME: self.username, EMAIL: self.email, COORDINATES: self.coordinates,
-                PHONE_NUMBER: self.phone_number, PASSWORD: self.password}
+                PHONE_NUMBER: self.phone_number, PASSWORD: self.password, DATE_OF_BIRTH: date_of_birth}
 
     def is_valid_email(self, email):
 
@@ -86,14 +93,13 @@ class DogOwner(User):
         try:
             # Insert the new user into the database
             collection.insert_one(data)
-        except Exception:
+        except Exception as e:
             cluster.close()
-            raise HTTPException(status_code=400, detail="Please try gain")
+            raise HTTPException(status_code=400, detail=f"{e} - Please try gain")
         cluster.close()
 
 
 class DogWalker(User):
-    age: float
     years_of_experience: float
     hourly_rate: float
 
@@ -104,14 +110,13 @@ class DogWalker(User):
     def save_user(self):
         self.check_email_uniqueness(DOG_WALKER)
         data = super().save_user()
-        data[AGE] = self.age
         data[YEARS_OF_EXPERIENCE] = self.years_of_experience
         data[HOURLY_RATE] = self.hourly_rate
         collection, cluster = get_collection(DOG_WALKER)
         try:
             # Insert the new user into the database
             collection.insert_one(data)
-        except Exception:
+        except Exception as e:
             cluster.close()
-            raise HTTPException(status_code=400, detail="Please try gain")
+            raise HTTPException(status_code=400, detail=f"{e} - Please try gain")
         cluster.close()
