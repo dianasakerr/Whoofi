@@ -1,6 +1,5 @@
 # routes/user_routes.py
-from fastapi import APIRouter, HTTPException, status, Depends
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import APIRouter, HTTPException, status
 from backend.security import verify_token
 from backend.models.user import DogOwner, DogWalker
 from pydantic import BaseModel
@@ -9,8 +8,6 @@ from backend.database import *
 from pymongo.errors import *
 from backend.security import create_access_token
 user_router = APIRouter()
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 class UserCustomForm(BaseModel):
