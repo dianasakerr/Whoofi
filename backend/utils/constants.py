@@ -10,6 +10,7 @@ OWNER = 'owner'
 # COLLECTIONS KEYS
 ID = '_id'
 USERNAME = 'username'
+USER_TYPE = 'user_type'
 EMAIL = 'email'
 COORDINATES = 'coordinates'
 PHONE_NUMBER = 'phone_number'
