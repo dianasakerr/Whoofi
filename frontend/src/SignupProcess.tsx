@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ChooseAccountType from "./SignupProcessComponents/ChooseAccountType";
 import EnterEmail from "./SignupProcessComponents/EnterEmail";
@@ -7,6 +7,10 @@ import SetName from "./SignupProcessComponents/SetName";
 import SubmitPage from "./SignupProcessComponents/SubmitPage";
 import SetLocation from "./SignupProcessComponents/SetLocation";
 import { Container, Typography, Box, CssBaseline } from "@mui/material";
+import SetDateOfBirth from "./SignupProcessComponents/SetDateOfBirth";
+import { Dayjs } from "dayjs";
+import SetExperience from "./SignupProcessComponents/SetExperience";
+import EnterHourlyRate from "./SignupProcessComponents/EnterHourlyRate";
 
 interface Location {
   lat: number;
@@ -19,30 +23,13 @@ function SignupProcess() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [address, setAddress] = useState<string>("");
-  const [location, setLocation] = useState<Location | undefined>(undefined);
+  const [birthDate, setBirthDate] = useState<string>("e");
+  const [location, setLocation] = useState<Location | undefined>();
+  const [hourlyRate, setHourlyRate] = useState<number | undefined>();
+  const [exp, setExp] = useState<number | null>();
   const navigate = useNavigate();
 
-  const handleBackToEmail = () => {
-    setEmail("");
-  };
-
-  const handleBackToAccountType = () => {
-    setAccountType("");
-  };
-
-  const handleBackToSetPassword = () => {
-    setPassword("");
-  };
-
-  const handleBackToSetName = () => {
-    // Reset the name state
-    setName("");
-  };
-
-  const handleBackToSetLocation = () => {
-    // Reset the location state
-    setLocation(undefined);
-  };
+  useEffect(() => console.log(birthDate, typeof birthDate), [birthDate]);
 
   const onSubmit = async () => {
     return fetch(import.meta.env.VITE_API_URL + "create_user/", {
@@ -51,29 +38,17 @@ function SignupProcess() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        user_type: accountType, // Make sure this is directly under the root of the JSON body
-        user_data:
-          accountType === "owner"
-            ? {
-                username: name,
-                email: email,
-                phone_number: "0545356002",
-                coordinates: [location?.lat, location?.lng],
-                password: password,
-                address: address,
-                dogs: [],
-              }
-            : {
-                username: name,
-                email: email,
-                password: password,
-                coordinates: [location?.lat, location?.lng],
-                address: address,
-                phone_number: "0545356002",
-                hourly_rate: -1,
-                years_of_experience: 3,
-                age: 17,
-              },
+        user_type: accountType,
+        username: name,
+        email: email,
+        phone_number: "0545356002",
+        longitude: location?.lng,
+        latitude: location?.lat,
+        password: password,
+        address: address,
+        date_of_birth: birthDate,
+        hourly_rate: hourlyRate,
+        years_of_experience: exp,
       }),
     })
       .then((res) => {
@@ -108,35 +83,76 @@ function SignupProcess() {
         <Typography component="h1" variant="h5" className="title">
           Whoofi Signup Process
         </Typography>
+
         {accountType === "" && (
           <ChooseAccountType setAccountType={setAccountType} />
         )}
+
         {accountType !== "" && email === "" && (
-          <EnterEmail setEmail={setEmail} onBack={handleBackToAccountType} />
+          <EnterEmail setEmail={setEmail} onBack={() => setAccountType("")} />
         )}
+
         {email !== "" && password === "" && (
-          <SetPassword setPassword={setPassword} onBack={handleBackToEmail} />
+          <SetPassword setPassword={setPassword} onBack={() => setEmail("")} />
         )}
+
         {email !== "" && password !== "" && name === "" && (
-          <SetName setName={setName} onBack={handleBackToSetPassword} />
+          <SetName setName={setName} onBack={() => setPassword("")} />
         )}
-        {email !== "" && password !== "" && name !== "" && !location && (
-          <SetLocation
-            setFinalLocation={setLocation}
-            setFinalAddress={setAddress}
-            onBack={handleBackToSetName}
+
+        {email !== "" && password !== "" && name !== "" && birthDate === "" && (
+          <SetDateOfBirth setFinal={setBirthDate} onBack={() => setName("")} />
+        )}
+
+        {email !== "" &&
+          password !== "" &&
+          name !== "" &&
+          birthDate !== "" &&
+          !location && (
+            <SetLocation
+              setFinalLocation={setLocation}
+              setFinalAddress={setAddress}
+              onBack={() => setBirthDate("")}
+            />
+          )}
+
+        {location && accountType === "walker" && hourlyRate === undefined && (
+          <EnterHourlyRate
+            setHourlyRate={setHourlyRate}
+            onBack={() => setLocation(undefined)}
           />
         )}
-        {email !== "" && password !== "" && name !== "" && location && (
-          <SubmitPage
-            name={name}
-            email={email}
-            onSubmit={onSubmit}
-            setEmail={setEmail}
-            setName={setName}
-            onBack={handleBackToSetLocation}
-          />
-        )}
+
+        {location &&
+          hourlyRate &&
+          accountType === "walker" &&
+          exp === undefined && (
+            <SetExperience
+              onBack={() => setHourlyRate(undefined)}
+              setFinal={setExp}
+            />
+          )}
+
+        {email !== "" &&
+          password !== "" &&
+          name !== "" &&
+          location &&
+          birthDate &&
+          (exp || accountType === "owner") && (
+            <SubmitPage
+              name={name}
+              email={email}
+              address={address}
+              birthDate={birthDate}
+              hourlyRate={hourlyRate}
+              onSubmit={onSubmit}
+              setEmail={setEmail}
+              setName={setName}
+              setAddress={setAddress}
+              setBirthDate={setBirthDate}
+              setHourlyRate={setHourlyRate}
+            />
+          )}
       </Box>
     </Container>
   );

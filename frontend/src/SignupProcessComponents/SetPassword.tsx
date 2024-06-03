@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { Box, Button, TextField, Typography, Container, Alert } from '@mui/material';
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  Container,
+  Alert,
+} from "@mui/material";
 
 interface Props {
   setPassword: (password: string) => void;
@@ -16,7 +23,7 @@ const SetPassword = ({ setPassword, onBack }: Props) => {
       // show alert for 3 seconds
       setShowAlert(true);
       setTimeout(() => {
-          setShowAlert(false);
+        setShowAlert(false);
       }, 3000);
     } else {
       setPassword(innerPassword);
@@ -28,16 +35,16 @@ const SetPassword = ({ setPassword, onBack }: Props) => {
       <Box
         sx={{
           marginTop: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
         }}
       >
         <Typography component="h1" variant="h5" gutterBottom>
-          Choose Password
+          Choose a password
         </Typography>
         {showAlert && (
-          <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
+          <Alert severity="error" sx={{ width: "100%", mb: 2 }}>
             {innerPassword.length < 8
               ? "Password must be longer than 8 characters"
               : "Repeated password must match the password"}
@@ -64,7 +71,14 @@ const SetPassword = ({ setPassword, onBack }: Props) => {
           id="repeatedPasswordField"
           onChange={(e) => setRepeatedPassword(e.target.value)}
         />
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', mt: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            width: "100%",
+            mt: 2,
+          }}
+        >
           <Button variant="contained" onClick={onBack}>
             Back
           </Button>
