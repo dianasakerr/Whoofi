@@ -1,19 +1,27 @@
-import { useState, useEffect } from 'react';
-import { Container, Typography, Box, TextField, Button, Switch, FormControlLabel } from '@mui/material';
-import { styled } from '@mui/system';
+import { useState, useEffect } from "react";
+import {
+  Container,
+  Typography,
+  Box,
+  TextField,
+  Button,
+  Switch,
+  FormControlLabel,
+} from "@mui/material";
+import { styled } from "@mui/system";
 
 const ProfileContainer = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(4),
 }));
 
 const ProfilePage = () => {
-  const [userType, setUserType] = useState('dogOwner'); // 'dogOwner' or 'dogWalker'
+  const [userType, setUserType] = useState("dogOwner"); // 'dogOwner' or 'dogWalker'
   const [profileData, setProfileData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    experience: '',
-    rate: '',
+    name: "",
+    email: "",
+    phone: "",
+    experience: "",
+    rate: "",
     sizesAccepted: {
       small: false,
       mid: false,
@@ -28,7 +36,7 @@ const ProfilePage = () => {
 
   const handleChange = (e: any) => {
     const { name, value, type, checked } = e.target;
-    if (type === 'checkbox') {
+    if (type === "checkbox") {
       setProfileData((prevData) => ({
         ...prevData,
         sizesAccepted: {
@@ -46,15 +54,19 @@ const ProfilePage = () => {
 
   const handleSave = () => {
     // Save profile data
-    console.log('Profile data saved:', profileData);
+    console.log("Profile data saved:", profileData);
   };
 
   return (
     <ProfileContainer maxWidth="md">
       <Typography variant="h4" component="h1" gutterBottom>
-        Edit {userType === 'dogOwner' ? 'Dog Owner Profile' : 'Dog Walker Profile'}
+        Edit{" "}
+        {userType === "dogOwner" ? "Dog Owner Profile" : "Dog Walker Profile"}
       </Typography>
-      <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <Box
+        component="form"
+        sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+      >
         <TextField
           label="Name"
           name="name"
@@ -76,7 +88,7 @@ const ProfilePage = () => {
           onChange={handleChange}
           fullWidth
         />
-        {userType === 'dogWalker' && (
+        {userType === "dogWalker" && (
           <>
             <TextField
               label="Experience (years)"
