@@ -1,12 +1,12 @@
-import { AppBar, Toolbar, Button, Box } from '@mui/material';
-import { Link } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { AppBar, Toolbar, Button, Box } from "@mui/material";
+import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const Header = () => {
   const [isSignedIn, setIsSignedIn] = useState<boolean>(false);
 
   const checkLocalStorage = () => {
-    const item = localStorage.getItem('token');
+    const item = localStorage.getItem("token");
     setIsSignedIn(!!item);
   };
 
@@ -14,21 +14,21 @@ const Header = () => {
     checkLocalStorage();
 
     const handleStorageChange = () => {
-      console.log('Storage change heard from header');
+      console.log("Storage change heard from header");
       checkLocalStorage();
     };
 
-    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener("storage", handleStorageChange);
 
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener("storage", handleStorageChange);
     };
   }, []);
 
   const handleSignOut = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
     setIsSignedIn(false);
-    window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new Event("storage"));
   };
 
   return (
