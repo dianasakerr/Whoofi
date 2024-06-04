@@ -5,19 +5,29 @@ import { useState } from "react";
 interface Props {
   name: string;
   email: string;
+  address: string;
+  birthDate: string;
+  hourlyRate?: number;
   onSubmit: () => Promise<boolean | void>;
   setEmail: (email: string) => void;
   setName: (name: string) => void;
-  onBack: () => void;
+  setAddress: (address: string) => void;
+  setBirthDate: (birthDate: string) => void;
+  setHourlyRate: (rate: number | undefined) => void;
 }
 
 const SubmitPage = ({
   name,
   email,
+  address,
+  birthDate,
+  hourlyRate,
   onSubmit,
   setEmail,
   setName,
-  onBack,
+  setAddress,
+  setBirthDate,
+  setHourlyRate,
 }: Props) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -28,15 +38,16 @@ const SubmitPage = ({
       if (res) {
         setLoading(false);
       } else if (res === false) {
-        setError("This email already has an account. sign in instead");
+        setError("This email already has an account. Sign in instead.");
       } else {
         setError(
-          "A server error has accured. please check your internet connection and try again"
+          "A server error has occurred. Please check your internet connection and try again."
         );
       }
       setLoading(false);
     });
   };
+
   return (
     <Box
       sx={{
@@ -70,6 +81,44 @@ const SubmitPage = ({
           Change
         </Button>
       </Typography>
+      <Typography variant="h5" component="h3" gutterBottom>
+        Address: {address}
+        <Button
+          variant="outlined"
+          color="primary"
+          size="small"
+          onClick={() => setAddress("")}
+          sx={{ ml: 2 }}
+        >
+          Change
+        </Button>
+      </Typography>
+      <Typography variant="h5" component="h3" gutterBottom>
+        Birth Date: {birthDate}
+        <Button
+          variant="outlined"
+          color="primary"
+          size="small"
+          onClick={() => setBirthDate("")}
+          sx={{ ml: 2 }}
+        >
+          Change
+        </Button>
+      </Typography>
+      {hourlyRate !== undefined && (
+        <Typography variant="h5" component="h3" gutterBottom>
+          Hourly Rate: {hourlyRate}
+          <Button
+            variant="outlined"
+            color="primary"
+            size="small"
+            onClick={() => setHourlyRate?.(undefined)}
+            sx={{ ml: 2 }}
+          >
+            Change
+          </Button>
+        </Typography>
+      )}
       {error && <p>{error}</p>}
       <Box sx={{ mt: 3, display: "flex", gap: 2 }}>
         <LoadingButton
@@ -80,9 +129,6 @@ const SubmitPage = ({
         >
           {!loading && "Sign up"}
         </LoadingButton>
-        <Button variant="outlined" onClick={onBack}>
-          Back
-        </Button>
       </Box>
     </Box>
   );
