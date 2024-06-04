@@ -2,16 +2,17 @@ import { useRef } from "react";
 import { Box, Button, TextField, Typography, Container } from "@mui/material";
 
 interface Props {
-  setEmail: (email: string) => void;
+  setHourlyRate: (rate: number) => void;
   onBack: () => void;
 }
 
-const EnterEmail = ({ setEmail, onBack }: Props) => {
-  const emailRef = useRef<HTMLInputElement>(null);
+const EnterHourlyRate = ({ setHourlyRate, onBack }: Props) => {
+  const rateRef = useRef<HTMLInputElement>(null);
 
   const handleNext = () => {
-    if (emailRef.current?.value !== undefined) {
-      setEmail(emailRef.current?.value);
+    const rateValue = rateRef.current?.value;
+    if (rateValue !== undefined && !isNaN(Number(rateValue))) {
+      setHourlyRate(Number(rateValue));
     }
   };
 
@@ -26,19 +27,21 @@ const EnterEmail = ({ setEmail, onBack }: Props) => {
         }}
       >
         <Typography component="h1" variant="h5" gutterBottom>
-          What's your email?
+          What's your hourly rate?
         </Typography>
         <TextField
           variant="outlined"
           margin="normal"
           required
           fullWidth
-          id="email"
-          label="Enter email"
-          name="email"
-          autoComplete="email"
+          id="hourly-rate"
+          label="Enter hourly rate"
+          name="hourly-rate"
+          autoComplete="off"
           autoFocus
-          inputRef={emailRef}
+          type="number"
+          inputRef={rateRef}
+          InputProps={{ inputProps: { min: 1 } }}
         />
         <Box
           sx={{
@@ -60,4 +63,4 @@ const EnterEmail = ({ setEmail, onBack }: Props) => {
   );
 };
 
-export default EnterEmail;
+export default EnterHourlyRate;
