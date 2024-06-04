@@ -1,6 +1,5 @@
-import { useState } from "react";
-import { Box, Button, Container, MenuItem } from "@mui/material";
-import Select from "@mui/material/Select";
+import { useRef } from "react";
+import { Box, Button, Container, TextField } from "@mui/material";
 
 interface Props {
   onBack: () => void;
@@ -8,30 +7,38 @@ interface Props {
 }
 
 const SetExperience = ({ onBack, setFinal }: Props) => {
-  const [exp, setExp] = useState<number | null>(null);
+  const expRef = useRef<HTMLInputElement>(null);
+
+  const handleNext = () => {
+    const rateValue = expRef.current?.value;
+    if (rateValue !== undefined && !isNaN(Number(rateValue))) {
+      setFinal(Number(rateValue));
+    }
+  };
 
   return (
     <Container component="main" maxWidth="sm">
       <Box>
         <div>How many years have you been a dog walker?</div>
 
-        <Select
-          value={exp}
-          label="Age"
-          onChange={(event) => setExp(event.target.value as number)}
-        >
-          {[...Array(35).keys()].map((i) => (
-            <MenuItem value={i + 1}>{i + 1}</MenuItem>
-          ))}
-        </Select>
+        <TextField
+          variant="outlined"
+          margin="normal"
+          required
+          fullWidth
+          id="hourly-rate"
+          label="Enter your experience in years"
+          name="hourly-rate"
+          autoComplete="off"
+          autoFocus
+          type="number"
+          inputRef={expRef}
+          InputProps={{ inputProps: { min: 1, max: 40 } }}
+        />
         <Button variant="contained" onClick={onBack}>
           Back
         </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => setFinal(exp)}
-        >
+        <Button variant="contained" color="primary" onClick={handleNext}>
           Next
         </Button>
       </Box>

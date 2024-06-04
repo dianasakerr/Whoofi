@@ -8,7 +8,6 @@ import SubmitPage from "./SignupProcessComponents/SubmitPage";
 import SetLocation from "./SignupProcessComponents/SetLocation";
 import { Container, Typography, Box, CssBaseline } from "@mui/material";
 import SetDateOfBirth from "./SignupProcessComponents/SetDateOfBirth";
-import { Dayjs } from "dayjs";
 import SetExperience from "./SignupProcessComponents/SetExperience";
 import EnterHourlyRate from "./SignupProcessComponents/EnterHourlyRate";
 
@@ -23,7 +22,7 @@ function SignupProcess() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [address, setAddress] = useState<string>("");
-  const [birthDate, setBirthDate] = useState<string>("e");
+  const [birthDate, setBirthDate] = useState<string>("");
   const [location, setLocation] = useState<Location | undefined>();
   const [hourlyRate, setHourlyRate] = useState<number | undefined>();
   const [exp, setExp] = useState<number | null>();
