@@ -41,6 +41,7 @@ const EnterHourlyRate = ({ setHourlyRate, onBack }: Props) => {
           autoFocus
           type="number"
           inputRef={rateRef}
+          InputProps={{ inputProps: { min: 1 } }}
         />
         <Box
           sx={{
