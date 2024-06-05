@@ -2,6 +2,7 @@
 import re
 
 from pydantic import BaseModel
+from typing import Optional, List
 from abc import abstractmethod
 from backend.database import *
 from fastapi import HTTPException
@@ -12,23 +13,21 @@ from datetime import datetime
 class User(BaseModel):
     username: str
     email: str
-    coordinates: list  # [longitude, latitude]
+    coordinates: List[float]  # [longitude, latitude]
     phone_number: str
     password: str
-    date_of_birth: str
+    date_of_birth: datetime
+    profile_picture_id: Optional[str] = None  # Adding profile_picture_id field
 
     class Config:
         from_attributes = True
 
     @abstractmethod
     def save_user(self):
-        # Convert date_of_birth from string to date object
-        try:
-            date_of_birth = datetime.strptime(self.date_of_birth, "%d-%m-%Y")
-        except ValueError:
-            raise HTTPException(status_code=400, detail="Invalid date format. Use DD-MM-YYYY.")
+
         return {USERNAME: self.username, EMAIL: self.email, COORDINATES: self.coordinates,
-                PHONE_NUMBER: self.phone_number, PASSWORD: self.password, DATE_OF_BIRTH: date_of_birth}
+                PHONE_NUMBER: self.phone_number, PASSWORD: self.password, DATE_OF_BIRTH: self.date_of_birth,
+                PROFILE_PICTURE_ID: self.profile_picture_id}
 
     def is_valid_email(self, email):
 
