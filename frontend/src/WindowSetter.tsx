@@ -5,6 +5,8 @@ import SignupProcess from './SignupProcess';
 import DogWalkersSearchPage from './DogWalkersSearchPage';
 import Header from './Header';
 import Profile from "./Profile";
+import BarkingDetecter from "./BarkingDetector.tsx";
+import DogWalkerProfile from "./DogWalkerProfile.jsx";
 
 const WindowSetter = () => {
 
@@ -18,6 +20,8 @@ const WindowSetter = () => {
         <Route path="/signup" element={<SignupProcess />} />
         <Route path="/search" element={<DogWalkersSearchPage />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/barkingDetecter" element={<BarkingDetecter />} />
+        <Route path="/DogWalkerProfile" element={<DogWalkerProfile />} />
       </Routes>
     </div>
   );

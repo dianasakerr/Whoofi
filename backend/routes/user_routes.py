@@ -1,13 +1,13 @@
 # routes/user_routes.py
 from fastapi import APIRouter, HTTPException, status
-from backend.security import verify_token
-from backend.models.user import DogOwner, DogWalker
+from security import verify_token
+from models.user import DogOwner, DogWalker
 from pydantic import BaseModel
 import bcrypt
-from backend.database import *
+from database import *
 from pymongo.errors import *
-from backend.utils.user_utils import calculate_age, generate_whatsapp_link
-from backend.security import create_access_token
+from utils.user_utils import calculate_age, generate_whatsapp_link
+from security import create_access_token
 user_router = APIRouter()
 
 
