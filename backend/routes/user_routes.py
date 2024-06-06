@@ -5,6 +5,7 @@ import logging
 from fastapi import APIRouter, HTTPException, status, File, UploadFile
 from backend.security import verify_token
 from backend.models.user import DogOwner, DogWalker
+from fastapi.responses import StreamingResponse
 from bson.objectid import ObjectId
 from pydantic import BaseModel
 import bcrypt
@@ -27,7 +28,7 @@ class SignInReq(BaseModel):
     password: str
 
 
-@user_router.put("/create_user/")
+@user_router.post("/create_user/")
 async def create_user(user_type: str, username: str, email: str, longitude: float, latitude: float, phone_number: str,
                       password: str, date_of_birth: str, years_of_experience: float = None, hourly_rate: float = None,
                       file: UploadFile = File(None)):
@@ -128,17 +129,18 @@ def get_user(token: str):
     user[AGE] = calculate_age(user[DATE_OF_BIRTH])
     file_id = user.get(PROFILE_PICTURE_ID)
     if file_id and PROFILE_PICTURE not in user.keys():
-        try:
-            file_data = fs.get(ObjectId(file_id))
-            file_content = file_data.read()
-            if file_content:
-                user[PROFILE_PICTURE] = {
-                    "content": io.BytesIO(file_content).getvalue().decode('latin1'),  # Convert binary to string
-                    "content_type": file_data.content_type}
-        except Exception as e:
-            logging.error(f"Error retrieving profile picture: {str(e)}")
-
+        user[PROFILE_PICTURE_URL] = f"/get_profile_picture/{file_id}"
     return user
+
+
+@user_router.get("/get_profile_picture/")
+def get_profile_picture(file_id: str):
+    try:
+        file_data = fs.get(ObjectId(file_id))
+        return StreamingResponse(io.BytesIO(file_data.read()), media_type=file_data.content_type)
+    except Exception as e:
+        logging.error(f"Error retrieving profile picture: {str(e)}")
+        raise HTTPException(status_code=404, detail="Profile picture not found")
 
 
 @user_router.put("/edit_user/")
