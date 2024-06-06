@@ -1,14 +1,26 @@
 # routes/user_routes.py
-from fastapi import APIRouter, HTTPException, status
+import io
+import logging
+
+from fastapi import APIRouter, HTTPException, status, File, UploadFile
 from backend.security import verify_token
 from backend.models.user import DogOwner, DogWalker
+from fastapi.responses import StreamingResponse
+from bson.objectid import ObjectId
 from pydantic import BaseModel
 import bcrypt
 from backend.database import *
 from pymongo.errors import *
 from backend.utils.user_utils import calculate_age, generate_whatsapp_link
 from backend.security import create_access_token
+from gridfs import GridFS
+from datetime import datetime
 user_router = APIRouter()
+
+# Get the MongoDB client and GridFS setup
+client = get_mongo_client()
+db = client[WHOOFI]
+fs = GridFS(db)
 
 
 class SignInReq(BaseModel):
@@ -16,13 +28,29 @@ class SignInReq(BaseModel):
     password: str
 
 
-@user_router.put("/create_user/")
+@user_router.post("/create_user/")
 async def create_user(user_type: str, username: str, email: str, longitude: float, latitude: float, phone_number: str,
-                      password: str, date_of_birth: str, years_of_experience: float = None, hourly_rate: float = None):
+                      password: str, date_of_birth: str, years_of_experience: float = None, hourly_rate: float = None,
+                      file: UploadFile = File(None)):
 
     user_type = user_type.lower()
+
+    file_id = None
+    if file:
+        file_contents = await file.read()
+        if not file.content_type.startswith("image/"):
+            raise HTTPException(status_code=400, detail="Invalid file type. Only images are allowed.")
+        file_id = fs.put(file_contents, filename=file.filename, content_type=file.content_type)
+
+    # Convert date_of_birth from string to date object
+    try:
+        date_of_birth = datetime.strptime(date_of_birth, "%d-%m-%Y")
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid date format. Use DD-MM-YYYY.")
+
     user_data = {USERNAME: username, EMAIL: email, COORDINATES: [longitude, latitude], PHONE_NUMBER: phone_number,
-                 PASSWORD: password, DATE_OF_BIRTH: date_of_birth}
+                 PASSWORD: password, DATE_OF_BIRTH: date_of_birth, PROFILE_PICTURE_ID: str(file_id)}
+
     # Hash the password before saving
     user_data[PASSWORD] = bcrypt.hashpw(user_data[PASSWORD].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
@@ -99,13 +127,26 @@ def get_user(token: str):
             headers={"WWW-Authenticate": "Bearer"})
 
     user[AGE] = calculate_age(user[DATE_OF_BIRTH])
+    file_id = user.get(PROFILE_PICTURE_ID)
+    if file_id and PROFILE_PICTURE not in user.keys():
+        user[PROFILE_PICTURE_URL] = f"/get_profile_picture/{file_id}"
     return user
+
+
+@user_router.get("/get_profile_picture/")
+def get_profile_picture(file_id: str):
+    try:
+        file_data = fs.get(ObjectId(file_id))
+        return StreamingResponse(io.BytesIO(file_data.read()), media_type=file_data.content_type)
+    except Exception as e:
+        logging.error(f"Error retrieving profile picture: {str(e)}")
+        raise HTTPException(status_code=404, detail="Profile picture not found")
 
 
 @user_router.put("/edit_user/")
 async def edit_user(token: str, username: str = None, longitude: float = None, latitude: float = None,
                     phone_number: str = None, date_of_birth: str = None, hourly_rate: float = None,
-                    years_of_experience: float = None):
+                    years_of_experience: float = None, file: UploadFile = File(None)):
 
     user = verify_token(token)
     if user is None:
@@ -119,9 +160,18 @@ async def edit_user(token: str, username: str = None, longitude: float = None, l
     else:
         coordinates = None
 
+    file_id = None
+    # Handle profile picture update
+    if file:
+        file_contents = await file.read()
+        if not file.content_type.startswith("image/"):
+            raise HTTPException(status_code=400, detail="Invalid file type. Only images are allowed.")
+        # Store the new picture in GridFS
+        file_id = fs.put(file_contents, filename=file.filename, content_type=file.content_type)
+
     # Convert the MongoDB result to a dictionary
     data = {USERNAME: username, COORDINATES: coordinates, PHONE_NUMBER: phone_number, DATE_OF_BIRTH: date_of_birth,
-            HOURLY_RATE: hourly_rate, YEARS_OF_EXPERIENCE: years_of_experience}
+            HOURLY_RATE: hourly_rate, YEARS_OF_EXPERIENCE: years_of_experience, PROFILE_PICTURE_ID: str(file_id)}
     result = {}
     for key, value in data.items():
         if key in user.keys() and value:

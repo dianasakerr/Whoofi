@@ -3,9 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="8c1c587a-4e63-4909-be1b-8f70790227c6" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/database.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/routes/user_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/routes/user_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/utils/user_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/utils/user_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/utils/constants.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/utils/constants.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -68,7 +67,7 @@
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="dbb76671-eeb8-4d09-bb81-dc7378b3c81f" name="Changes" comment="" />
+      <changelist id="8c1c587a-4e63-4909-be1b-8f70790227c6" name="Changes" comment="" />
       <created>1716057971430</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
@@ -97,23 +96,13 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/backend/models/user.py</url>
-          <line>96</line>
+          <line>95</line>
           <option name="timeStamp" value="28" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/backend/models/user.py</url>
-          <line>120</line>
+          <line>119</line>
           <option name="timeStamp" value="29" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/backend/security.py</url>
-          <line>9</line>
-          <option name="timeStamp" value="30" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/backend/database.py</url>
-          <line>16</line>
-          <option name="timeStamp" value="32" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

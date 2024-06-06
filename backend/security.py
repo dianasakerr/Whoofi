@@ -10,11 +10,10 @@ def create_access_token(data: dict):
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
-
     # change datetime object to ISO format strings
     date_of_birth = to_encode[DATE_OF_BIRTH]
     if isinstance(date_of_birth, datetime):
-        to_encode[DATE_OF_BIRTH] = date_of_birth.date().isoformat()
+        to_encode[DATE_OF_BIRTH] = date_of_birth.date().strftime("%d-%m-%Y")
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
