@@ -23,32 +23,31 @@ function SignupProcess() {
   const [password, setPassword] = useState<string>("");
   const [address, setAddress] = useState<string>("");
   const [birthDate, setBirthDate] = useState<string>("");
-  const [location, setLocation] = useState<Location | undefined>();
-  const [hourlyRate, setHourlyRate] = useState<number | undefined>();
+  const [location, setLocation] = useState<Location>();
+  const [hourlyRate, setHourlyRate] = useState<number>();
   const [exp, setExp] = useState<number | null>();
   const navigate = useNavigate();
 
   useEffect(() => console.log(birthDate, typeof birthDate), [birthDate]);
 
   const onSubmit = async () => {
-    return fetch(import.meta.env.VITE_API_URL + "create_user/", {
+    const url = import.meta.env.VITE_API_URL + "create_user/?";
+    const params = {
+      user_type: accountType,
+      username: name,
+      email: email,
+      phone_number: "0545356002",
+      longitude: location ? location.lng : "",
+      latitude: location ? location.lat : "",
+      password: password,
+      address: address,
+      date_of_birth: birthDate,
+      hourly_rate: hourlyRate ? hourlyRate : 0,
+      years_of_experience: exp ? exp : 0,
+    };
+
+    return fetch(url + new URLSearchParams(params), {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        user_type: accountType,
-        username: name,
-        email: email,
-        phone_number: "0545356002",
-        longitude: location?.lng,
-        latitude: location?.lat,
-        password: password,
-        address: address,
-        date_of_birth: birthDate,
-        hourly_rate: hourlyRate,
-        years_of_experience: exp,
-      }),
     })
       .then((res) => {
         if (res.ok) {

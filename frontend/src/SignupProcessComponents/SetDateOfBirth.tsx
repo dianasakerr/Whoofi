@@ -36,7 +36,7 @@ const SetDateOfBirth = ({ setFinal, onBack }: Props) => {
             label="Select Date"
             onChange={(newValue) => {
               if (newValue) {
-                setDateOfBirth(newValue.toString());
+                setDateOfBirth(newValue.format("DD-MM-YYYY"));
               }
             }}
           />
