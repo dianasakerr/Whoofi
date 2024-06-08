@@ -120,3 +120,41 @@ class DogWalker(User):
             cluster.close()
             raise HTTPException(status_code=400, detail=f"{e} - Please try gain")
         cluster.close()
+
+
+class Manager(User):
+    def __init__(self, **values):
+        super().__init__(**values)
+        self.save_user()
+
+    def save_user(self):
+        self.check_email_uniqueness(MANAGER)
+        data = super().save_user()
+        collection, cluster = get_collection(MANAGER)
+        try:
+            # Insert the new user into the database
+            collection.insert_one(data)
+        except Exception as e:
+            cluster.close()
+            raise HTTPException(status_code=400, detail=f"{e} - Please try again")
+        cluster.close()
+
+    def delete_user(self, email: str, user_type: str):
+        collection, cluster = get_collection_by_user_type(user_type)
+        try:
+            result = collection.delete_one({EMAIL: email})
+            if result.deleted_count == 0:
+                raise HTTPException(status_code=404, detail="User not found")
+        except Exception as e:
+            cluster.close()
+            raise HTTPException(status_code=400, detail=f"{e} - Could not delete user")
+        cluster.close()
+
+    def see_all_users(self) -> List[dict]:
+        all_users = []
+        for user_type in [DOG_OWNER, DOG_WALKER, MANAGER]:
+            collection, cluster = get_collection(user_type)
+            users = list(collection.find({}, {"password": False, "coordinates": True}))
+            all_users.extend(users)
+            cluster.close()
+        return all_users

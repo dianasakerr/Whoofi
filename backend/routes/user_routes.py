@@ -1,24 +1,23 @@
-# routes/user_routes.py
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 from backend.security import verify_token
-from backend.models.user import DogOwner, DogWalker
+from backend.models.user import DogOwner, DogWalker, Manager
 from pydantic import BaseModel
 import bcrypt
 from backend.database import *
 from pymongo.errors import *
-from backend.utils.user_utils import calculate_age, generate_whatsapp_link
+from backend.utils.user_utils import calculate_age
 from backend.security import create_access_token
-user_router = APIRouter()
+from typing import Optional
 
+user_router = APIRouter()
 
 class SignInReq(BaseModel):
     email: str
     password: str
 
-
 @user_router.put("/create_user/")
 async def create_user(user_type: str, username: str, email: str, longitude: float, latitude: float, phone_number: str,
-                      password: str, date_of_birth: str, years_of_experience: float = None, hourly_rate: float = None):
+                      password: str, date_of_birth: str, years_of_experience: Optional[float] = None, hourly_rate: Optional[float] = None):
 
     user_type = user_type.lower()
     user_data = {USERNAME: username, EMAIL: email, COORDINATES: [longitude, latitude], PHONE_NUMBER: phone_number,
@@ -36,25 +35,68 @@ async def create_user(user_type: str, username: str, email: str, longitude: floa
         user_data[YEARS_OF_EXPERIENCE] = years_of_experience
         user_data[HOURLY_RATE] = hourly_rate
         user = DogWalker(**user_data)
+    elif user_type == MANAGER:
+        user = Manager(**user_data)
     else:
-        raise HTTPException(status_code=400, detail="Invalid user type. Please specify 'owner' or 'walker'.")
+        raise HTTPException(status_code=400, detail="Invalid user type. Please specify 'owner', 'walker' or 'manager'.")
 
     access_token = create_access_token(data=dict(user))
     return {"access_token": access_token, "user_type": user_type}
 
 
+@user_router.delete("/delete_user/")
+async def delete_user(token: str, email: str, user_type: str):
+    user = verify_token(token)
+    if user is None or user[USER_TYPE] != MANAGER:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized access",
+                            headers={"WWW-Authenticate": "Bearer"})
+
+    manager = Manager(**user)
+    manager.delete_user(email, user_type)
+    return {"message": f"User with email {email} deleted successfully"}
+
+
+@user_router.get("/see_all_users/", response_model=List[User])
+async def see_all_users(
+    token: str,
+    user_type: Optional[str] = None,
+    max_age: Optional[int] = None,
+    location_radius_km: Optional[float] = None,
+    latitude: Optional[float] = None,
+    longitude: Optional[float] = None,
+):
+    user = verify_token(token)
+    if user is None or user[USER_TYPE] != MANAGER:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized access",
+                            headers={"WWW-Authenticate": "Bearer"})
+
+    manager = Manager(**user)
+    all_users = manager.see_all_users()
+
+    # Apply filters
+    if user_type:
+        all_users = [u for u in all_users if u['user_type'] == user_type]
+    if max_age is not None:
+        all_users = [u for u in all_users if u['age'] <= max_age]
+    if location_radius_km is not None:
+        if latitude is None or longitude is None:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Latitude and longitude must be provided for location filtering")
+
+        center_location = (latitude, longitude)
+        all_users = [u for u in all_users if 'coordinates' in u and geodesic(u['coordinates'][::-1], center_location).km <= location_radius_km]
+
+    return [User(**u) for u in all_users]
+
 @user_router.post("/sign_in/")
 async def sign_in(sign_in_data: SignInReq):
-
     dog_owner = __get_user(sign_in_data.email, OWNER, password=True)
     dog_walker = __get_user(sign_in_data.email, WALKER, password=True)
+    manager = __get_user(sign_in_data.email, MANAGER, password=True)
 
-    user = dog_owner if dog_owner else dog_walker
-    user_type = OWNER if dog_owner else WALKER
+    user = dog_owner if dog_owner else dog_walker if dog_walker else manager
+    user_type = OWNER if dog_owner else WALKER if dog_walker else MANAGER
 
     if user and bcrypt.checkpw(sign_in_data.password.encode('utf-8'), user[PASSWORD].encode('utf-8')):
-        print(f"message Welcome back, {user[USERNAME]}!")
-        # create token access
         user[USER_TYPE] = user_type
         access_token = create_access_token(data=user)
         return {"access_token": access_token, "user_type": user_type}
@@ -62,32 +104,10 @@ async def sign_in(sign_in_data: SignInReq):
     raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="email or password are incorrect",
                         headers={"WWW-Authenticate": "Bearer"})
 
-
 def __get_user(email: str, user_type: str, password: bool = False):
-    try:
-        collection, _ = get_collection_by_user_type(user_type)
-        # Find the user by email
-        filters = {ID: False} if password else {ID: False, PASSWORD: False}
-        user = collection.find_one({EMAIL: email}, filters)
-        if user:
-            return user
-        else:
-            print(f"No user found with email: {email}")
-            return None
-    except errors.PyMongoError as e:
-        print(f"Error finding user: {str(e)}")
-        raise
-
-
-@user_router.get("/get_whatsapp_link/")
-async def get_whatsapp_link(token: str):
-    user = verify_token(token)
-    if user is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
-
-    whatsapp_link = generate_whatsapp_link(user[PHONE_NUMBER])
-    return whatsapp_link
-
+    collection, _ = get_collection_by_user_type(user_type)
+    filters = {ID: False} if password else {ID: False, PASSWORD: False}
+    return collection.find_one({EMAIL: email}, filters)
 
 @user_router.get("/get_user/")
 def get_user(token: str):
@@ -100,7 +120,6 @@ def get_user(token: str):
 
     user[AGE] = calculate_age(user[DATE_OF_BIRTH])
     return user
-
 
 @user_router.put("/edit_user/")
 async def edit_user(token: str, username: str = None, longitude: float = None, latitude: float = None,
