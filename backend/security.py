@@ -1,9 +1,21 @@
+# security.py
 import jwt
+import os
+import logging
 from datetime import datetime, timedelta
-from backend.utils.constants import DATE_OF_BIRTH
-SECRET_KEY = "your_secret_key"
+from utils.constants import *
+from dotenv import load_dotenv
+
+# Load environment variables from a .env file
+load_dotenv()
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+SECRET_KEY = os.getenv("SECRET_KEY", "team")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60*2
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 2
 
 
 def create_access_token(data: dict):
@@ -11,18 +23,38 @@ def create_access_token(data: dict):
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
     # change datetime object to ISO format strings
-    date_of_birth = to_encode[DATE_OF_BIRTH]
+    date_of_birth = to_encode[USER][DATE_OF_BIRTH]
     if isinstance(date_of_birth, datetime):
-        to_encode[DATE_OF_BIRTH] = date_of_birth.date().strftime("%d-%m-%Y")
+        to_encode[USER][DATE_OF_BIRTH] = date_of_birth.date().strftime("%d-%m-%Y")
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    logger.info("Access token created successfully")
     return encoded_jwt
+
+
+def get_access_token(user: dict, user_type: str):
+    private_data = {PASSWORD: user[PASSWORD]}
+    if user_type == WALKER:
+        private_data[RATING] = user[RATING]
+        del user[RATING]
+
+    del user[PASSWORD]
+    data = {'user': user, 'private_data': private_data}
+    access_token = create_access_token(data=data)
+    logger.info(f"Access token generated for user type: {user_type}")
+    return {"access_token": access_token, "user_type": user_type}
 
 
 def verify_token(token: str):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        logger.info("Token verified successfully")
         return payload
     except jwt.ExpiredSignatureError:
-        return None
+        logger.error("Token expired")
+        return
     except jwt.InvalidTokenError:
-        return None
+        logger.error("Invalid token")
+        return
+    except Exception as e:
+        logger.error(f"Token verification failed: {e}")
+        return

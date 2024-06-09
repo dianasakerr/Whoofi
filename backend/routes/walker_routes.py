@@ -1,17 +1,54 @@
 # routes/walker_routes.py
-from fastapi import APIRouter
 from backend.database import *
 from pymongo import GEOSPHERE
 from datetime import datetime, timedelta
 from backend.security import verify_token
 from fastapi import APIRouter, HTTPException, status
+from backend.utils.user_utils import calculate_age
+import numpy as np
 import re
 
 walker_router = APIRouter()
 
 
+@walker_router.put("/add_rating/")
+def add_rating(token: str, walker_email: str, rate: float):
+    data = verify_token(token)
+    if data is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token",
+                            headers={"WWW-Authenticate": "Bearer"})
+
+    user = data.get(USER, {})
+    if user.get(USER_TYPE) != OWNER:
+        error_message = "only Dog Owner can rate Dog Walkers"
+        print(error_message)
+        return error_message
+
+    walker, collection, client = get_user_by_type(email=walker_email, user_type=WALKER)
+    if not walker:
+        error_message = f"Dog walker with email {walker_email} not found"
+        print(error_message)
+        return error_message
+
+    if not (0 <= rate <= 5):
+        error_message = f'Illegal rating number {rate} ' \
+                        f'Dog Walker rate must be in range 0-5.'
+        print(error_message)
+        return error_message
+
+    # Update the rating list and calculate the average
+    rating = walker[RATING]
+    rating[user[EMAIL]] = rate
+    avg = {AVG_RATE: np.average(list(walker[RATING].values()))}
+
+    # Update the user document in MongoDB
+    collection.update_one({EMAIL: walker[EMAIL]}, {"$set": {RATING: rating, AVG_RATE: avg[AVG_RATE]}})
+    client.close()
+
+    return "Rating added successfully"
+
+
 @walker_router.get("/get_dog_walkers/")
-# TODO: if coordinates is None take from user db
 async def get_dog_walkers(token: str, name: str = None, location_radius_km: float = None, latitude: float = None,
                           longitude: float = None, min_experience: float = None, max_price: float = None,
                           min_age: float = None):
@@ -28,10 +65,11 @@ async def get_dog_walkers(token: str, name: str = None, location_radius_km: floa
         if latitude and longitude:
             center_location = [longitude, latitude]
         else:
-            user = verify_token(token)
-            if user is None:
+            data = verify_token(token)
+            if data is None:
                 raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token",
                                     headers={"WWW-Authenticate": "Bearer"})
+            user = data[USER]
             center_location = user[COORDINATES]
 
         try:
@@ -61,11 +99,16 @@ async def get_dog_walkers(token: str, name: str = None, location_radius_km: floa
         min_birth_date = current_date - timedelta(days=min_age * 365.25)
         filter_by[DATE_OF_BIRTH] = {"$lte": min_birth_date}
 
-    projection = {ID: 0, EMAIL: 1, USERNAME: 1, COORDINATES: 1, PHONE_NUMBER: 1, AGE: 1, HOURLY_RATE: 1,
-                  YEARS_OF_EXPERIENCE: 1}
+    projection = {ID: 0, PASSWORD: 0, PROFILE_PICTURE_URL: 0, RATED_USERS: 0}
 
     try:
-        return list(dog_walkers_collection.find(filter_by, projection))
+        walkers = list(dog_walkers_collection.find(filter_by, projection))
+        for walker in walkers:
+            walker[AGE] = calculate_age(walker[DATE_OF_BIRTH])
+            file_id = walker.get(PROFILE_PICTURE_ID)
+            if file_id and PROFILE_PICTURE not in walker.keys():
+                walker[PROFILE_PICTURE_URL] = f"/get_profile_picture/{file_id}"
+        return walkers
     except Exception as e:
         print(e)
         return []
