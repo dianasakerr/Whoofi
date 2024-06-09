@@ -1,7 +1,13 @@
 # models/dog.py
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
-from backend.database import *
+from backend.utils.constants import *
+from backend.database import get_collection
+import logging
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 class Dog(BaseModel):
@@ -25,20 +31,27 @@ class Dog(BaseModel):
         return BIG
 
     def save_dog(self):
-        # check if owner_id exists in dog_owner collection
-        dog_owner_collection, dog_owner_cluster = get_collection(DOG_OWNER)
-        owner_exists = dog_owner_collection.find_one({ID: self.owner_id}) is not None
+        try:
+            # check if owner_id exists in dog_owner collection
+            dog_owner_collection, dog_owner_cluster = get_collection(DOG_OWNER)
+            owner_exists = dog_owner_collection.find_one({ID: self.owner_id}) is not None
 
-        if not owner_exists:
-            raise ValueError(f"Owner with ID {self.owner_id} does not exist.")
+            if not owner_exists:
+                raise ValueError(f"Owner with ID {self.owner_id} does not exist.")
 
-        data = {NAME: self.name, AGE: self.age, RACE: self.race, OWNER_ID: self.owner_id, WEIGHT: self.weight,
-                SIZE: self.size}
-        collection, cluster = get_collection(DOG)
-        collection.insert_one(data)
-        cluster.close()
+            data = {NAME: self.name, AGE: self.age, RACE: self.race, OWNER_ID: self.owner_id, WEIGHT: self.weight,
+                    SIZE: self.size}
+            collection, cluster = get_collection(DOG)
+            collection.insert_one(data)
+            logger.info(f"Dog {self.name} saved to the database.")
 
-        # update dog owner dogs list
-        # TODO: check if to save unique names of the dogs owner or to save dog in dogs list by id
-        dog_owner_collection.update_one(filter={ID: self.owner_id}, update={'$push': {DOGS: [self.name]}})
-        dog_owner_cluster.close()
+            # update dog owner dogs list
+            # TODO: check if to save unique names of the dogs owner or to save dog in dogs list by id
+            dog_owner_collection.update_one(filter={ID: self.owner_id}, update={'$push': {DOGS: [self.name]}})
+            logger.info(f"Dog {self.name} added to the owner's list of dogs.")
+
+        except Exception as e:
+            logger.error(f"Error saving dog: {e}")
+        finally:
+            dog_owner_cluster.close()
+            cluster.close()

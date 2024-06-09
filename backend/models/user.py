@@ -1,13 +1,17 @@
 # models/user.py
 import re
-
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional, List
 from abc import abstractmethod
-from backend.database import *
+from backend.database import get_collection
 from fastapi import HTTPException
 from backend.utils.constants import *
 from datetime import datetime
+import logging
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 class User(BaseModel):
@@ -69,12 +73,14 @@ class User(BaseModel):
                                                         "   - Special characters: '.', _, +, -")
 
         collection, cluster = get_collection(collection_name)
-        existing = collection.find_one({EMAIL: self.email})
+        try:
+            existing = collection.find_one({EMAIL: self.email})
+            if existing:
+                raise HTTPException(status_code=400, detail="Email already exists. Please sign in.")
 
-        if existing:
+            collection, cluster = get_collection(collection_name)
+        finally:
             cluster.close()
-            raise HTTPException(status_code=400, detail="Email already exists. Please sign in.")
-        cluster.close()
 
 
 class DogOwner(User):
@@ -92,15 +98,18 @@ class DogOwner(User):
         try:
             # Insert the new user into the database
             collection.insert_one(data)
+            logger.info(f"DogOwner {self.username} saved to the database.")
         except Exception as e:
-            cluster.close()
             raise HTTPException(status_code=400, detail=f"{e} - Please try gain")
-        cluster.close()
+        finally:
+            cluster.close()
 
 
 class DogWalker(User):
     years_of_experience: float
     hourly_rate: float
+    rating: dict = {}
+    avg_rate: float = None
 
     def __init__(self, **values):
         super().__init__(**values)
@@ -109,13 +118,16 @@ class DogWalker(User):
     def save_user(self):
         self.check_email_uniqueness(DOG_WALKER)
         data = super().save_user()
-        data[YEARS_OF_EXPERIENCE] = self.years_of_experience
-        data[HOURLY_RATE] = self.hourly_rate
+        other_data = {YEARS_OF_EXPERIENCE: self.years_of_experience, HOURLY_RATE: self.hourly_rate, RATING: self.rating,
+                      AVG_RATE: self.avg_rate}
+        data.update(other_data)
         collection, cluster = get_collection(DOG_WALKER)
         try:
             # Insert the new user into the database
             collection.insert_one(data)
+            logger.info(f"DogWalker {self.username} saved to the database.")
         except Exception as e:
-            cluster.close()
+            logger.error(f"Error saving DogWalker: {e}")
             raise HTTPException(status_code=400, detail=f"{e} - Please try gain")
-        cluster.close()
+        finally:
+            cluster.close()
