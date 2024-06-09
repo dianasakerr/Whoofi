@@ -1,7 +1,19 @@
+# database.py
 from pymongo import MongoClient, errors
 from utils.constants import *
+from dotenv import load_dotenv
+import os
+import logging
 
-CONN_STR = "mongodb+srv://dianasakeer:1234@cluster-1.xgxy3zr.mongodb.net/?retryWrites=true&w=majority&appName=Cluster-1"
+# Load environment variables from a .env file
+load_dotenv()
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+CONN_STR = os.getenv("MONGO_CONN_STR",
+                     "mongodb+srv://dianasakeer:1234@cluster-1.xgxy3zr.mongodb.net/?retryWrites=true&w=majority&appName=Cluster-1&tls=true")
 
 
 def get_mongo_client():
@@ -17,18 +29,21 @@ def get_mongo_client():
         client.admin.command('ping')
         print("Connected to MongoDB!")
         return client
-    except errors.ServerSelectionTimeoutError as err:
-        print("Failed to connect to MongoDB", err)
-        raise
-    except errors.PyMongoError as err:
-        print("MongoDB connection error: ", err)
-        raise
+    except errors.ServerSelectionTimeoutError as e:
+        logger.error(f"Failed to connect to MongoDB: Server selection timeout: {e}")
+    except errors.ConnectionFailure as e:
+        logger.error(f"Failed to connect to MongoDB: Connection failure: {e}")
+    except Exception as e:
+        print(f"Failed to connect to MongoDB: {e}")
 
 
 def get_collection(collection_name):
     client = get_mongo_client()
-    db = client[WHOOFI]
-    return db[collection_name], client
+    if client:
+        db = client[WHOOFI]
+        return db[collection_name], client
+    else:
+        return None, None
 
 
 def get_collection_by_user_type(user_type: str):
@@ -41,3 +56,23 @@ def get_collection_by_user_type(user_type: str):
 
     collection, client = get_collection(collection_name)
     return collection, client
+
+
+def get_user_by_type(email: str, user_type: str, password: bool = False):
+    try:
+        collection, client = get_collection_by_user_type(user_type)
+        if collection is None or client is None:
+            return None, None, None
+
+        # Find the user by email
+        filters = {ID: False} if password else {ID: False, PASSWORD: False}
+        user = collection.find_one({EMAIL: email}, filters)
+        if user:
+            return user, collection, client
+        else:
+            logger.info(f"No user found with email: {email}")
+
+    except errors.PyMongoError as e:
+        print(f"Error finding user: {str(e)}")
+
+    return None, None, None

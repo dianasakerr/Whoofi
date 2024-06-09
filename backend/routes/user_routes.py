@@ -3,7 +3,6 @@ import io
 import logging
 
 from fastapi import APIRouter, HTTPException, status, File, UploadFile
-from backend.security import verify_token
 from backend.models.user import DogOwner, DogWalker
 from fastapi.responses import StreamingResponse
 from bson.objectid import ObjectId
@@ -12,7 +11,7 @@ import bcrypt
 from backend.database import *
 from pymongo.errors import *
 from backend.utils.user_utils import calculate_age, generate_whatsapp_link
-from backend.security import create_access_token
+from backend.security import *
 from gridfs import GridFS
 from datetime import datetime
 user_router = APIRouter()
@@ -67,15 +66,14 @@ async def create_user(user_type: str, username: str, email: str, longitude: floa
     else:
         raise HTTPException(status_code=400, detail="Invalid user type. Please specify 'owner' or 'walker'.")
 
-    access_token = create_access_token(data=dict(user))
-    return {"access_token": access_token, "user_type": user_type}
+    return get_access_token(user=dict(user), user_type=user_type)
 
 
 @user_router.post("/sign_in/")
 async def sign_in(sign_in_data: SignInReq):
 
-    dog_owner = __get_user(sign_in_data.email, OWNER, password=True)
-    dog_walker = __get_user(sign_in_data.email, WALKER, password=True)
+    dog_owner, _, _ = get_user_by_type(sign_in_data.email, OWNER, password=True)
+    dog_walker, _, _ = get_user_by_type(sign_in_data.email, WALKER, password=True)
 
     user = dog_owner if dog_owner else dog_walker
     user_type = OWNER if dog_owner else WALKER
@@ -84,52 +82,38 @@ async def sign_in(sign_in_data: SignInReq):
         print(f"message Welcome back, {user[USERNAME]}!")
         # create token access
         user[USER_TYPE] = user_type
-        access_token = create_access_token(data=user)
-        return {"access_token": access_token, "user_type": user_type}
+        return get_access_token(user, user_type)
 
     raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="email or password are incorrect",
                         headers={"WWW-Authenticate": "Bearer"})
 
 
-def __get_user(email: str, user_type: str, password: bool = False):
-    try:
-        collection, _ = get_collection_by_user_type(user_type)
-        # Find the user by email
-        filters = {ID: False} if password else {ID: False, PASSWORD: False}
-        user = collection.find_one({EMAIL: email}, filters)
-        if user:
-            return user
-        else:
-            print(f"No user found with email: {email}")
-            return None
-    except errors.PyMongoError as e:
-        print(f"Error finding user: {str(e)}")
-        raise
-
-
 @user_router.get("/get_whatsapp_link/")
 async def get_whatsapp_link(token: str):
-    user = verify_token(token)
-    if user is None:
+    data = verify_token(token)
+    if data is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
+    user = data[USER]
     whatsapp_link = generate_whatsapp_link(user[PHONE_NUMBER])
     return whatsapp_link
 
 
 @user_router.get("/get_user/")
 def get_user(token: str):
-    user = verify_token(token)
-    if user is None:
+    data = verify_token(token)
+    if data is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token",
             headers={"WWW-Authenticate": "Bearer"})
 
+    user = data[USER]
     user[AGE] = calculate_age(user[DATE_OF_BIRTH])
     file_id = user.get(PROFILE_PICTURE_ID)
     if file_id and PROFILE_PICTURE not in user.keys():
         user[PROFILE_PICTURE_URL] = f"/get_profile_picture/{file_id}"
+
     return user
 
 
@@ -148,11 +132,12 @@ async def edit_user(token: str, username: str = None, longitude: float = None, l
                     phone_number: str = None, date_of_birth: str = None, hourly_rate: float = None,
                     years_of_experience: float = None, file: UploadFile = File(None)):
 
-    user = verify_token(token)
-    if user is None:
+    data = verify_token(token)
+    if data is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token",
                             headers={"WWW-Authenticate": "Bearer"})
 
+    user = data[USER]
     if longitude or latitude:
         longitude = longitude if longitude else user[COORDINATES][0]
         latitude = latitude if latitude else user[COORDINATES][1]
@@ -186,5 +171,4 @@ async def edit_user(token: str, username: str = None, longitude: float = None, l
     except PyMongoError as e:
         raise HTTPException(status_code=500, detail=f"Database update error: {str(e)}")
 
-    cluster.close()
     return {"message": f"User {user[USERNAME]} updated successfully"}
