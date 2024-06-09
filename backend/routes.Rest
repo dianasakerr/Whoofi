@@ -1,0 +1,10 @@
+POST http://localhost:8000/create_user/?user_type=owner&password=12345678 HTTP/1.1
+
+###
+POST  http://localhost:8000/create_user HTTP/1.1
+Content-Type: application/json
+
+{
+    "user_type": "owner",
+    "password": "12345678"
+}

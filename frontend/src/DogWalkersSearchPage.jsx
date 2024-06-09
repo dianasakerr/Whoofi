@@ -60,7 +60,8 @@ const DogWalkersSearchPage = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}get_dog_walkers/?`
+        `${import.meta.env.VITE_API_URL}get_dog_walkers/?token=` +
+          localStorage.getItem("token")
       );
       if (!response.ok) throw new Error("Failed to fetch dog walkers");
       const data = await response.json();
@@ -76,11 +77,8 @@ const DogWalkersSearchPage = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}get_user/?` +
-          new URLSearchParams({
-            email: localStorage.getItem("token"),
-            user_type: localStorage.getItem("userType"),
-          })
+        `${import.meta.env.VITE_API_URL}get_user/?token=` +
+          localStorage.getItem("token")
       );
       if (!response.ok) throw new Error("Failed to fetch user");
       const user = await response.json();
@@ -88,6 +86,7 @@ const DogWalkersSearchPage = () => {
       const filterResponse = await fetch(
         `${import.meta.env.VITE_API_URL}get_dog_walkers/?` +
           new URLSearchParams({
+            token: localStorage.getItem("token"),
             location_radius_km: distanceFilter,
             small: sizeFilter.small,
             mid: sizeFilter.mid,
@@ -208,8 +207,8 @@ const DogWalkersSearchPage = () => {
           {error && <Typography color="error">{error}</Typography>}
 
           <Grid container spacing={3} className="dog-walker-list">
-            {dogWalkers.map((dogWalker) => (
-              <Grid item xs={12} sm={6} md={4} key={dogWalker.id}>
+            {dogWalkers.map((dogWalker, index) => (
+              <Grid key={index} item xs={12} sm={6} md={4}>
                 <Card
                   className="dog-walker-card"
                   onClick={() => handleProfileClick(dogWalker)}
@@ -217,10 +216,10 @@ const DogWalkersSearchPage = () => {
                   <CardContent>
                     <Typography variant="h6">{dogWalker.username}</Typography>
                     <Typography>{dogWalker.location}</Typography>
-                    <Typography>Age: {dogWalker.age}</Typography>
                     <Box className="experience">
-                      <Typography>Experience:</Typography>
-                      {renderExperiencePaws(dogWalker.experience)}
+                      <Typography>
+                        Experience: {dogWalker.years_of_experience}
+                      </Typography>
                     </Box>
                   </CardContent>
                 </Card>
