@@ -13,6 +13,7 @@ import {
   CardMedia,
   IconButton,
   Container,
+  Rating,
 } from "@mui/material";
 
 const DogWalkerProfile = ({ dogWalker, setCurrentDogWalker }) => {
@@ -26,6 +27,7 @@ const DogWalkerProfile = ({ dogWalker, setCurrentDogWalker }) => {
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
       );
       response.json().then((data) => {
+        console.log(data.address);
         setAddress(data.address);
       });
     } catch (error) {
@@ -35,12 +37,25 @@ const DogWalkerProfile = ({ dogWalker, setCurrentDogWalker }) => {
 
   useEffect(() => {
     reverseGeocode(...dogWalker.coordinates);
-    console.log(dogWalker);
   }, []);
 
   const gotoWhatsApp = () => {
     const internetional = "+972" + dogWalker.phone_number.replace(/^0/, "");
     window.open("https://wa.me/" + internetional);
+  };
+
+  const handleRate = (event, value) => {
+    console.log(dogWalker, value);
+    fetch(
+      import.meta.env.VITE_API_URL +
+        "add_rating/?" +
+        new URLSearchParams({
+          token: localStorage.getItem("token"),
+          walker_email: dogWalker.email,
+          rate: value,
+        }),
+      { method: "PUT" }
+    );
   };
 
   return (
@@ -83,8 +98,9 @@ const DogWalkerProfile = ({ dogWalker, setCurrentDogWalker }) => {
             <img src={whatsappLogo} width={40} height={40} />
           </IconButton>
           <Typography variant="body1" color="textSecondary">
-            Rating: {dogWalker.rating}
+            Rate dog walker
           </Typography>
+          <Rating defaultValue={2.5} precision={0.25} onChange={handleRate} />
         </CardContent>
         <IconButton onClick={resetDogWalker} sx={{ mt: 2 }}>
           <img src={backArrow} width={20} height={20} />

@@ -12,6 +12,7 @@ import {
   FormControlLabel,
   CircularProgress,
   Grid,
+  Rating,
 } from "@mui/material";
 import DogWalkerProfile from "./DogWalkerProfile";
 import dogPaw from "./logosAndIcons/dogPaw.svg";
@@ -218,7 +219,14 @@ const DogWalkersSearchPage = () => {
                     <Typography>{dogWalker.location}</Typography>
                     <Box className="experience">
                       <Typography>
-                        Experience: {dogWalker.years_of_experience}
+                        Experience: {dogWalker.years_of_experience} years
+                      </Typography>
+                      <Typography>
+                        <Rating
+                          readOnly
+                          defaultValue={dogWalker.avg_rate}
+                          precision={0.25}
+                        />
                       </Typography>
                     </Box>
                   </CardContent>

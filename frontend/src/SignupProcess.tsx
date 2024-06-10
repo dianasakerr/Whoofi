@@ -51,10 +51,11 @@ function SignupProcess() {
     })
       .then((res) => {
         if (res.ok) {
-          res
-            .json()
-            .then((data) => localStorage.setItem("token", data.access_token));
-          window.dispatchEvent(new Event("storage"));
+          res.json().then((data) => {
+            localStorage.setItem("token", data.access_token);
+            window.dispatchEvent(new Event("storage"));
+          });
+
           navigate("/profile");
           console.log("User created successfully");
           return true;
