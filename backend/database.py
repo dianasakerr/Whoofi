@@ -51,6 +51,8 @@ def get_collection_by_user_type(user_type: str):
         collection_name = DOG_WALKER
     elif user_type == OWNER:
         collection_name = DOG_OWNER
+    elif user_type == MANAGER:
+        collection_name = MANAGER
     else:
         raise ValueError(f"user type isn`t correct {user_type}")
 
