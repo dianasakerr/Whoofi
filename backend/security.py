@@ -5,7 +5,7 @@ import logging
 from datetime import datetime, timedelta
 from utils.constants import *
 from dotenv import load_dotenv
-
+import bcrypt
 # Load environment variables from a .env file
 load_dotenv()
 
@@ -16,6 +16,12 @@ logger = logging.getLogger(__name__)
 SECRET_KEY = os.getenv("SECRET_KEY", "team")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 2
+
+
+def hash_password(password: str) -> str:
+    salt = bcrypt.gensalt()
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
+    return hashed_password.decode('utf-8')
 
 
 def create_access_token(data: dict):
@@ -41,7 +47,7 @@ def get_access_token(user: dict, user_type: str):
     data = {'user': user, 'private_data': private_data}
     access_token = create_access_token(data=data)
     logger.info(f"Access token generated for user type: {user_type}")
-    return {"access_token": access_token, "user_type": user_type}
+    return {"access_token": access_token, "manager_type": user_type}
 
 
 def verify_token(token: str):

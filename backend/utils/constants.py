@@ -9,11 +9,12 @@ DOG = 'dog'
 # USER TYPE
 WALKER = 'walker'
 OWNER = 'owner'
+MANAGER = 'manager'
 
 # COLLECTIONS KEYS
 ID = '_id'
 USERNAME = 'username'
-USER_TYPE = 'user_type'
+USER_TYPE = 'manager_type'
 EMAIL = 'email'
 COORDINATES = 'coordinates'
 PHONE_NUMBER = 'phone_number'

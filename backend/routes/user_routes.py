@@ -1,19 +1,19 @@
 # routes/user_routes.py
 import io
-import logging
 
 from fastapi import APIRouter, HTTPException, status, File, UploadFile
-from backend.models.user import DogOwner, DogWalker
+from backend.models.user import DogOwner, DogWalker, Manager
 from fastapi.responses import StreamingResponse
 from bson.objectid import ObjectId
 from pydantic import BaseModel
-import bcrypt
 from backend.database import *
 from pymongo.errors import *
-from backend.utils.user_utils import calculate_age, generate_whatsapp_link
+from backend.utils.user_utils import calculate_age, check_password_uniqueness_across_collections
 from backend.security import *
 from gridfs import GridFS
 from datetime import datetime
+from typing import Optional
+
 user_router = APIRouter()
 
 # Get the MongoDB client and GridFS setup
@@ -27,41 +27,48 @@ class SignInReq(BaseModel):
     password: str
 
 
+class CreateUsrReq(BaseModel):
+    user_type: str
+    username: str
+    email: str
+    longitude: float
+    latitude: float
+    phone_number: str
+    password: str
+    date_of_birth: str
+    years_of_experience: Optional[float] = None
+    hourly_rate: Optional[float] = None
+
+
 @user_router.post("/create_user/")
-async def create_user(user_type: str, username: str, email: str, longitude: float, latitude: float, phone_number: str,
-                      password: str, date_of_birth: str, years_of_experience: float = None, hourly_rate: float = None,
-                      file: UploadFile = File(None)):
+async def create_user(data: CreateUsrReq):
 
-    user_type = user_type.lower()
-
-    file_id = None
-    if file:
-        file_contents = await file.read()
-        if not file.content_type.startswith("image/"):
-            raise HTTPException(status_code=400, detail="Invalid file type. Only images are allowed.")
-        file_id = fs.put(file_contents, filename=file.filename, content_type=file.content_type)
+    user_type = data.user_type.lower()
 
     # Convert date_of_birth from string to date object
     try:
-        date_of_birth = datetime.strptime(date_of_birth, "%d-%m-%Y")
+        date_of_birth = datetime.strptime(data.date_of_birth, "%d-%m-%Y")
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid date format. Use DD-MM-YYYY.")
 
-    user_data = {USERNAME: username, EMAIL: email, COORDINATES: [longitude, latitude], PHONE_NUMBER: phone_number,
-                 PASSWORD: password, DATE_OF_BIRTH: date_of_birth, PROFILE_PICTURE_ID: str(file_id)}
+    user_data = {USERNAME: data.username, EMAIL: data.email, COORDINATES: [data.longitude, data.latitude],
+                 PHONE_NUMBER: data.phone_number, PASSWORD: data.password, DATE_OF_BIRTH: date_of_birth}
+
+    # Check password uniqueness before hashing
+    check_password_uniqueness_across_collections(data.email, data.password, user_type)
 
     # Hash the password before saving
-    user_data[PASSWORD] = bcrypt.hashpw(user_data[PASSWORD].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    user_data[PASSWORD] = hash_password(data.password)
 
     # Validate and create user object based on user type
     if user_type == OWNER:
         user_data[DOG] = None
         user = DogOwner(**user_data)
     elif user_type == WALKER:
-        if years_of_experience is None or hourly_rate is None:
+        if data.years_of_experience is None or data.hourly_rate is None:
             raise HTTPException(status_code=400, detail="DogWalker must have years_of_experience and hourly_rate.")
-        user_data[YEARS_OF_EXPERIENCE] = years_of_experience
-        user_data[HOURLY_RATE] = hourly_rate
+        user_data[YEARS_OF_EXPERIENCE] = data.years_of_experience
+        user_data[HOURLY_RATE] = data.hourly_rate
         user = DogWalker(**user_data)
     else:
         raise HTTPException(status_code=400, detail="Invalid user type. Please specify 'owner' or 'walker'.")
@@ -69,14 +76,74 @@ async def create_user(user_type: str, username: str, email: str, longitude: floa
     return get_access_token(user=dict(user), user_type=user_type)
 
 
+@user_router.put("/upload_profile_picture/")
+async def upload_profile_picture(token: str, file: UploadFile = File(None)):
+    result = await edit_user(token=token, file=file)
+    return result
+
+
+@user_router.delete("/delete_user/")
+async def delete_user(token: str, email: str, user_type: str):
+
+    data = verify_token(token)
+    manager = data.get(USER, {})
+    manager_type = manager.get(USER_TYPE)
+    if manager is None or manager_type != MANAGER or user_type == MANAGER:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized access",
+                            headers={"WWW-Authenticate": "Bearer"})
+
+    Manager.delete_user(email, user_type)
+    return {"message": f"User with email {email} deleted successfully"}
+
+
+@user_router.get("/see_all_users/")
+async def see_all_users(token: str, user_type: Optional[str] = None, max_age: Optional[int] = None):
+
+    data = verify_token(token)
+    user = data[USER]
+
+    if user is None or user.get(USER_TYPE) != MANAGER:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized access",
+                            headers={"WWW-Authenticate": "Bearer"})
+    if user_type and user_type not in [OWNER, WALKER, MANAGER]:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="manager_type is not valid",
+                            headers={"WWW-Authenticate": "Bearer"})
+
+    filter_by = {}
+    if max_age:
+        current_date = datetime.utcnow()
+        max_birth_age = current_date - timedelta(days=max_age * 365.25)
+        filter_by[DATE_OF_BIRTH] = {"$gte": max_birth_age}
+
+    users_types = [OWNER, WALKER, MANAGER] if user_type is None else [user_type]
+    all_users = []
+    for user_type in users_types:
+
+        collection, cluster = get_collection_by_user_type(user_type)
+        try:
+            users = list(collection.find(filter_by, {PASSWORD: False, ID: False}))
+            all_users.extend(users)
+        finally:
+            cluster.close()
+
+    for usr in all_users:
+        usr[AGE] = calculate_age(usr[DATE_OF_BIRTH])
+        file_id = usr.get(PROFILE_PICTURE_ID)
+        if file_id and PROFILE_PICTURE not in usr.keys():
+            usr[PROFILE_PICTURE_URL] = f"/get_profile_picture/{file_id}"
+
+    return all_users
+
+
 @user_router.post("/sign_in/")
 async def sign_in(sign_in_data: SignInReq):
 
     dog_owner, _, _ = get_user_by_type(sign_in_data.email, OWNER, password=True)
     dog_walker, _, _ = get_user_by_type(sign_in_data.email, WALKER, password=True)
+    manager, _, _ = get_user_by_type(sign_in_data.email, MANAGER, password=True)
 
-    user = dog_owner if dog_owner else dog_walker
-    user_type = OWNER if dog_owner else WALKER
+    user = dog_owner if dog_owner else dog_walker if dog_walker else manager
+    user_type = OWNER if dog_owner else WALKER if dog_walker else MANAGER
 
     if user and bcrypt.checkpw(sign_in_data.password.encode('utf-8'), user[PASSWORD].encode('utf-8')):
         print(f"message Welcome back, {user[USERNAME]}!")
@@ -86,17 +153,6 @@ async def sign_in(sign_in_data: SignInReq):
 
     raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="email or password are incorrect",
                         headers={"WWW-Authenticate": "Bearer"})
-
-
-@user_router.get("/get_whatsapp_link/")
-async def get_whatsapp_link(token: str):
-    data = verify_token(token)
-    if data is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
-
-    user = data[USER]
-    whatsapp_link = generate_whatsapp_link(user[PHONE_NUMBER])
-    return whatsapp_link
 
 
 @user_router.get("/get_user/")
