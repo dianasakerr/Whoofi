@@ -6,7 +6,6 @@ from abc import abstractmethod
 from backend.database import *
 from fastapi import HTTPException
 from backend.utils.constants import *
-from backend.utils.user_utils import check_password_uniqueness_across_collections
 from datetime import datetime
 import logging
 
