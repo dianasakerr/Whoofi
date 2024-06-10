@@ -3,7 +3,7 @@ import re
 from pydantic import BaseModel, Field
 from typing import Optional, List
 from abc import abstractmethod
-from backend.database import get_collection
+from backend.database import *
 from fastapi import HTTPException
 from backend.utils.constants import *
 from datetime import datetime
@@ -22,6 +22,7 @@ class User(BaseModel):
     password: str
     date_of_birth: datetime
     profile_picture_id: Optional[str] = None  # Adding profile_picture_id field
+    user_type: str = Field(default="", init=False)
 
     class Config:
         from_attributes = True
@@ -31,7 +32,7 @@ class User(BaseModel):
 
         return {USERNAME: self.username, EMAIL: self.email, COORDINATES: self.coordinates,
                 PHONE_NUMBER: self.phone_number, PASSWORD: self.password, DATE_OF_BIRTH: self.date_of_birth,
-                PROFILE_PICTURE_ID: self.profile_picture_id}
+                PROFILE_PICTURE_ID: self.profile_picture_id, USER_TYPE: self.user_type}
 
     def is_valid_email(self, email):
 
@@ -77,14 +78,13 @@ class User(BaseModel):
             existing = collection.find_one({EMAIL: self.email})
             if existing:
                 raise HTTPException(status_code=400, detail="Email already exists. Please sign in.")
-
-            collection, cluster = get_collection(collection_name)
         finally:
             cluster.close()
 
 
 class DogOwner(User):
     dogs: list = []
+    user_type: str = OWNER
 
     def __init__(self, **values):
         super().__init__(**values)
@@ -92,6 +92,7 @@ class DogOwner(User):
 
     def save_user(self):
         self.check_email_uniqueness(DOG_OWNER)
+
         data = super().save_user()
         data[DOGS] = self.dogs
         collection, cluster = get_collection(DOG_OWNER)
@@ -110,6 +111,7 @@ class DogWalker(User):
     hourly_rate: float
     rating: dict = {}
     avg_rate: float = None
+    user_type: str = WALKER
 
     def __init__(self, **values):
         super().__init__(**values)
@@ -117,6 +119,7 @@ class DogWalker(User):
 
     def save_user(self):
         self.check_email_uniqueness(DOG_WALKER)
+
         data = super().save_user()
         other_data = {YEARS_OF_EXPERIENCE: self.years_of_experience, HOURLY_RATE: self.hourly_rate, RATING: self.rating,
                       AVG_RATE: self.avg_rate}
@@ -131,3 +134,42 @@ class DogWalker(User):
             raise HTTPException(status_code=400, detail=f"{e} - Please try gain")
         finally:
             cluster.close()
+
+
+class Manager(User):
+    user_type: str = MANAGER
+
+    def __init__(self, **values):
+        super().__init__(**values)
+        self.save_user()
+
+    def save_user(self):
+        self.check_email_uniqueness(MANAGER)
+
+        data = super().save_user()
+        collection, cluster = get_collection(MANAGER)
+        try:
+            # Insert the new user into the database
+            collection.insert_one(data)
+            logger.info(f"Manager {self.username} saved to the database.")
+        except Exception as e:
+            logger.error(f"Error saving Manager: {e}")
+            raise HTTPException(status_code=400, detail=f"{e} - Please try again")
+        finally:
+            cluster.close()
+
+    @classmethod
+    def delete_user(cls, email: str, user_type: str):
+
+        user, collection, cluster = get_user_by_type(email, user_type, password=False)
+        try:
+            result = collection.delete_one({EMAIL: email})
+            if result.deleted_count == 0:
+                raise HTTPException(status_code=404, detail="User not found")
+            logger.info(f"User with email {email} deleted from {user_type} collection.")
+        except Exception as e:
+            logger.error(f"Error deleting user: {e}")
+            raise HTTPException(status_code=400, detail=f"{e} - Could not delete user")
+        finally:
+            if cluster:
+                cluster.close()
