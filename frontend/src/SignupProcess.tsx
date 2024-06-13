@@ -61,11 +61,12 @@ function SignupProcess() {
           return {status: res.status};
         } else {
           console.log("Error creating user");
-          return false;
+          return {status: res.status};
         }
       })
       .catch((err) => {
         console.error("my error log:", err);
+        return {status: 404}
       });
   };
 
