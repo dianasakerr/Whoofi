@@ -8,7 +8,7 @@ interface Props {
   address: string;
   birthDate: string;
   hourlyRate?: number;
-  onSubmit: () => Promise<boolean | void>;
+  onSubmit: () => Promise<{status: number}>;
   setEmail: (email: string) => void;
   setName: (name: string) => void;
   setAddress: (address: string) => void;
@@ -35,14 +35,8 @@ const SubmitPage = ({
   const handleSubmit = async () => {
     setLoading(true);
     onSubmit()?.then((res) => {
-      if (res) {
-        setLoading(false);
-      } else if (res === false) {
-        setError("This email already has an account. Sign in instead.");
-      } else {
-        setError(
-          "A server error has occurred. Please check your internet connection and try again."
-        );
+      if (res.status !== 200) {
+        setError("Sign up failed, make sure your input is correct and try again.");
       }
       setLoading(false);
     });
