@@ -79,10 +79,10 @@ const DogWalkerProfile = ({ dogWalker, setCurrentDogWalker }) => {
           <Typography variant="h4" component="div" gutterBottom>
             {dogWalker.username}
           </Typography>
-          <Typography variant="body1" color="textSecondary">
+          {address && <Typography variant="body1" color="textSecondary">
             Location: {address.city || address.town}, {address.road}{" "}
             {address.house_number}
-          </Typography>
+          </Typography>}
           <Typography variant="body1" color="textSecondary">
             Experience: {dogWalker.years_of_experience} years
           </Typography>

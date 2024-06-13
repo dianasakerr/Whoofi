@@ -32,22 +32,22 @@ function SignupProcess() {
 
   const onSubmit = async () => {
     const url = import.meta.env.VITE_API_URL + "create_user/?";
-    const params = {
-      user_type: accountType,
-      username: name,
-      email: email,
-      phone_number: "0545356002",
-      longitude: location ? location.lng : "",
-      latitude: location ? location.lat : "",
-      password: password,
-      address: address,
-      date_of_birth: birthDate,
-      hourly_rate: hourlyRate ? hourlyRate : 0,
-      years_of_experience: exp ? exp : 0,
-    };
 
-    return fetch(url + new URLSearchParams(params), {
+    return fetch(url, {
       method: "POST",
+      headers: {"Content-Type":"application/json", "Accept":"application/json"},
+      body: JSON.stringify({
+        user_type: accountType,
+        username: name,
+        email: email,
+        phone_number: "0545356002", // TODO
+        longitude: location ? location.lng : 0,
+        latitude: location ? location.lat : 0,
+        password: password,
+        date_of_birth: birthDate,
+        hourly_rate: hourlyRate ? hourlyRate : 0,
+        years_of_experience: exp ? exp : 0,
+      })
     })
       .then((res) => {
         if (res.ok) {
@@ -58,7 +58,7 @@ function SignupProcess() {
 
           navigate("/profile");
           console.log("User created successfully");
-          return true;
+          return {status: res.status};
         } else {
           console.log("Error creating user");
           return false;
