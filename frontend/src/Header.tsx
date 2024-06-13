@@ -1,9 +1,11 @@
 import { AppBar, Toolbar, Button, Box } from "@mui/material";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
   const [isSignedIn, setIsSignedIn] = useState<boolean>(false);
+  const nav = useNavigate();
 
   const checkLocalStorage = () => {
     const item = localStorage.getItem("token");
@@ -28,6 +30,7 @@ const Header = () => {
   const handleSignOut = () => {
     localStorage.removeItem("token");
     setIsSignedIn(false);
+    nav('/');
     window.dispatchEvent(new Event("storage"));
   };
 
