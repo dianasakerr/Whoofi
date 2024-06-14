@@ -10,6 +10,7 @@ import { Container, Typography, Box, CssBaseline } from "@mui/material";
 import SetDateOfBirth from "./SignupProcessComponents/SetDateOfBirth";
 import SetExperience from "./SignupProcessComponents/SetExperience";
 import EnterHourlyRate from "./SignupProcessComponents/EnterHourlyRate";
+import SetPhoneNumber from "./SignupProcessComponents/SetPhoneNumber";
 
 interface Location {
   lat: number;
@@ -26,6 +27,7 @@ function SignupProcess() {
   const [location, setLocation] = useState<Location>();
   const [hourlyRate, setHourlyRate] = useState<number>();
   const [exp, setExp] = useState<number | null>();
+  const [phoneNumber, setPhoneNumber] = useState<string>("");
   const navigate = useNavigate();
 
   useEffect(() => console.log(birthDate, typeof birthDate), [birthDate]);
@@ -35,19 +37,22 @@ function SignupProcess() {
 
     return fetch(url, {
       method: "POST",
-      headers: {"Content-Type":"application/json", "Accept":"application/json"},
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
       body: JSON.stringify({
         user_type: accountType,
         username: name,
         email: email,
-        phone_number: "0545356002", // TODO
+        phone_number: phoneNumber, // Using phone number from state
         longitude: location ? location.lng : 0,
         latitude: location ? location.lat : 0,
         password: password,
         date_of_birth: birthDate,
         hourly_rate: hourlyRate ? hourlyRate : 0,
         years_of_experience: exp ? exp : 0,
-      })
+      }),
     })
       .then((res) => {
         if (res.ok) {
@@ -58,14 +63,14 @@ function SignupProcess() {
 
           navigate("/profile");
           console.log("User created successfully");
-          return {status: res.status};
         } else {
           console.log("Error creating user");
-          return false;
         }
+        return { status: res.status };
       })
       .catch((err) => {
         console.error("my error log:", err);
+        return { status: 404 };
       });
   };
 
@@ -108,11 +113,23 @@ function SignupProcess() {
           password !== "" &&
           name !== "" &&
           birthDate !== "" &&
+          phoneNumber === "" && (
+            <SetPhoneNumber
+              setPhoneNumber={setPhoneNumber}
+              onBack={() => setBirthDate("")}
+            />
+          )}
+
+        {email !== "" &&
+          password !== "" &&
+          name !== "" &&
+          birthDate !== "" &&
+          phoneNumber !== "" &&
           !location && (
             <SetLocation
               setFinalLocation={setLocation}
               setFinalAddress={setAddress}
-              onBack={() => setBirthDate("")}
+              onBack={() => setPhoneNumber("")}
             />
           )}
 
@@ -138,18 +155,21 @@ function SignupProcess() {
           name !== "" &&
           location &&
           birthDate &&
+          phoneNumber &&
           (exp || accountType === "owner") && (
             <SubmitPage
               name={name}
               email={email}
               address={address}
               birthDate={birthDate}
+              phoneNumber={phoneNumber}
               hourlyRate={hourlyRate}
               onSubmit={onSubmit}
               setEmail={setEmail}
               setName={setName}
               setAddress={setAddress}
               setBirthDate={setBirthDate}
+              setPhoneNumber={setPhoneNumber}
               setHourlyRate={setHourlyRate}
             />
           )}
