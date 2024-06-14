@@ -37,6 +37,7 @@ const Login = () => {
         if (res.ok) {
           res.json().then((response) => {
             localStorage.setItem("token", response.access_token);
+            if (response.manager_type) localStorage.setItem("mngr", response.manager_type);
             window.dispatchEvent(new Event("storage"));
           });
           navigate("/search");
