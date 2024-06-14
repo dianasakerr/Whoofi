@@ -1,14 +1,11 @@
 # routes/user_routes.py
 import io
 
-from fastapi import APIRouter, HTTPException, status, File, UploadFile
-from backend.models.user import DogOwner, DogWalker, Manager
+from fastapi import APIRouter, status, File, UploadFile
 from fastapi.responses import StreamingResponse
 from bson.objectid import ObjectId
-from pydantic import BaseModel
-from backend.database import *
 from pymongo.errors import *
-from backend.utils.user_utils import calculate_age, check_password_uniqueness_across_collections
+from backend.utils.user_utils import *
 from backend.security import *
 from gridfs import GridFS
 from datetime import datetime
@@ -126,13 +123,7 @@ async def see_all_users(token: str, user_type: Optional[str] = None, max_age: Op
         finally:
             cluster.close()
 
-    for usr in all_users:
-        usr[AGE] = calculate_age(usr[DATE_OF_BIRTH])
-        file_id = usr.get(PROFILE_PICTURE_ID)
-        if file_id and PROFILE_PICTURE not in usr.keys():
-            usr[PROFILE_PICTURE_URL] = f"/get_profile_picture/{file_id}"
-
-    return all_users
+    return calc_data_to_users(all_users)
 
 
 @user_router.post("/sign_in/")
@@ -164,13 +155,7 @@ def get_user(token: str):
             detail="Invalid token",
             headers={"WWW-Authenticate": "Bearer"})
 
-    user = data[USER]
-    user[AGE] = calculate_age(user[DATE_OF_BIRTH])
-    file_id = user.get(PROFILE_PICTURE_ID)
-    if file_id and PROFILE_PICTURE not in user.keys():
-        user[PROFILE_PICTURE_URL] = f"/get_profile_picture/{file_id}"
-
-    return user
+    return data[USER]
 
 
 @user_router.get("/get_profile_picture/")

@@ -39,3 +39,11 @@ def check_password_uniqueness_across_collections(email: str, password: str, curr
                                     detail=f"Password must be different for each user type for email: {email}.")
         finally:
             cluster.close()
+
+
+def calc_data_to_users(users):
+    for usr in users:
+        usr[AGE] = calculate_age(usr[DATE_OF_BIRTH])
+        file_id = usr.get(PROFILE_PICTURE_ID)
+        if file_id and PROFILE_PICTURE not in usr.keys():
+            usr[PROFILE_PICTURE_URL] = f"/get_profile_picture/{file_id}"

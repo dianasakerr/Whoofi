@@ -3,8 +3,8 @@ from backend.database import *
 from pymongo import GEOSPHERE
 from datetime import datetime, timedelta
 from backend.security import verify_token
+from backend.utils.user_utils import calc_data_to_users
 from fastapi import APIRouter, HTTPException, status
-from backend.utils.user_utils import calculate_age
 import numpy as np
 import re
 
@@ -103,12 +103,9 @@ async def get_dog_walkers(token: str, name: str = None, location_radius_km: floa
 
     try:
         walkers = list(dog_walkers_collection.find(filter_by, projection))
-        for walker in walkers:
-            walker[AGE] = calculate_age(walker[DATE_OF_BIRTH])
-            file_id = walker.get(PROFILE_PICTURE_ID)
-            if file_id and PROFILE_PICTURE not in walker.keys():
-                walker[PROFILE_PICTURE_URL] = f"/get_profile_picture/{file_id}"
+        calc_data_to_users(walkers)
         return walkers
+
     except Exception as e:
         print(e)
         return []
