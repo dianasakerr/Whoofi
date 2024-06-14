@@ -40,7 +40,7 @@ const WindowSetter = () => {
         <Route path="/Admin" element={<Admin/>}></Route>
       </Routes>
       {admin && 
-      <Fab color="primary" sx={{position: 'absolute',bottom:20,right:20, p:7}} onClick={toAdmin}>Manage users</Fab>}
+      <Fab color="primary" sx={{position: 'fixed',bottom:20,right:20, p:7}} onClick={toAdmin}>Manage users</Fab>}
     </div>
   );
 };
