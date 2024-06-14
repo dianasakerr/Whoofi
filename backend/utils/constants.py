@@ -14,7 +14,7 @@ MANAGER = 'manager'
 # COLLECTIONS KEYS
 ID = '_id'
 USERNAME = 'username'
-USER_TYPE = 'manager_type'
+USER_TYPE = 'user_type'
 EMAIL = 'email'
 COORDINATES = 'coordinates'
 PHONE_NUMBER = 'phone_number'
