@@ -123,7 +123,8 @@ async def see_all_users(token: str, user_type: Optional[str] = None, max_age: Op
         finally:
             cluster.close()
 
-    return calc_data_to_users(all_users)
+    calc_data_to_users(all_users)
+    return all_users
 
 
 @user_router.post("/sign_in/")
