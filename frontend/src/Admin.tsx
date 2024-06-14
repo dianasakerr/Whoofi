@@ -6,6 +6,7 @@ interface User {
   username: string;
   email: string;
   user_type: string;
+  manager_type: string;
 }
 
 const Admin = () => {
@@ -50,9 +51,11 @@ const Admin = () => {
 
   const deleteUser = (email: string, user_type: string) =>  {
     fetch(import.meta.env.VITE_API_URL + "delete_user/?token=" +
-        localStorage.getItem("token") + '&email='+ email , {
+        localStorage.getItem("token") + '&email='+ email + "&user_type=" + user_type, {
             method: "DELETE"
         });
+    setUsers((prevUsers) => prevUsers.filter((user) => user.email !== email))
+    setFilteredUsers((prevUsers) => prevUsers.filter((user) => user.email !== email))
   }
 
   return (
@@ -83,7 +86,7 @@ const Admin = () => {
                 primary={user.username}
                 secondary={<Typography variant="body2">{user.email}</Typography>}
               />
-              <Fab color="error" size="small" onClick={() => deleteUser(user.email,user.user_type)}>
+              <Fab color="error" size="small" onClick={() => deleteUser(user.email,user.manager_type)}>
                 X
               </Fab>
             </ListItem>

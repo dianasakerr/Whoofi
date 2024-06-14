@@ -1,5 +1,5 @@
 import { LoadingButton } from "@mui/lab";
-import { Box, Button, Typography } from "@mui/material";
+import { Alert, Box, Button, Typography } from "@mui/material";
 import { useState } from "react";
 
 interface Props {
@@ -113,7 +113,7 @@ const SubmitPage = ({
           </Button>
         </Typography>
       )}
-      {error && <p>{error}</p>}
+      {error && <Alert severity="warning">{error}</Alert>}
       <Box sx={{ mt: 3, display: "flex", gap: 2 }}>
         <LoadingButton
           loading={loading}
