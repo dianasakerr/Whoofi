@@ -2,13 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8c1c587a-4e63-4909-be1b-8f70790227c6" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/database.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/models/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/models/user.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/routes/user_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/routes/user_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/security.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/security.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/utils/constants.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/utils/constants.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/utils/user_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/utils/user_utils.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/SignupProcessComponents/SetPhoneNumber.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/SignupProcess.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/SignupProcess.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/SignupProcessComponents/SubmitPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/SignupProcessComponents/SubmitPage.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -84,7 +80,19 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="HEAD" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>
@@ -95,13 +103,13 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/backend/routes/user_routes.py</url>
-          <line>80</line>
-          <option name="timeStamp" value="12" />
+          <line>176</line>
+          <option name="timeStamp" value="13" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/backend/routes/user_routes.py</url>
-          <line>190</line>
-          <option name="timeStamp" value="13" />
+          <line>98</line>
+          <option name="timeStamp" value="14" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
