@@ -4,6 +4,9 @@
     <list default="true" id="8c1c587a-4e63-4909-be1b-8f70790227c6" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/models/dog.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/models/dog.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/routes/dog_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/routes/dog_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/routes/user_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/routes/user_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/security.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/security.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/utils/constants.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/utils/constants.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -102,14 +105,19 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/backend/routes/user_routes.py</url>
-          <line>176</line>
-          <option name="timeStamp" value="13" />
+          <url>file://$PROJECT_DIR$/backend/routes/dog_routes.py</url>
+          <line>46</line>
+          <option name="timeStamp" value="19" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/backend/routes/user_routes.py</url>
-          <line>98</line>
-          <option name="timeStamp" value="14" />
+          <url>file://$PROJECT_DIR$/backend/routes/dog_routes.py</url>
+          <line>67</line>
+          <option name="timeStamp" value="21" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/backend/routes/dog_routes.py</url>
+          <line>156</line>
+          <option name="timeStamp" value="25" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

@@ -29,6 +29,7 @@ const Header = () => {
 
   const handleSignOut = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("mngr");
     setIsSignedIn(false);
     nav('/');
     window.dispatchEvent(new Event("storage"));

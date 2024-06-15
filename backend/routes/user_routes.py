@@ -194,11 +194,11 @@ async def edit_user(token: str, username: str = None, longitude: float = None, l
         if not file.content_type.startswith("image/"):
             raise HTTPException(status_code=400, detail="Invalid file type. Only images are allowed.")
         # Store the new picture in GridFS
-        file_id = fs.put(file_contents, filename=file.filename, content_type=file.content_type)
+        file_id = str(fs.put(file_contents, filename=file.filename, content_type=file.content_type))
 
     # Convert the MongoDB result to a dictionary
     data = {USERNAME: username, COORDINATES: coordinates, PHONE_NUMBER: phone_number, DATE_OF_BIRTH: date_of_birth,
-            HOURLY_RATE: hourly_rate, YEARS_OF_EXPERIENCE: years_of_experience, PROFILE_PICTURE_ID: str(file_id)}
+            HOURLY_RATE: hourly_rate, YEARS_OF_EXPERIENCE: years_of_experience, PROFILE_PICTURE_ID: file_id}
     result = {}
     for key, value in data.items():
         if key in user.keys() and value:
@@ -209,6 +209,12 @@ async def edit_user(token: str, username: str = None, longitude: float = None, l
         collection, cluster = get_collection_by_user_type(user[USER_TYPE])
         if result:
             collection.update_many({EMAIL: user[EMAIL]}, {"$set": result})
+
+            # get new user data and generate new token
+            updated_user = collection.find_one({EMAIL: user[EMAIL]})
+            new_token = update_token(token, updated_user)
+            cluster.close()
+            return new_token
         cluster.close()
     except PyMongoError as e:
         raise HTTPException(status_code=500, detail=f"Database update error: {str(e)}")
