@@ -3,7 +3,6 @@ from pydantic import BaseModel
 from typing import Optional, Dict
 from backend.utils.constants import *
 from backend.database import get_collection
-from datetime import datetime
 from fastapi import HTTPException
 from datetime import timedelta, datetime
 import logging
@@ -11,6 +10,20 @@ import logging
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+VACCINATION_SCHEDULE_FOR_PUPPIES = {
+    "חיסון משושה ראשון": 8,
+    "חיסון משושה שני": 12,
+    " חיסון כלבת + שבב": 13,
+    "חיסון משושה שלישי": 16,
+}
+
+REPEATED_VACCINATION_SCHEDULE = {
+    "משושה": 52,  # 1 year
+    "כלבת": 52,  # 1 year
+    "טיפול מונע כנגד תולעים": 26,  # 6 months
+    "טיפול מונע כנגד תולעת הפארק": 13,  # 3 months
+}
 
 
 class Dog(BaseModel):
@@ -20,13 +33,14 @@ class Dog(BaseModel):
     owner_email: str
     weight: float  # in kg
     size: Optional[str] = None
+    vaccination_status: Optional[Dict[str, str]] = None
     profile_picture_id: Optional[str] = None  # Adding profile_picture_id field
-    vaccination_status: Dict[str, str] = {}
 
     def __init__(self, **values):
         super().__init__(**values)
         self.size = self._get_size()
-        self.check_email_uniqueness()
+        self.vaccination_status = self.set_default_vaccination_schedule()
+        self.check_name_uniqueness()
         self.save_dog()
 
     def _get_size(self):
@@ -44,7 +58,7 @@ class Dog(BaseModel):
             return MEDIUM
         return BIG
 
-    def check_email_uniqueness(self):
+    def check_name_uniqueness(self):
         """
         Check if the email already exists in the database
         :return:
@@ -57,56 +71,27 @@ class Dog(BaseModel):
         finally:
             cluster.close()
 
-    def set_default_vaccination_status(self):
-        vaccination_schedule = self.get_vaccination_schedule()
-        for vaccine in vaccination_schedule.keys():
-            self.vaccination_status[vaccine] = "לא נלקח"
-
-    def get_vaccination_schedule(self):
+    def set_default_vaccination_schedule(self):
         # Define vaccination schedule (vaccine name: age in weeks when the vaccine should be given)
-        vaccination_schedule = {
-            "כלבת": 52,  # 1 year
-            "DHPP": 8,  # 2 months
-            "בורדטלה": 12,  # 3 months
-            "לפטוספירוזיס": 16  # 4 months
-        }
+        schedule = {}
 
+        # Add puppy vaccination schedule
+        for vaccine, weeks in VACCINATION_SCHEDULE_FOR_PUPPIES.items():
+            due_date = self.date_of_birth + timedelta(weeks=weeks)
+            key = f"{vaccine}-{due_date.strftime('%d-%m-%Y')}"
+            schedule[key] = {"vaccine": vaccine, "date": due_date.strftime('%d-%m-%Y'), "status": "לא נלקח"}
+
+        # Add repeated vaccination schedule up to one year from today
         today = datetime.today()
         one_year_from_today = today + timedelta(days=365)
-        schedule = {}
-        for vaccine, weeks in vaccination_schedule.items():
+        for vaccine, weeks in REPEATED_VACCINATION_SCHEDULE.items():
             due_date = self.date_of_birth + timedelta(weeks=weeks)
             while due_date <= one_year_from_today:
-                schedule[vaccine] = due_date
+                key = f"{vaccine}-{due_date.strftime('%d-%m-%Y')}"
+                schedule[key] = {"vaccine": vaccine, "date": due_date.strftime('%d-%m-%Y'), "status": "לא נלקח"}
                 due_date += timedelta(weeks=weeks)
 
         return schedule
-
-    def update_vaccination_status(self, vaccine_name: str, status: str):
-        if vaccine_name in self.vaccination_status:
-            self.vaccination_status[vaccine_name] = status
-        else:
-            raise ValueError(f"חיסון {vaccine_name} אינו ברשימה.")
-
-    def get_vaccination_table(self):
-        schedule = self.get_vaccination_schedule()
-        table = {}
-        today = datetime.today()
-        one_year_from_today = today + timedelta(days=365)
-
-        # return all vaccinations for the next year
-        for vaccine, due_date in schedule.items():
-            if due_date <= one_year_from_today:
-                if today >= due_date:
-                    status = self.vaccination_status.get(vaccine, "לא נלקח")
-                else:
-                    status = f"עד {due_date.strftime('%d-%m-%Y')}"
-                table[vaccine] = {
-                    "תאריך חיסון": due_date.strftime('%d-%m-%Y'),
-                    "סטטוס": status
-                }
-
-        return table
 
     def save_dog(self):
         dog_owner_cluster, cluster = None, None
@@ -126,7 +111,6 @@ class Dog(BaseModel):
             logger.info(f"Dog {self.name} saved to the database.")
 
             # update dog owner dogs list
-            # TODO: check if to save unique names of the dogs owner or to save dog in dogs list by id
             dog_owner_collection.update_one(filter={EMAIL: self.owner_email}, update={'$push': {DOGS: self.name}})
             logger.info(f"Dog {self.name} added to the owner's list of dogs.")
         except Exception as e:

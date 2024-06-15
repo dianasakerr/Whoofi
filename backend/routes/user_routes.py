@@ -211,8 +211,8 @@ async def edit_user(token: str, username: str = None, longitude: float = None, l
             collection.update_many({EMAIL: user[EMAIL]}, {"$set": result})
 
             # get new user data and generate new token
-            updated_user = collection.find_one({EMAIL: user[EMAIL]})
-            new_token = update_token(token, updated_user)
+            updated_user = collection.find_one({EMAIL: user[EMAIL]}, {ID: 0})
+            new_token = update_token(token, updated_user, OWNER)
             cluster.close()
             return new_token
         cluster.close()

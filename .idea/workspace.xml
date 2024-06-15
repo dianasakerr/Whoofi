@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8c1c587a-4e63-4909-be1b-8f70790227c6" name="Changes" comment="">
+    <list default="true" id="2007f90a-ab0c-4276-9992-e19d84046448" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/models/dog.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/models/dog.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/routes/dog_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/routes/dog_routes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/routes/user_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/routes/user_routes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/security.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/security.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/utils/constants.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/utils/constants.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -98,6 +97,36 @@
             </State>
           </value>
         </entry>
+        <entry key="f298c1f1-e623-4109-b71f-58f805ddbd8a">
+          <value>
+            <State>
+              <option name="SHOW_ONLY_AFFECTED_CHANGES" value="true" />
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="HEAD" />
+                      </list>
+                    </value>
+                  </entry>
+                  <entry key="structure">
+                    <value>
+                      <list>
+                        <option value="dir:C:/Users/Diana/PycharmProjects/Whoofi/backend" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="OPEN_GENERIC_TABS">
+      <map>
+        <entry key="f298c1f1-e623-4109-b71f-58f805ddbd8a" value="TOOL_WINDOW" />
       </map>
     </option>
   </component>
@@ -106,18 +135,13 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/backend/routes/dog_routes.py</url>
-          <line>46</line>
-          <option name="timeStamp" value="19" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/backend/routes/dog_routes.py</url>
-          <line>67</line>
-          <option name="timeStamp" value="21" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/backend/routes/dog_routes.py</url>
-          <line>156</line>
+          <line>229</line>
           <option name="timeStamp" value="25" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/backend/security.py</url>
+          <line>81</line>
+          <option name="timeStamp" value="27" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
