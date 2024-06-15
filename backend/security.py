@@ -3,6 +3,7 @@ import jwt
 import os
 import logging
 from datetime import datetime, timedelta
+from typing import Dict
 from utils.constants import *
 from utils.user_utils import calc_data_to_users
 from dotenv import load_dotenv
@@ -48,7 +49,7 @@ def get_access_token(user: dict, user_type: str):
 
     # add age to user and profile_picture_id
     calc_data_to_users([user])
-    data = {'user': user, 'private_data': private_data}
+    data = {USER: user, PRIVATE_USER: private_data}
     access_token = create_access_token(data=data)
     logger.info(f"Access token generated for user type: {user_type}")
     return {"access_token": access_token, "manager_type": user_type}
@@ -68,3 +69,15 @@ def verify_token(token: str):
     except Exception as e:
         logger.error(f"Token verification failed: {e}")
         return
+
+
+def update_token(token: str, user_update: Dict) -> str:
+    payload = verify_token(token)
+
+    # Remove the old expiration time and set a new one
+    if "exp" in payload:
+        del payload["exp"]
+
+    # Create a new token with the updated data
+    new_token = get_access_token(user_update, DOGS)
+    return new_token['access_token']
