@@ -4,10 +4,11 @@ import Login from './Login';
 import SignupProcess from './SignupProcess';
 import DogWalkersSearchPage from './DogWalkersSearchPage';
 import Header from './Header';
-import Profile from "./Profile";
+// import Profile from "./Profile";
 import { useEffect, useState } from "react";
 import { Fab } from "@mui/material";
 import Admin from "./Admin";
+import DogWalkerProfile from "./DogWalkerProfile";
 
 
 const WindowSetter = () => {
@@ -36,7 +37,7 @@ const WindowSetter = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignupProcess />} />
         <Route path="/search" element={<DogWalkersSearchPage />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/profile/:userId" element={<DogWalkerProfile />} />
         <Route path="/Admin" element={<Admin/>}></Route>
       </Routes>
       {admin && 

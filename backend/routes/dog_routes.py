@@ -1,8 +1,8 @@
 # routes/dog_routes.py
-from backend.models.dog import Dog
+from models.dog import Dog
 from fastapi import APIRouter, status, File, UploadFile
-from backend.utils.user_utils import *
-from backend.security import *
+from utils.user_utils import *
+from security import *
 from gridfs import GridFS
 from datetime import datetime
 from pymongo.errors import *

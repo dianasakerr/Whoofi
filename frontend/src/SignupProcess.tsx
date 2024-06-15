@@ -60,12 +60,12 @@ function SignupProcess() {
             localStorage.setItem("token", data.access_token);
             window.dispatchEvent(new Event("storage"));
           });
-
           navigate("/profile");
           console.log("User created successfully");
         } else {
           console.log("Error creating user");
-        return { status: res.status };
+          return { status: res.status };
+        }
       })
       .catch((err) => {
         console.error("my error log:", err);
