@@ -1,0 +1,13 @@
+.welcome-text {
+  background-color: rgb(255 255 255 / 90%);
+  border-radius: 5px;
+  padding: 5px;
+  width: 35vw;
+  text-align: left;
+}
+
+@media only screen and (max-width: 600px) {
+  .welcome-text {
+    width: 90vw;
+  }
+}

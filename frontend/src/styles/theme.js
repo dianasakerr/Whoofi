@@ -10,7 +10,20 @@ const salmonRedPalette = {
   },
 };
 
-let theme = createTheme({});
+let theme = createTheme({
+  components: {
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          backgroundColor: "#ffffff",
+          "& .MuiInputBase-root": {
+            backgroundColor: "#ffffff",
+          },
+        },
+      },
+    },
+  },
+});
 
 theme = createTheme({
   palette: {
@@ -20,6 +33,18 @@ theme = createTheme({
       },
       name: "salmon",
     }),
+  },
+  components: {
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          backgroundColor: "#ffffff",
+          "& .MuiInputBase-root": {
+            backgroundColor: "#ffffff",
+          },
+        },
+      },
+    },
   },
 });
 
