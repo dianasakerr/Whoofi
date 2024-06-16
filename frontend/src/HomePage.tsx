@@ -1,4 +1,3 @@
-import React from 'react';
 import { Container, Typography, Box, Button } from '@mui/material';
 import { Link } from 'react-router-dom'; // Import Link for navigation
 import './styles/HomePage.css'; // Import CSS file for styling

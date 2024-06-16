@@ -37,6 +37,7 @@ PROFILE_PICTURE_URL = 'profile_picture_url'
 PROFILE_PICTURE = 'profile_picture'
 USER = 'user'
 PRIVATE_USER = 'private_user'
+VACCINATION_STATUS = 'vaccination_status'
 
 # DOG SIZE
 SMALL = 'small'

@@ -71,7 +71,7 @@ def verify_token(token: str):
         return
 
 
-def update_token(token: str, user_update: Dict) -> str:
+def update_token(token: str, user_update: Dict, user_type: str) -> str:
     payload = verify_token(token)
 
     # Remove the old expiration time and set a new one
@@ -79,5 +79,5 @@ def update_token(token: str, user_update: Dict) -> str:
         del payload["exp"]
 
     # Create a new token with the updated data
-    new_token = get_access_token(user_update, DOGS)
+    new_token = get_access_token(user_update, user_type)
     return new_token['access_token']

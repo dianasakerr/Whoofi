@@ -1,19 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
+<<<<<<< HEAD
     <list default="true" id="5eb19395-d16e-4acd-9bf5-bb31767c1173" name="Changes" comment="">
       <change afterPath="$PROJECT_DIR$/frontend/src/styles/HomePage.css" afterDir="false" />
+=======
+    <list default="true" id="2007f90a-ab0c-4276-9992-e19d84046448" name="Changes" comment="">
+>>>>>>> 2e5a4f9aabe140a1d12df4b1bf9e27f4b11b7409
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/models/dog.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/models/dog.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/models/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/models/user.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/routes/dog_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/routes/dog_routes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/routes/user_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/routes/user_routes.py" afterDir="false" />
+<<<<<<< HEAD
       <change beforePath="$PROJECT_DIR$/backend/routes/walker_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/routes/walker_routes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/utils/user_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/utils/user_utils.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/DogWalkerProfile.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/DogWalkerProfile.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/HomePage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/HomePage.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/SignupProcess.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/SignupProcess.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/WindowSetter.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/WindowSetter.tsx" afterDir="false" />
+=======
+      <change beforePath="$PROJECT_DIR$/backend/security.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/security.py" afterDir="false" />
+>>>>>>> 2e5a4f9aabe140a1d12df4b1bf9e27f4b11b7409
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -116,6 +124,36 @@
             </State>
           </value>
         </entry>
+        <entry key="f298c1f1-e623-4109-b71f-58f805ddbd8a">
+          <value>
+            <State>
+              <option name="SHOW_ONLY_AFFECTED_CHANGES" value="true" />
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="HEAD" />
+                      </list>
+                    </value>
+                  </entry>
+                  <entry key="structure">
+                    <value>
+                      <list>
+                        <option value="dir:C:/Users/Diana/PycharmProjects/Whoofi/backend" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="OPEN_GENERIC_TABS">
+      <map>
+        <entry key="f298c1f1-e623-4109-b71f-58f805ddbd8a" value="TOOL_WINDOW" />
       </map>
     </option>
   </component>
@@ -124,18 +162,13 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/backend/routes/dog_routes.py</url>
-          <line>46</line>
-          <option name="timeStamp" value="19" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/backend/routes/dog_routes.py</url>
-          <line>67</line>
-          <option name="timeStamp" value="21" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/backend/routes/dog_routes.py</url>
-          <line>156</line>
+          <line>229</line>
           <option name="timeStamp" value="25" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/backend/security.py</url>
+          <line>81</line>
+          <option name="timeStamp" value="27" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

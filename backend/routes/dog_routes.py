@@ -4,9 +4,8 @@ from fastapi import APIRouter, status, File, UploadFile
 from utils.user_utils import *
 from security import *
 from gridfs import GridFS
-from datetime import datetime
 from pymongo.errors import *
-
+from models.dog import *
 # Get the MongoDB client and GridFS setup
 client = get_mongo_client()
 db = client[WHOOFI]
@@ -33,6 +32,9 @@ async def create_dog(token: str, dog_data: DogCustomForm):
 
     user = user_data[USER]
 
+    if user[USER_TYPE] != OWNER:
+        raise Exception('only dog owner can have dogs')
+
     # Convert date_of_birth from string to date object
     try:
         date_of_birth = datetime.strptime(dog_data.date_of_birth, "%d-%m-%Y")
@@ -44,9 +46,12 @@ async def create_dog(token: str, dog_data: DogCustomForm):
 
     dog = Dog(**data)
 
-    user[DOGS].append(dog.name)
-    user_data[USER] = user
-    new_token = update_token(token=token, user_update=user_data)
+    # get new user data and generate new token
+    collection, cluster = get_collection(DOG_OWNER)
+    updated_user = collection.find_one({EMAIL: user[EMAIL]}, {ID: 0})
+    new_token = update_token(token, updated_user, OWNER)
+    cluster.close()
+
     return {"message": f"Hello {dog.name}, your data is: {data}", "token": new_token}
 
 
@@ -76,6 +81,75 @@ async def upload_dog_picture(token: str, dog_name: str, file: UploadFile = File(
         raise HTTPException(status_code=500, detail=f"Database update error: {str(e)}")
 
     return {"message": f"User {user[USERNAME]} dog - {dog_name} updated successfully"}
+
+
+@dog_router.put("/update_vaccine_status")
+def update_vaccination_status(token: str, dog_name: str, vaccine_name: str, vaccine_date: str, vaccine_status: str):
+    data = verify_token(token)
+    if data is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token",
+                            headers={"WWW-Authenticate": "Bearer"})
+    user = data[USER]
+
+    dog_collection, dog_cluster = get_collection(DOG)
+    dog = dog_collection.find_one({NAME: dog_name, OWNER_EMAIL: user[EMAIL]}, {ID: 0})
+
+    if dog is None:
+        raise FileNotFoundError(f'current dog owner {user[USERNAME]} doesn`t have this dog {dog_name}')
+
+    vaccination_status = dog[VACCINATION_STATUS]
+    key = f"{vaccine_name}-{vaccine_date}"
+    if key in vaccination_status:
+        vaccination_status[key]['status'] = vaccine_status
+    else:
+        raise ValueError(f"{vaccine_name} isn`t in {dog_name} vaccination list")
+
+    # Save the updated vaccination status back to the database
+    dog_collection.update_one(
+        filter={NAME: dog_name, OWNER_EMAIL: user[EMAIL]},
+        update={"$set": {VACCINATION_STATUS: vaccination_status}}
+    )
+    dog_cluster.close()
+
+    return {"message": f"Vaccination status for {vaccine_name} on {vaccine_date} updated to {vaccine_status}"}
+
+
+@dog_router.get("/get_vaccination_table")
+def get_vaccination_table(token: str, dog_name: str):
+    data = verify_token(token)
+    if data is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token",
+                            headers={"WWW-Authenticate": "Bearer"})
+    user = data[USER]
+
+    dog_collection, dog_cluster = get_collection(DOG)
+    dog_data = dog_collection.find_one({NAME: dog_name, OWNER_EMAIL: user[EMAIL]}, {ID: 0})
+    if not dog_data:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dog not found")
+
+    vaccination_status = dog_data[VACCINATION_STATUS]
+
+    today = datetime.today()
+    one_year_from_today = today + timedelta(days=365)
+
+    # Ensure all existing and upcoming vaccines within the next year are included
+    for vaccine, weeks in REPEATED_VACCINATION_SCHEDULE.items():
+        due_date = dog_data[DATE_OF_BIRTH] + timedelta(weeks=weeks)
+        while due_date <= one_year_from_today:
+            key = f"{vaccine}-{due_date.strftime('%d-%m-%Y')}"
+            if key not in vaccination_status:
+                vaccination_status[key] = {"vaccine": vaccine, "date": due_date.strftime('%Y-%m-%d'),
+                                           "status": "לא נלקח"}
+            due_date += timedelta(weeks=weeks)
+
+    updated_vaccination_status = dict(sorted(vaccination_status.items(), key=lambda item: item[1]['date']))
+    # Save the updated vaccination status back to the database
+    dog_collection.update_one(
+        filter={NAME: dog_name, OWNER_EMAIL: user[EMAIL]},
+        update={"$set": {VACCINATION_STATUS: updated_vaccination_status}}
+    )
+    dog_cluster.close()
+    return updated_vaccination_status
 
 
 @dog_router.get("/get_dogs_by_user/")
@@ -154,7 +228,7 @@ async def edit_dog(token: str, dog_name: str, name: str = None, date_of_birth: s
 
                 # get new user data and generate new token
                 updated_user = user_collection.find_one({EMAIL: user[EMAIL]}, {ID: 0})
-                new_token = update_token(token, updated_user)
+                new_token = update_token(token, updated_user, user_type=OWNER)
 
                 dog_cluster.close()
                 cluster.close()
