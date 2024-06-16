@@ -3,4 +3,9 @@ html, body {
     padding: 0;
     text-align: center;
 }
+.App {
+  text-align: center;
+  font-family: Arial, sans-serif;
+}
+
 

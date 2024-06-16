@@ -39,6 +39,9 @@ const Header = () => {
     <AppBar position="sticky">
       <Toolbar>
         <Box display="flex" justifyContent="space-between" width={"100vw"}>
+          <Button color="inherit" component={Link} to="/DogWalkerProfile">
+            My Profile
+          </Button>
           <Button color="inherit" component={Link} to="/">
             Home Page
           </Button>
@@ -63,6 +66,9 @@ const Header = () => {
           )}
           <Button color="inherit" component={Link} to="/search">
             Look for a Dog Walker
+          </Button>
+          <Button color="inherit" component={Link} to="/barkingDetecter">
+            Dog Bark Detector
           </Button>
         </Box>
       </Toolbar>
