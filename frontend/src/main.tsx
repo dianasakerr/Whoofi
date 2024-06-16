@@ -11,6 +11,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <ThemeProvider theme={theme}>
       <Router>
         <WindowSetter />
+        <div className="background"></div>
       </Router>
     </ThemeProvider>
   </React.StrictMode>
