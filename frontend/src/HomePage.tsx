@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'; // Import Link for navigation
-import { Container, Typography, Box } from "@mui/material";
-import "./styles/HomePage.css";
+import { Container, Typography, Box, Button } from "@mui/material";
+import "./styles/Homepage.css";
 
 const HomePage = () => {
   return (
@@ -8,9 +8,6 @@ const HomePage = () => {
       <Box className="content-box">
         <Typography variant="h3" component="h1" className="heading">
           Welcome to Whoofi!
-        </Typography>
-        <Typography variant="body1" className="description">
-          Welcome to Whoofi, where wagging tails and happy walks meet! This platform is designed to connect passionate dog walkers with loving dog owners. Whether you're a dedicated pet parent seeking reliable care for your furry friend or an enthusiastic dog lover eager to embark on joyful adventures with canine companions, you've come to the right place. We will help you find the perfect match, ensuring that every walk is not just a stroll but an experience filled with care, trust, and tail-wagging delight.
         </Typography>
         
         <Typography className="welcome-text" sx={{ mx: "auto" }}>
@@ -29,6 +26,8 @@ const HomePage = () => {
         </Button>
       </Box>
     </Container>
+    )
+  }
 /*
 import React from 'react';
 import './styles/HomePage.css';
@@ -37,7 +36,6 @@ import { Link } from 'react-router-dom';
 const HomePage = () => {
   return (
     <div className="homepage">
-      {/* Hero Section */}
       <section className="hero">
         <div className="hero-content">
           <h1>Connecting Dog Owners with Trusted Dog Walkers</h1>
@@ -49,7 +47,6 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Features Section */}
       <section className="features">
         <h2>Why Choose Us?</h2>
         <div className="features-grid">
@@ -72,7 +69,6 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* How It Works Section */}
       <section className="how-it-works">
         <h2>How It Works</h2>
         <div className="steps">
@@ -95,7 +91,6 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Testimonials Section */}
       <section className="testimonials">
         <h2>What Our Users Say</h2>
         <div className="testimonial">
@@ -108,7 +103,6 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* FAQ Section */}
       <section className="faq">
         <h2>Frequently Asked Questions</h2>
         <div className="faq-item">
@@ -121,7 +115,6 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="footer">
         <div className="footer-links">
           <a href="/about">About</a>

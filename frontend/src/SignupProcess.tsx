@@ -62,6 +62,7 @@ function SignupProcess() {
           });
           navigate("/profile");
           console.log("User created successfully");
+          return { status: res.status };
         } else {
           console.log("Error creating user");
           return { status: res.status };

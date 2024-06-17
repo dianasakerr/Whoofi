@@ -7,7 +7,7 @@ import DogWalkersSearchPage from "./DogWalkersSearchPage";
 import Header from "./Header";
 import Profile from "./Profile";
 import { useEffect, useState } from "react";
-import { Fab } from "@mui/material";
+import { Box, Fab } from "@mui/material";
 import Admin from "./Admin";
 import "./styles/WindowSetter.css";
 
@@ -30,7 +30,7 @@ const WindowSetter = () => {
   }, []);
 
   return (
-    <div className="body">
+    <Box className="body">
       <Header />
       <Routes>
         <Route path="/" element={<HomePage />} />
@@ -50,7 +50,7 @@ const WindowSetter = () => {
           Manage users
         </Fab>
       )}
-    </div>
+    </Box>
   );
 };
 
