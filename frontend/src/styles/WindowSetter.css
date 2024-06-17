@@ -1,0 +1,19 @@
+.background {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  padding-top: 95vh;
+  width: 100%;
+  height: auto;
+  background-color: #fff5e6;
+  background-image: url("/background.svg");
+  background-repeat: no-repeat;
+  background-position: bottom center;
+  z-index: -1;
+}
+
+@media only screen and (max-width: 600px) {
+  .background {
+    background-size: 200vw;
+  }
+}

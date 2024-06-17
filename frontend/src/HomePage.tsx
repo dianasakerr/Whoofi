@@ -1,7 +1,6 @@
-<<<<<<< HEAD
-import { Container, Typography, Box, Button } from '@mui/material';
 import { Link } from 'react-router-dom'; // Import Link for navigation
-import './styles/HomePage.css'; // Import CSS file for styling
+import { Container, Typography, Box } from "@mui/material";
+import "./styles/HomePage.css";
 
 const HomePage = () => {
   return (
@@ -13,12 +12,24 @@ const HomePage = () => {
         <Typography variant="body1" className="description">
           Welcome to Whoofi, where wagging tails and happy walks meet! This platform is designed to connect passionate dog walkers with loving dog owners. Whether you're a dedicated pet parent seeking reliable care for your furry friend or an enthusiastic dog lover eager to embark on joyful adventures with canine companions, you've come to the right place. We will help you find the perfect match, ensuring that every walk is not just a stroll but an experience filled with care, trust, and tail-wagging delight.
         </Typography>
+        
+        <Typography className="welcome-text" sx={{ mx: "auto" }}>
+          Welcome to Whoofi, where wagging tails and happy walks meet! this
+          platform is designed to connect passionate dog walkers with loving dog
+          owners. Whether you're a dedicated pet parent seeking reliable care
+          for your furry friend or an enthusiastic dog lover eager to embark on
+          joyful adventures with canine companions, you've come to the right
+          place. We will help you to find perfect match, ensuring that every
+          walk is not just a stroll but an experience filled with care, trust,
+          and tail-wagging delight. Join us today and let's make tails wag
+          together!
+        </Typography>
         <Button component={Link} to="/signup" variant="contained" color="primary" className="action-button">
           Join Us Today
         </Button>
       </Box>
     </Container>
-=======
+/*
 import React from 'react';
 import './styles/HomePage.css';
 import { Link } from 'react-router-dom';
@@ -125,8 +136,7 @@ const HomePage = () => {
         </div>
       </footer>
     </div>
->>>>>>> 2a7eae9 (Login btn going to the searchdogwalker pag)
   );
 };
-
+*/
 export default HomePage;
