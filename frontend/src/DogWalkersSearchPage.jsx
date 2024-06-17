@@ -132,7 +132,6 @@ const DogWalkersSearchPage = () => {
 
   return (
     <>
-<<<<<<< HEAD
       {currentDogWalker ? (
         <DogWalkerProfile
           dogWalker={currentDogWalker}
@@ -238,31 +237,6 @@ const DogWalkersSearchPage = () => {
         </Container>
       )}
     </>
-=======
-    {currentDogWalker && <DogWalkerProfile dogWalker={currentDogWalker} setCurrentDogWalker={setCurrentDogWalker}/>}
-    {!currentDogWalker && 
-    <div className="container1">
-      <h1>Dog Walkers Search</h1>
-      
-      <div className="dog-walker-list">
-        {dogWalkers ? dogWalkers.map(dogWalker => (
-          <div key={dogWalker.id} className="dog-walker-card" onClick={() => handleProfileClick(dogWalker)}>
-            <div className="details">
-              <h2>{dogWalker.username}</h2>
-              <p>{dogWalker.location}</p>
-              <p>Age: {dogWalker.age}</p>
-              <div className="experience">
-                <p>Experience:</p>
-                {renderExperiencePaws(dogWalker.experience)}
-              </div>
-            </div>
-          </div>
-        )) : <p>No dogwalkers in whoofi's system</p>}
-      </div>
-    </div>
-  }
-  </>
->>>>>>> 2a7eae9 (Login btn going to the searchdogwalker pag)
   );
 };
 

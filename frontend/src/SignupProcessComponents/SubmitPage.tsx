@@ -63,6 +63,9 @@ const SubmitPage = ({
         flexDirection: "column",
         alignItems: "center",
         mt: 4,
+        p: 2,
+        backgroundColor: 'white',
+        borderRadius: '10px'
       }}
     >
       <TableBody>
