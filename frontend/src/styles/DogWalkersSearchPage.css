@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 .dog-walker-card img {
   width: 100%;
   width: 4vw;
@@ -5,4 +6,64 @@
   height: auto;
   border-radius: 8px;
   margin-bottom: 10px;
+=======
+/* DogWalkersSearchPage.css */
+
+.container1 {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.dog-walker-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.dog-walker-card {
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 20px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.dog-walker-card:hover {
+  transform: translateY(-5px);
+}
+
+.details {
+  text-align: center;
+}
+
+.details h2 {
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.details p {
+  margin-bottom: 10px;
+  color: #666;
+}
+
+.experience {
+  display: flex;
+  align-items: center;
+}
+
+.experience p {
+  margin-right: 5px;
+  font-weight: bold;
+}
+
+.paw-container {
+  display: flex;
+}
+
+.paw-img {
+  width: 20px;
+  height: auto;
+  margin-right: 3px;
+>>>>>>> 2a7eae9 (Login btn going to the searchdogwalker pag)
 }

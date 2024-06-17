@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-html, body {
-    margin: 0;
-    padding: 0;
-=======
 /* Color Palette */
 :root {
     --dusty-rose: #D8B1A0;
@@ -20,8 +15,6 @@ body {
     display: flex;
     background-color: var(--dusty-rose);
     height: 100vh;
-    width: 100vw;
-    margin: 0;
 }
 
 .background-image-container {
@@ -43,18 +36,44 @@ body {
     width: 300px;
     padding: 20px;
     border-radius: 10px;
->>>>>>> 2a7eae9 (Login btn going to the searchdogwalker pag)
     text-align: center;
-}
-.App {
-  text-align: center;
-  font-family: Arial, sans-serif;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
-<<<<<<< HEAD
-=======
 .login-center {
     margin-bottom: 10px;
 }
->>>>>>> 2a7eae9 (Login btn going to the searchdogwalker pag)
 
+.login-input {
+    border: 1px solid var(--maroon);
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 250px;
+    box-sizing: border-box;
+}
+
+.login-input:focus {
+    outline: none;
+}
+
+.login-btn {
+    background-color: var(--desert-sun);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.login-btn:hover {
+    *background-color: var(--maroon);
+}
+@media only screen and (max-width: 2600px) {
+    .login-container {
+        width: 90%;
+        max-width: none;
+    }
+}
