@@ -3,9 +3,9 @@ import re
 from pydantic import BaseModel, Field
 from typing import Optional, List
 from abc import abstractmethod
-from backend.database import *
+from database import *
 from fastapi import HTTPException
-from backend.utils.constants import *
+from utils.constants import *
 from datetime import datetime
 import logging
 

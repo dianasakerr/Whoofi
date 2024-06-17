@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useState } from "react";
 import {
   TextField,
@@ -17,6 +18,15 @@ const Login = () => {
   const [password, setPassword] = useState<string>("");
   const [loginFailed, setLoginFailed] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+=======
+import { useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import "./styles/login.css";
+
+const Login = () => {
+  const email = useRef<HTMLInputElement>(null);
+  const [password, setPassword] = useState<string>("");
+>>>>>>> 2a7eae9 (Login btn going to the searchdogwalker pag)
   const navigate = useNavigate();
 
   const handleLogin = (event: React.FormEvent) => {
@@ -50,6 +60,7 @@ const Login = () => {
       .finally(() => setLoading(false));
   };
 
+<<<<<<< HEAD
   const handleFailedLogin = () => {
     setLoginFailed(true);
     setTimeout(() => setLoginFailed(false), 2500);
@@ -116,6 +127,55 @@ const Login = () => {
         </Box>
       </Box>
     </Container>
+=======
+    // Replace console logs with requests to the server
+    console.log(email.current?.value);
+    console.log(password);
+
+    // After successful login, navigate to the home page or any other page
+    navigate("/search");
+  };
+
+  return (
+    <div className="background-container">
+      <div className="background-image-container">
+        <div className="login-container">
+          <div className="login-center">
+            <h2>Log in</h2>
+            <form onSubmit={handleLogin}>
+              <input
+                className="login-input"
+                type="text"
+                id="usernameField"
+                placeholder="Email"
+                ref={email}
+              />
+              <br />
+              <input
+                className="login-input"
+                type="password"
+                id="passwordField"
+                placeholder="Password"
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <br />
+              <input
+                className="login-btn"
+                type="submit"
+                value="Log in"
+              />
+            </form>
+            <button
+              className="login-btn"
+              onClick={() => navigate("/signup")}
+            >
+              Sign up
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+>>>>>>> 2a7eae9 (Login btn going to the searchdogwalker pag)
   );
 };
 

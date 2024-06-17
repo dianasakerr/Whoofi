@@ -1,4 +1,5 @@
 import { Route, Routes, useNavigate } from "react-router-dom";
+
 import HomePage from "./HomePage"; // Import the home page component
 import Login from "./Login";
 import SignupProcess from "./SignupProcess";

@@ -1,0 +1,227 @@
+<<<<<<< HEAD
+.home-page-container {
+  padding-top: 80px; /* Adjust as needed */
+  padding-bottom: 80px; /* Adjust as needed */
+  text-align: center;
+}
+
+.content-box {
+  margin-top: 4rem; /* Adjust top margin */
+  margin-bottom: 4rem; /* Adjust bottom margin */
+}
+
+.heading {
+  margin-bottom: 2rem; /* Adjust bottom margin */
+  color: #3f51b5; /* Primary color */
+}
+
+.description {
+  margin-bottom: 1.5rem; /* Adjust bottom margin */
+  font-size: 1.2rem; /* Adjust font size */
+  line-height: 1.6; /* Adjust line height */
+}
+
+.action-button {
+  margin-top: 2rem; /* Adjust top margin */
+  padding: 1rem 3rem; /* Adjust padding */
+  font-size: 1rem; /* Adjust font size */
+  font-weight: bold; /* Bold font weight */
+=======
+/* HomePage.css */
+
+:root {
+  --primary-color: #fff; /* Default primary color */
+}
+
+.homepage {
+  font-family: 'Myriad Regular', sans-serif;
+  color: #333;
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+}
+
+.hero {
+  background-image: url('./dogInTheWoods.jpg');
+  background-size: cover;
+  background-position: center;
+  text-align: center;
+  padding: 100px 10px;
+  color: white;
+}
+
+
+/*.hero::before {*/
+/*  content: '';*/
+/*  position: absolute;*/
+/*  top: 0;*/
+/*  left: 0;*/
+/*  right: 0;*/
+/*  bottom: 0;*/
+/*  background: inherit;*/
+/*  filter: blur(20px);*/
+/*  z-index: 1;*/
+/*  mask-image: radial-gradient(circle, transparent, black);*/
+/*}*/
+
+.hero-content h1 {
+  font-size: 4rem;
+  font-family: 'Myriad Regular', sans-serif;
+  margin-bottom: 5px;
+  /*margin-top: 0px;*/
+}
+
+.h1{
+  font-color: white;
+}
+
+.hero-content p {
+  font-size: 1.5rem;
+  margin-bottom: 40px;
+}
+
+.cta-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.btn-primary,
+.btn-secondary {
+  padding: 15px 30px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  text-decoration: none;
+  color: white;
+}
+
+.btn-primary {
+  background-color: saddlebrown;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+}
+
+.features {
+  padding: 60px 20px;
+  background-color: #f9f9f9;
+  text-align: center;
+}
+
+.features h2 {
+  margin-bottom: 40px;
+  font-size: 2.5rem;
+}
+
+.features-grid {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.feature {
+  flex: 1;
+  max-width: 200px;
+}
+
+.feature h3 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.feature p {
+  font-size: 1rem;
+}
+
+.how-it-works {
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.how-it-works h2 {
+  margin-bottom: 40px;
+  font-size: 2.5rem;
+}
+
+.steps {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.step {
+  flex: 1;
+  max-width: 150px;
+}
+
+.step h3 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.step p {
+  font-size: 1rem;
+}
+
+.testimonials {
+  padding: 60px 20px;
+  background-color: #f9f9f9;
+  text-align: center;
+}
+
+.testimonials h2 {
+  margin-bottom: 40px;
+  font-size: 2.5rem;
+}
+
+.testimonial {
+  margin-bottom: 20px;
+}
+
+.faq {
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.faq h2 {
+  margin-bottom: 40px;
+  font-size: 2.5rem;
+}
+
+.faq-item {
+  margin-bottom: 20px;
+}
+
+.faq-item h3 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.footer {
+  padding: 20px;
+  background-color: #333;
+  color: white;
+  text-align: center;
+}
+
+.footer-links,
+.social-media {
+  margin-bottom: 10px;
+}
+
+.footer-links a,
+.social-media a {
+  color: white;
+  text-decoration: none;
+  margin: 0 10px;
+}
+
+.footer-links a:hover,
+.social-media a:hover {
+  text-decoration: underline;
+>>>>>>> 2a7eae9 (Login btn going to the searchdogwalker pag)
+}

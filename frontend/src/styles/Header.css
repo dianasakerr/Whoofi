@@ -1,0 +1,38 @@
+:root {
+    --dusty-rose: #D8B1A0;
+    --offwhite: #f9f3b9;
+    --maroon: #fff;
+    --desert-sun: #BB8A50;
+}
+.header {
+    background-color: mediumseagreen;
+    padding: 10px 20px;
+    color: white;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: white;
+    margin-left: 20px;
+    border: none;
+    background-color: transparent;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.nav-link:hover {
+    background-color: #555;
+}

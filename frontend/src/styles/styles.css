@@ -1,6 +1,60 @@
+<<<<<<< HEAD
 html, body {
     margin: 0;
     padding: 0;
+=======
+/* Color Palette */
+:root {
+    --dusty-rose: #D8B1A0;
+    --offwhite: #f3c7a5;
+    --maroon: #854B50;
+    --desert-sun: #BB8A50;
+}
+
+/* Fonts */
+body {
+    font-family: 'Myriad Regular', sans-serif;
+}
+
+.background-container {
+    display: flex;
+    background-color: var(--dusty-rose);
+    height: 100vh;
+    width: 100vw;
+    margin: 0;
+}
+
+.background-image-container {
+    background-image: url('your-background-image.jpg'); /* Add your background image here */
+    background-size: cover;
+    background-position: center;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-container {
+    background-color: var(--offwhite);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    padding: 20px;
+    border-radius: 10px;
+>>>>>>> 2a7eae9 (Login btn going to the searchdogwalker pag)
     text-align: center;
 }
+.App {
+  text-align: center;
+  font-family: Arial, sans-serif;
+}
+
+<<<<<<< HEAD
+=======
+.login-center {
+    margin-bottom: 10px;
+}
+>>>>>>> 2a7eae9 (Login btn going to the searchdogwalker pag)
 

@@ -60,7 +60,6 @@ function SignupProcess() {
             localStorage.setItem("token", data.access_token);
             window.dispatchEvent(new Event("storage"));
           });
-
           navigate("/profile");
           console.log("User created successfully");
         } else {

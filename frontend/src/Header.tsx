@@ -36,9 +36,13 @@ const Header = () => {
   };
 
   return (
+<<<<<<< HEAD
     <AppBar position="sticky">
       <Toolbar>
         <Box display="flex" justifyContent="space-between" width={"100vw"}>
+          <Button color="inherit" component={Link} to="/DogWalkerProfile">
+            My Profile
+          </Button>
           <Button color="inherit" component={Link} to="/">
             Home Page
           </Button>
@@ -64,9 +68,26 @@ const Header = () => {
           <Button color="inherit" component={Link} to="/search">
             Look for a Dog Walker
           </Button>
+          <Button color="inherit" component={Link} to="/barkingDetecter">
+            Dog Bark Detector
+          </Button>
         </Box>
       </Toolbar>
     </AppBar>
+=======
+    <header className="header">
+      <Logo />
+      <nav className="navbar">
+        <ul className="nav-list">
+          <li><Link to="/profile" className="nav-link">My Profile</Link></li>
+          <li><Link to="/Login" className="nav-link">Login</Link></li>
+          <li><Link to="/" className="nav-link">Home Page</Link></li>
+          <li><Link to="/search" className="nav-link">Look for a Dog Walker</Link></li>
+          <li><a href="#" className="nav-link" onClick={() => { /* Handle Exit */ }}>Exit</a></li>
+        </ul>
+      </nav>
+    </header>
+>>>>>>> 2a7eae9 (Login btn going to the searchdogwalker pag)
   );
 };
 
