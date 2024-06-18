@@ -8,7 +8,6 @@ import {
   Avatar,
   Typography,
   Container,
-  Fab,
   CircularProgress,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
@@ -131,7 +130,7 @@ const Admin = () => {
               />
               <Typography
                 className="delete-btn"
-                onClick={() => deleteUser(user.email, user.manager_type)}
+                onClick={() => deleteUser(user.email, user.user_type)}
               >
                 X
               </Typography>
