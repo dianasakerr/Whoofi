@@ -5,10 +5,11 @@ from fastapi import APIRouter, status, File, UploadFile
 from fastapi.responses import StreamingResponse
 from bson.objectid import ObjectId
 from pymongo.errors import *
-from utils.user_utils import *
-from security import *
+from backend.utils.user_utils import *
+from backend.security import *
 from gridfs import GridFS
 from datetime import datetime
+from backend.database import get_mongo_client
 from typing import Optional
 
 user_router = APIRouter()
@@ -214,7 +215,7 @@ async def edit_user(token: str, username: str = None, longitude: float = None, l
             updated_user = collection.find_one({EMAIL: user[EMAIL]}, {ID: 0})
             new_token = update_token(token, updated_user, OWNER)
             cluster.close()
-            return new_token
+            return {"message": f"User {user[USERNAME]} updated successfully, ", "token": new_token}
         cluster.close()
     except PyMongoError as e:
         raise HTTPException(status_code=500, detail=f"Database update error: {str(e)}")
