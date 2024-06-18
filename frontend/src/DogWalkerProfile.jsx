@@ -1,74 +1,84 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
 import "./styles/styles.css"; // Import your CSS styles
 import woofiLogo from "./logosAndIcons/woofiLogo.jpeg";
 import backArrow from "./logosAndIcons/back-arrow.svg";
+import whatsappLogo from "./logosAndIcons/whatsapp logo.png";
+import axios from "axios";
 import {
+  Box,
+  Button,
+  Typography,
+  Card,
+  CardContent,
+  CardMedia,
+  IconButton,
+  Container,
   Rating,
 } from "@mui/material";
 
 const DogWalkerProfile = ({ dogWalker, setCurrentDogWalker }) => {
-  const { userId } = useParams(); // Get the user ID from the URL
-  const navigate = useNavigate();
-  const [dogWalker, setDogWalker] = useState(null);
   const [address, setAddress] = useState("");
 
   const resetDogWalker = () => setCurrentDogWalker(null);
-  useEffect(() => {
-    // Fetch user data based on the userId
-    const fetchDogWalker = async () => {
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}get_user/${userId}`
-        );
-        setDogWalker(response.data);
-        reverseGeocode(response.data.coordinates.lat, response.data.coordinates.lng);
-      } catch (error) {
-        console.error("Error fetching dog walker data:", error);
-      }
-    };
-
-    fetchDogWalker();
-  }, [userId]);
 
   const reverseGeocode = async (lat, lng) => {
     try {
-@@ -35,13 +54,11 @@ const DogWalkerProfile = ({ dogWalker, setCurrentDogWalker }) => {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+      );
+      response.json().then((data) => {
+        console.log(data.address);
+        setAddress(data.address);
+      });
+    } catch (error) {
+      setAddress("Address not found");
     }
   };
 
   useEffect(() => {
     reverseGeocode(...dogWalker.coordinates);
   }, []);
-  const resetDogWalker = () => navigate("/");
 
   const gotoWhatsApp = () => {
     const internetional = "+972" + dogWalker.phone_number.replace(/^0/, "");
     window.open("https://wa.me/" + internetional);
-    const international = "+972" + dogWalker.phone_number.replace(/^0/, "");
-    window.open("https://wa.me/" + international);
   };
 
   const handleRate = (event, value) => {
-@@ -58,6 +75,10 @@ const DogWalkerProfile = ({ dogWalker, setCurrentDogWalker }) => {
+    console.log(dogWalker, value);
+    fetch(
+      import.meta.env.VITE_API_URL +
+        "add_rating/?" +
+        new URLSearchParams({
+          token: localStorage.getItem("token"),
+          walker_email: dogWalker.email,
+          rate: value,
+        }),
+      { method: "PUT" }
     );
   };
-
-  if (!dogWalker) {
-    return <Typography>Loading...</Typography>;
-  }
 
   return (
     <Container>
       <Card
-@@ -79,10 +100,12 @@ const DogWalkerProfile = ({ dogWalker, setCurrentDogWalker }) => {
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          mt: 4,
+        }}
+      >
+        <CardMedia
+          component="img"
+          height="300"
+          image={woofiLogo}
+          alt={dogWalker.name}
+          sx={{ width: "300px", borderRadius: "50%" }}
+        />
+        <CardContent>
           <Typography variant="h4" component="div" gutterBottom>
             {dogWalker.username}
           </Typography>
-          {address && <Typography variant="body1" color="textSecondary">
-            Location: {address.city || address.town}, {address.road}{" "}
-            {address.house_number}
-          </Typography>}
           {address && (
             <Typography variant="body1" color="textSecondary">
               Location: {address.city || address.town}, {address.road}{" "}
@@ -101,4 +111,5 @@ const DogWalkerProfile = ({ dogWalker, setCurrentDogWalker }) => {
     </Container>
   );
 };
+
 export default DogWalkerProfile;
