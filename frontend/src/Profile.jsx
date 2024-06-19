@@ -40,7 +40,6 @@ const Profile = () => {
   const [address, setAddress] = useState("");
   const [profilePicture, setProfilePicture] = useState(null);
   const [editMode, setEditMode] = useState(false);
-  const [token, setToken] = useState("");
   const [addingDog, setAddingDog] = useState(false);
   const [loadedVaccines, setLoadedVaccines] = useState(-1);
   const [vaccinationData, setVaccinationData] = useState();
@@ -210,12 +209,15 @@ const Profile = () => {
   const handleSave = async () => {
     try {
       setLoading(true);
-      if (!token) {
+      if (!localStorage.getItem("token")) {
         setError("No token found");
         return;
       }
 
-      let url = `${import.meta.env.VITE_API_URL}edit_user/?token=${token}`;
+      
+      const formData = new FormData();
+      let url = `${import.meta.env.VITE_API_URL}edit_user/?token=${localStorage.getItem("token")}`;
+      
 
       for (const [key, value] of Object.entries(userData)) {
         url += "&" + key + "=" + value;
