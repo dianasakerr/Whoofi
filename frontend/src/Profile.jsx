@@ -1,18 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Container,
-  Typography,
-  Box,
-  TextField,
-  Button,
-  Table,
-  TableContainer,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  Paper,
-} from "@mui/material";
+import { Container, Typography, Box, TextField, Button, Table, TableContainer, TableHead, TableBody, TableRow, TableCell, Paper, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import woofiLogo from "./logosAndIcons/woofiLogo.jpeg";
@@ -34,20 +21,23 @@ const Profile = () => {
     latitude: 0,
     profilePicture: null,
   });
+
   const [initialUserData, setInitialUserData] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [address, setAddress] = useState("");
   const [profilePicture, setProfilePicture] = useState(null);
   const [editMode, setEditMode] = useState(false);
+  const [token, setToken] = useState("");
   const [addingDog, setAddingDog] = useState(false);
-  const [loadedVaccines, setLoadedVaccines] = useState(-1);
-  const [vaccinationData, setVaccinationData] = useState();
+  const [vaccinationData, setVaccinationData] = useState([]);
+  const [openVaccinationModal, setOpenVaccinationModal] = useState(false);
+  const [dogs, setDogs] = useState([]);
+
 
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        // Fetch user profile data
         const storedToken = localStorage.getItem("token");
         if (!storedToken) {
           setError("No token found");
@@ -55,151 +45,99 @@ const Profile = () => {
           return;
         }
         setToken(storedToken);
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}get_user/?token=${storedToken}`
-        );
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}get_user/?token=${storedToken}`);
         setUserData(response.data);
+        // const responseDogs = await axios.get(`${import.meta.env.VITE_API_URL}get_dogs_by_user/?token=${storedToken}`);
+        // setDogs(responseDogs.data.dogs);
+
         setInitialUserData(response.data);
-        await reverseGeocode(
-          response.data.coordinates[1],
-          response.data.coordinates[0]
-        );
-
-        // Fetch profile pic if exists
-        if (response.data.profile_picture_id) {
-          getProfilePic(response.data.profile_picture_id);
-        }
-
-        // Fetch vaccination data
-        const vacs = [];
-        for (const dogName of response.data.dogs) {
-          const vac_for_dog = await fetchVaccinationData(storedToken, dogName);
-          vacs.push({ vacs: vac_for_dog, name: dogName });
-        }
-        setVaccinationData(vacs);
-        setLoadedVaccines(response.data.dogs.length);
+        await reverseGeocode(response.data.coordinates[1], response.data.coordinates[0]);
+        // await fetchVaccinationData(storedToken, responseDogs.data.dogs.dog_name);
       } catch (error) {
         setError("Error fetching user data");
         console.error("Error fetching user data:", error);
       } finally {
         setLoading(false);
       }
+
+
+
+  // }
     };
 
+
     fetchUserProfile();
-    window.addEventListener("storage", () => {
-      console.log("heard");
-      fetchUserProfile();
-    });
   }, []);
 
   useEffect(() => {
-    if (!userData.profile_picture_id) {
+    if (!userData.profilePicture) {
       setProfilePicture(woofiLogo);
+    } else {
+      setProfilePicture(userData.profilePicture);
     }
-  }, []);
-
-  const arrayBufferToBase64 = (buffer) => {
-    let binary = "";
-    const bytes = new Uint8Array(buffer);
-    const len = bytes.byteLength;
-    for (let i = 0; i < len; i++) {
-      binary += String.fromCharCode(bytes[i]);
-    }
-    return btoa(binary);
-  };
-
-  const getProfilePic = async (id) => {
-    const response = await fetch(
-      import.meta.env.VITE_API_URL + "get_profile_picture/?file_id=" + id,
-      {
-        method: "GET",
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
-    }
-
-    const buffer = await response.arrayBuffer();
-
-    const base64Image = arrayBufferToBase64(buffer);
-    const imageUrl = `data:image/jpeg;base64,${base64Image}`;
-
-    setProfilePicture(imageUrl);
-  };
+  }, [userData.profilePicture]);
 
   const reverseGeocode = async (lat, lon) => {
     try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
-      );
+      const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
       const data = await response.json();
       const address = data.address;
-      setAddress(
-        `${address.road ? address.road : ""}, ${
-          address.city ? address.city : ""
-        }, ${address.country ? address.country : ""}`
-      );
+      setAddress(`${address.road ? address.road : ''}, ${address.city ? address.city : ''}, ${address.country ? address.country : ''}`);
     } catch (error) {
       console.error("Error fetching address:", error);
       setAddress("Address not found");
     }
   };
+  const handleAddDog = async (dogData) => {
+  try {
+    const storedToken = localStorage.getItem("token");
+    if (!storedToken) {
+      setError("No token found");
+      return;
+    }
+
+    const response = await axios.post(`${import.meta.env.VITE_API_URL}/create_dog/?token=${storedToken}`, dogData);
+
+    if (response.status === 200) {
+      // Fetch updated user data after adding a dog
+      const updatedResponse = await axios.get(`${import.meta.env.VITE_API_URL}get_user/?token=${storedToken}`);
+      setUserData(updatedResponse.data);
+    }
+  } catch (error) {
+    console.error("Error adding dog:", error);
+    setError("Error adding dog");
+  }
+};
+
+// Pass the function to AddDog
+<AddDog close={() => { setAddingDog(false) }} addDog={handleAddDog} />
 
   const fetchVaccinationData = async (token, dogName) => {
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}` +
-          "get_vaccination_table/?token=" +
-          token +
-          "&dog_name=" +
-          dogName,
-        {
-          method: "GET",
-        }
-      );
-      const data = await response.json();
-      if (data) {
-        return data;
+      const response = await fetch(`${import.meta.env.VITE_API_URL}` + '/get_vaccination_table/?token=' + token + '&dog_name=' + dogName, {
+        method: "GET"
+      });
+      if (response.data) {
+        setVaccinationData(response.data);
       }
     } catch (error) {
       console.error("Error fetching vaccination data:", error);
     }
   };
 
+
+
   const handleChange = (e) => {
     const { name, value, files } = e.target;
 
     if (name === "profilePicture") {
-      setNewProfilePic(files[0]);
+      setProfilePicture(files[0]);
     }
 
     setUserData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
-  };
-
-  const setNewProfilePic = async (file) => {
-    const formData = new FormData();
-    formData.append("file", file, file.name);
-    console.log(formData);
-    const response = await fetch(
-      import.meta.env.VITE_API_URL +
-        "upload_profile_picture/?token=" +
-        localStorage.getItem("token"),
-      {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      }
-    );
-
-    const data = await response.json();
-    localStorage.setItem("token", data.token);
   };
 
   const toggleEditMode = () => {
@@ -209,34 +147,30 @@ const Profile = () => {
   const handleSave = async () => {
     try {
       setLoading(true);
-      if (!localStorage.getItem("token")) {
+      if (!token) {
         setError("No token found");
         return;
       }
 
-      
       const formData = new FormData();
-      let url = `${import.meta.env.VITE_API_URL}edit_user/?token=${localStorage.getItem("token")}`;
-      
+      let url = `${import.meta.env.VITE_API_URL}edit_user/?token=${token}`;
 
       for (const [key, value] of Object.entries(userData)) {
-        url += "&" + key + "=" + value;
+        url += "&" + key + '=' + value
       }
 
       console.log(url);
-      const formData = new FormData();
-      const response = await fetch(url, {
+
+      const response = fetch(url, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": undefined,
         },
-        body: formData,
+        body: formData
       });
-      const data = await response.json();
 
-      localStorage.setItem("token", data.token);
-      window.dispatchEvent(new Event("storage"));
+      console.log("Save successful:", response.data);
       setEditMode(false);
     } catch (error) {
       setError("Error updating user profile");
@@ -253,6 +187,14 @@ const Profile = () => {
   const handleCancel = () => {
     setUserData(initialUserData);
     setEditMode(false);
+  };
+
+  const handleOpenVaccinationModal = () => {
+    setOpenVaccinationModal(true);
+  };
+
+  const handleCloseVaccinationModal = () => {
+    setOpenVaccinationModal(false);
   };
 
   if (loading) {
@@ -278,18 +220,13 @@ const Profile = () => {
               mt: 4,
               p: 2,
               backgroundColor: "white",
-              borderRadius: "10px",
+              borderRadius: "10px"
             }}
           >
             <img
               src={profilePicture}
               alt="Profile"
-              style={{
-                width: "200px",
-                height: "200px",
-                objectFit: "cover",
-                borderRadius: "50%",
-              }}
+              style={{ width: "200px", height: "200px", objectFit: "cover", borderRadius: "50%" }}
             />
             <TableBody>
               <TableRow>
@@ -319,9 +256,7 @@ const Profile = () => {
                   </Typography>
                 </TableCell>
                 <TableCell align="right">
-                  <Typography variant="body1">
-                    {userData.phone_number}
-                  </Typography>
+                  <Typography variant="body1">{userData.phone_number}</Typography>
                 </TableCell>
               </TableRow>
               <TableRow>
@@ -331,39 +266,31 @@ const Profile = () => {
                   </Typography>
                 </TableCell>
                 <TableCell align="right">
-                  <Typography variant="body1">
-                    {userData.date_of_birth}
-                  </Typography>
+                  <Typography variant="body1">{userData.date_of_birth}</Typography>
                 </TableCell>
               </TableRow>
-              {userData.user_type === "walker" && (
-                <>
-                  <TableRow>
-                    <TableCell>
-                      <Typography variant="h5" component="h3" gutterBottom>
-                        Years of Experience:
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="right">
-                      <Typography variant="body1">
-                        {userData.years_of_experience}
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>
-                      <Typography variant="h5" component="h3" gutterBottom>
-                        Hourly Rate:
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="right">
-                      <Typography variant="body1">
-                        {userData.hourly_rate}
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                </>
-              )}
+              {userData.user_type === 'walker' && <>
+                <TableRow>
+                  <TableCell>
+                    <Typography variant="h5" component="h3" gutterBottom>
+                      Years of Experience:
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Typography variant="body1">{userData.years_of_experience}</Typography>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>
+                    <Typography variant="h5" component="h3" gutterBottom>
+                      Hourly Rate:
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Typography variant="body1">{userData.hourly_rate}</Typography>
+                  </TableCell>
+                </TableRow>
+              </>}
             </TableBody>
             <Button
               variant="contained"
@@ -373,15 +300,21 @@ const Profile = () => {
             >
               Edit
             </Button>
+            {dogs.map((dog, index) => (
+  <Box key={index} sx={{ backgroundColor: "white", mt: 4, p: 2, borderRadius: "10px" }}>
+    <Typography variant="h4">{dog.name}</Typography>
+    <Typography variant="body1">Breed: {dog.breed}</Typography>
+    <Typography variant="body1">Age: {dog.age}</Typography>
+    {/* Add other dog information as needed */}
+  </Box>
+))}
+
           </Box>
+
         ) : (
-          <Box
-            component="form"
-            sx={{ display: "flex", flexDirection: "column", gap: 2 }}
-          >
+          <Box component="form" sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
             <TextField
               type="file"
-              accept=".jpg,.png,.jpeg"
               name="profilePicture"
               onChange={handleChange}
               fullWidth
@@ -400,91 +333,79 @@ const Profile = () => {
               onChange={handleChange}
               fullWidth
             />
-            {userData.user_type === "walker" && (
-              <>
-                <TextField
-                  label="Years of Experience"
-                  name="years_of_experience"
-                  type="number"
-                  value={userData.years_of_experience}
-                  onChange={handleChange}
-                  fullWidth
-                />
-                <TextField
-                  label="Hourly Rate"
-                  name="hourly_rate"
-                  type="number"
-                  value={userData.hourly_rate}
-                  onChange={handleChange}
-                  fullWidth
-                />
-              </>
-            )}
+            <TextField
+              label="Years of Experience"
+              name="years_of_experience"
+              type="number"
+              value={userData.years_of_experience}
+              onChange={handleChange}
+              fullWidth
+            />
+            <TextField
+              label="Hourly Rate"
+              name="hourly_rate"
+              type="number"
+              value={userData.hourly_rate}
+              onChange={handleChange}
+              fullWidth
+            />
             <Button variant="contained" color="primary" onClick={handleSave}>
               Save
             </Button>
             <Button variant="outlined" color="primary" onClick={handleCancel}>
               Cancel
             </Button>
+
           </Box>
         )}
 
         {/* Vaccination Table */}
 
-        <Box
-          sx={{ backgroundColor: "white", mt: 4, p: 2, borderRadius: "10px" }}
-        >
-          {userData.dogs.length === 0 && (
-            <Typography variant="h4">
-              Add your dogs to see their vaccinations here
-            </Typography>
-          )}
-          <Button variant="contained" onClick={() => setAddingDog(!addingDog)}>
-            Add Dog
-          </Button>
+        <Box sx={{ backgroundColor: "white", mt: 4, p: 2, borderRadius: "10px" }}>
+          {userData.dogs.length === 0 && <Typography variant="h4">Add your dogs to see their vaccinations here</Typography>}
+          <Button variant="contained" onClick={() => setAddingDog(!addingDog)}>Add Dog</Button>
           <br></br>
-          {addingDog && (
-            <AddDog
-              close={() => {
-                setAddingDog(false);
-              }}
-            />
-          )}
+          {addingDog && <AddDog close={() => { setAddingDog(false) }} />}
           {userData.dogs.length !== 0 &&
-            vaccinationData &&
-            vaccinationData.map((dogVacs, index) => (
-              <>
-                <Typography
-                  variant="h4"
-                  component="h2"
-                  gutterBottom
-                  style={{ marginTop: 20 }}
-                >
-                  {dogVacs.name}'s Vaccination Table
-                </Typography>
-                <TableContainer component={Paper} style={{ marginTop: 10 }}>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Vaccine Name</TableCell>
-                        <TableCell>Next Due Date</TableCell>
-                        <TableCell>status</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {Object.entries(dogVacs.vacs).map(([key, value]) => (
-                        <TableRow>
-                          <TableCell>{value.vaccine}</TableCell>
-                          <TableCell>{value.date}</TableCell>
-                          <TableCell>{value.status}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </>
-            ))}
+            <>
+              <Button variant="contained" onClick={handleOpenVaccinationModal} sx={{ mt: 2 }}>
+                View Vaccination Table
+              </Button>
+            </>
+          }
         </Box>
+
+        {/* Vaccination Modal */}
+        <Dialog open={openVaccinationModal} onClose={handleCloseVaccinationModal} maxWidth="md" fullWidth>
+          <DialogTitle>Vaccination Table</DialogTitle>
+          <DialogContent>
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Vaccine Name</TableCell>
+                    <TableCell>Next Due Date</TableCell>
+                    <TableCell>Status</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {vaccinationData.map((vaccine, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{vaccine.vaccine_name}</TableCell>
+                      <TableCell>{vaccine.date}</TableCell>
+                      <TableCell>{vaccine.status}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseVaccinationModal} color="primary">
+              Close
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     </Container>
   );
