@@ -1,11 +1,11 @@
 # routes/dog_routes.py
-from models.dog import Dog
 from fastapi import APIRouter, status, File, UploadFile
-from utils.user_utils import *
 from security import *
 from gridfs import GridFS
 from pymongo.errors import *
 from models.dog import *
+from database import get_mongo_client
+
 # Get the MongoDB client and GridFS setup
 client = get_mongo_client()
 db = client[WHOOFI]
@@ -167,7 +167,7 @@ async def get_dogs_by_user(token: str, owner_email: str = None):
 
     try:
         dogs = list(dog_collection.find({OWNER_EMAIL: owner_email}, {ID: 0}))
-        calc_data_to_users(dogs)
+        calc_data_to_users(dogs, is_dog=True)
         if not dogs:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No dogs found for this owner")
         return dogs

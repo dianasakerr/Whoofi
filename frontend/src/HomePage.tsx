@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'; // Import Link for navigation
+import { Link } from "react-router-dom"; // Import Link for navigation
 import { Container, Typography, Box, Button } from "@mui/material";
 import "./styles/Homepage.css";
 
@@ -9,7 +9,7 @@ const HomePage = () => {
         <Typography variant="h3" component="h1" className="heading">
           Welcome to Whoofi!
         </Typography>
-        
+
         <Typography className="welcome-text" sx={{ mx: "auto" }}>
           Welcome to Whoofi, where wagging tails and happy walks meet! this
           platform is designed to connect passionate dog walkers with loving dog
@@ -21,13 +21,20 @@ const HomePage = () => {
           and tail-wagging delight. Join us today and let's make tails wag
           together!
         </Typography>
-        <Button component={Link} to="/signup" variant="contained" color="primary" className="action-button">
+        <Button
+          component={Link}
+          to="/signup"
+          variant="contained"
+          color="primary"
+          className="action-button"
+          sx={{ mt: 2 }}
+        >
           Join Us Today
         </Button>
       </Box>
     </Container>
-    )
-  }
+  );
+};
 /*
 import React from 'react';
 import './styles/HomePage.css';

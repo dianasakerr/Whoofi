@@ -8,6 +8,7 @@ from utils.constants import *
 from utils.user_utils import calc_data_to_users
 from dotenv import load_dotenv
 import bcrypt
+
 # Load environment variables from a .env file
 load_dotenv()
 
@@ -48,7 +49,8 @@ def get_access_token(user: dict, user_type: str):
     del user[PASSWORD]
 
     # add age to user and profile_picture_id
-    calc_data_to_users([user])
+    is_dog = True if user_type == DOG else False
+    calc_data_to_users([user], is_dog)
     data = {USER: user, PRIVATE_USER: private_data}
     access_token = create_access_token(data=data)
     logger.info(f"Access token generated for user type: {user_type}")

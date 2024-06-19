@@ -1,9 +1,5 @@
 # models/dog.py
 from pydantic import BaseModel
-from typing import Optional
-from utils.constants import *
-from database import get_collection
-from datetime import datetime
 from typing import Optional, Dict
 from utils.constants import *
 from database import get_collection
@@ -37,7 +33,7 @@ class Dog(BaseModel):
     owner_email: str
     weight: float  # in kg
     size: Optional[str] = None
-    vaccination_status: Optional[Dict[str, str]] = None
+    vaccination_status: Optional[Dict] = None
     profile_picture_id: Optional[str] = None  # Adding profile_picture_id field
 
     def __init__(self, **values):

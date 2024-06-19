@@ -9,6 +9,7 @@ from utils.user_utils import *
 from security import *
 from gridfs import GridFS
 from datetime import datetime
+from database import get_mongo_client
 from typing import Optional
 
 user_router = APIRouter()
@@ -75,6 +76,7 @@ async def create_user(data: CreateUsrReq):
 
 @user_router.put("/upload_profile_picture/")
 async def upload_profile_picture(token: str, file: UploadFile = File(None)):
+
     result = await edit_user(token=token, file=file)
     return result
 
@@ -214,7 +216,7 @@ async def edit_user(token: str, username: str = None, longitude: float = None, l
             updated_user = collection.find_one({EMAIL: user[EMAIL]}, {ID: 0})
             new_token = update_token(token, updated_user, OWNER)
             cluster.close()
-            return new_token
+            return {"message": f"User {user[USERNAME]} updated successfully, ", "token": new_token}
         cluster.close()
     except PyMongoError as e:
         raise HTTPException(status_code=500, detail=f"Database update error: {str(e)}")

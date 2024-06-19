@@ -3,7 +3,7 @@ from datetime import datetime
 import bcrypt
 
 
-def calculate_age(date_of_birth):
+def calculate_age(date_of_birth, is_dog: bool = False):
     if isinstance(date_of_birth, str):
         # Convert date_of_birth from string to date object
         try:
@@ -12,8 +12,24 @@ def calculate_age(date_of_birth):
             raise HTTPException(status_code=400, detail=f"Invalid date format {date_of_birth}. Use DD-MM-YYYY.")
     if isinstance(date_of_birth, datetime):
         today = datetime.today()
-        age = today.year - date_of_birth.year - ((today.month, today.day) < (date_of_birth.month, date_of_birth.day))
-        return age
+
+        # Calculate the differences in years, months, and days
+        years = today.year - date_of_birth.year
+        months = today.month - date_of_birth.month
+        days = today.day - date_of_birth.day
+
+        # Adjust for negative days and months
+        if days < 0:
+            months -= 1
+            days += (today - datetime(today.year, today.month, 1)).days
+
+        if months < 0:
+            years -= 1
+            months += 12
+
+        if is_dog:
+            return f"{years} years and {months} months"
+        return f"{years} years"
 
     raise HTTPException(status_code=400, detail=f"Invalid date format {date_of_birth}. "
                                                 f"date_of_birth have to be instance of str or datetime.")
@@ -41,9 +57,9 @@ def check_password_uniqueness_across_collections(email: str, password: str, curr
             cluster.close()
 
 
-def calc_data_to_users(users):
+def calc_data_to_users(users, is_dog=False):
     for usr in users:
-        usr[AGE] = calculate_age(usr[DATE_OF_BIRTH])
+        usr[AGE] = calculate_age(usr[DATE_OF_BIRTH], is_dog)
         file_id = usr.get(PROFILE_PICTURE_ID)
         if file_id and PROFILE_PICTURE not in usr.keys():
             usr[PROFILE_PICTURE_URL] = f"/get_profile_picture/{file_id}"
