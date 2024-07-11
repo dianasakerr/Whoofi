@@ -71,14 +71,19 @@ const Profile = () => {
         }
 
         // Fetch vaccination data
-        const vacs = [];
-        for (const dogName of response.data.dogs) {
-          const vac_for_dog = await fetchVaccinationData(storedToken, dogName);
-          vacs.push({ vacs: vac_for_dog, name: dogName });
+        if (response.data.dogs) {
+          const vacs = [];
+          for (const dogName of response.data.dogs) {
+            const vac_for_dog = await fetchVaccinationData(
+              storedToken,
+              dogName
+            );
+            vacs.push({ vacs: vac_for_dog, name: dogName });
+          }
+          setVaccinationData(vacs);
+          setLoadedVaccines(response.data.dogs.length);
+          setShowVacTable(new Array(response.data.dogs.length).fill(false));
         }
-        setVaccinationData(vacs);
-        setLoadedVaccines(response.data.dogs.length);
-        setShowVacTable(new Array(response.data.dogs.length).fill(false));
       } catch (error) {
         setError("Error fetching user data");
         console.error("Error fetching user data:", error);
@@ -430,78 +435,83 @@ const Profile = () => {
         )}
 
         {/* Vaccination Table */}
+        {userData.dogs && (
+          <Box
+            sx={{ backgroundColor: "white", mt: 4, p: 2, borderRadius: "10px" }}
+          >
+            {userData.dogs && userData.dogs.length === 0 && (
+              <Typography variant="h4">
+                Add your dogs to see their vaccinations here
+              </Typography>
+            )}
+            <Button
+              variant="contained"
+              onClick={() => setAddingDog(!addingDog)}
+            >
+              Add Dog
+            </Button>
+            <br></br>
+            {addingDog && (
+              <AddDog
+                close={() => {
+                  setAddingDog(false);
+                }}
+              />
+            )}
+            {userData.dogs &&
+              userData.dogs.length !== 0 &&
+              vaccinationData &&
+              vaccinationData.map((dogVacs, index) => (
+                <>
+                  <Typography
+                    variant="h4"
+                    component="h2"
+                    gutterBottom
+                    style={{ marginTop: 20 }}
+                  >
+                    {dogVacs.name}'s Vaccination Table
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => {
+                      setShowVacTable((prevArray) => {
+                        const newArray = [...prevArray];
+                        newArray[index] = !prevArray[index];
+                        return newArray;
+                      });
+                    }}
+                  >
+                    Show Table
+                  </Button>
 
-        <Box
-          sx={{ backgroundColor: "white", mt: 4, p: 2, borderRadius: "10px" }}
-        >
-          {userData.dogs.length === 0 && (
-            <Typography variant="h4">
-              Add your dogs to see their vaccinations here
-            </Typography>
-          )}
-          <Button variant="contained" onClick={() => setAddingDog(!addingDog)}>
-            Add Dog
-          </Button>
-          <br></br>
-          {addingDog && (
-            <AddDog
-              close={() => {
-                setAddingDog(false);
-              }}
-            />
-          )}
-          {userData.dogs.length !== 0 &&
-            vaccinationData &&
-            vaccinationData.map((dogVacs, index) => (
-              <>
-                <Typography
-                  variant="h4"
-                  component="h2"
-                  gutterBottom
-                  style={{ marginTop: 20 }}
-                >
-                  {dogVacs.name}'s Vaccination Table
-                </Typography>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => {
-                    setShowVacTable((prevArray) => {
-                      const newArray = [...prevArray];
-                      newArray[index] = !prevArray[index];
-                      return newArray;
-                    });
-                  }}
-                >
-                  Show Table
-                </Button>
-
-                {/* here */}
-                {showVacTable[index] && (
-                  <TableContainer component={Paper} style={{ marginTop: 10 }}>
-                    <Table>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>Vaccine Name</TableCell>
-                          <TableCell>Next Due Date</TableCell>
-                          <TableCell>status</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {Object.entries(dogVacs.vacs).map(([key, value]) => (
+                  {/* here */}
+                  {showVacTable[index] && (
+                    <TableContainer component={Paper} style={{ marginTop: 10 }}>
+                      <Table>
+                        <TableHead>
                           <TableRow>
-                            <TableCell>{value.vaccine}</TableCell>
-                            <TableCell>{value.date}</TableCell>
-                            <TableCell>{value.status}</TableCell>
+                            <TableCell>Vaccine Name</TableCell>
+                            <TableCell>Next Due Date</TableCell>
+                            <TableCell>status</TableCell>
                           </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                )}
-              </>
-            ))}
-        </Box>
+                        </TableHead>
+                        <TableBody>
+                          {Object.entries(dogVacs.vacs).map(([key, value]) => (
+                            <TableRow>
+                              <TableCell>{value.vaccine}</TableCell>
+                              <TableCell>{value.date}</TableCell>
+                              <TableCell>{value.status}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  )}
+                </>
+              ))}
+          </Box>
+        )}
       </Box>
     </Container>
   );
