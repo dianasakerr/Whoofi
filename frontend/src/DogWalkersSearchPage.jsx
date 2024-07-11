@@ -35,18 +35,12 @@ const DogWalkersSearchPage = () => {
   const [isFiltering, setIsFiltering] = useState(false);
 
   const checkLogIn = () => {
-    setIsLoggedIn(
-      localStorage.getItem("token") !== null &&
-        localStorage.getItem("userType") !== null
-    );
+    setIsLoggedIn(localStorage.getItem("token") !== null);
   };
 
   useEffect(() => {
     fetchDogWalkers();
-    if (
-      localStorage.getItem("token") !== null &&
-      localStorage.getItem("userType") !== null
-    ) {
+    if (localStorage.getItem("token") !== null) {
       setIsLoggedIn(true);
     }
 
