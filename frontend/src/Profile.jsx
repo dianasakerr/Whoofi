@@ -34,10 +34,6 @@ const Profile = () => {
     latitude: 0,
     profilePicture: null,
   });
-
-  const [dogInfo, setDogInfo] = useState([]);
-  const [visibleDogDetails, setVisibleDogDetails] = useState(null);
-  const [dogData, setDogData] = useState([]);
   const [initialUserData, setInitialUserData] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -47,51 +43,35 @@ const Profile = () => {
   const [addingDog, setAddingDog] = useState(false);
   const [loadedVaccines, setLoadedVaccines] = useState(-1);
   const [vaccinationData, setVaccinationData] = useState();
+  const [showVacTable, setShowVacTable] = useState([]);
 
   useEffect(() => {
-    console.log("useEffect - Fetching user profile...");
-
     const fetchUserProfile = async () => {
       try {
+        // Fetch user profile data
         const storedToken = localStorage.getItem("token");
         if (!storedToken) {
           setError("No token found");
           setLoading(false);
           return;
         }
-
         const response = await axios.get(
           `${import.meta.env.VITE_API_URL}get_user/?token=${storedToken}`
         );
-
         setUserData(response.data);
         setInitialUserData(response.data);
-
         await reverseGeocode(
           response.data.coordinates[1],
           response.data.coordinates[0]
         );
 
+        // Fetch profile pic if exists
         if (response.data.profile_picture_id) {
-          await getProfilePic(response.data.profile_picture_id);
+          getProfilePic(response.data.profile_picture_id);
         }
 
-        // Fetch dogs only if user_type is not 'walker'
-        if (response.data.user_type !== "walker") {
-          try {
-            const dogData = await fetchDogInfo(
-              storedToken,
-              response.data.email
-            );
-          } catch (error) {
-            setDogInfo([]);
-          }
-          setDogInfo(dogData);
-        } else {
-          setDogInfo([]); // Set an empty array if user is a walker
-        }
-
-        if (response.data.dogs && response.data.dogs.length > 0) {
+        // Fetch vaccination data
+        if (response.data.dogs) {
           const vacs = [];
           for (const dogName of response.data.dogs) {
             const vac_for_dog = await fetchVaccinationData(
@@ -100,33 +80,23 @@ const Profile = () => {
             );
             vacs.push({ vacs: vac_for_dog, name: dogName });
           }
-
           setVaccinationData(vacs);
           setLoadedVaccines(response.data.dogs.length);
-        } else {
-          setVaccinationData([]);
-          setLoadedVaccines(0);
+          setShowVacTable(new Array(response.data.dogs.length).fill(false));
         }
-
-        setLoading(false); // Set loading to false after successful data fetch
       } catch (error) {
         setError("Error fetching user data");
         console.error("Error fetching user data:", error);
-        setLoading(false); // Ensure loading state is reset in case of error
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchUserProfile();
-
-    const handleStorageEvent = () => {
+    window.addEventListener("storage", () => {
+      console.log("heard");
       fetchUserProfile();
-    };
-
-    window.addEventListener("storage", handleStorageEvent);
-
-    return () => {
-      window.removeEventListener("storage", handleStorageEvent);
-    };
+    });
   }, []);
 
   useEffect(() => {
@@ -180,29 +150,6 @@ const Profile = () => {
     } catch (error) {
       console.error("Error fetching address:", error);
       setAddress("Address not found");
-    }
-  };
-
-  const fetchDogInfo = async (token, email) => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}` +
-          "get_dogs_by_user/?token=" +
-          token +
-          "&owner_email=" +
-          email,
-        {
-          method: "GET",
-        }
-      );
-
-      if (!response.ok) {
-      }
-
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error("Error fetching dog info:", error);
     }
   };
 
@@ -286,7 +233,7 @@ const Profile = () => {
       const response = await fetch(url, {
         method: "PUT",
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
           "Content-Type": undefined,
         },
         body: formData,
@@ -431,118 +378,6 @@ const Profile = () => {
             >
               Edit
             </Button>
-            {userData.user_type !== "walker" && (
-              <Box
-                sx={{
-                  backgroundColor: "white",
-                  mt: 4,
-                  p: 2,
-                  borderRadius: "10px",
-                }}
-              >
-                <Typography variant="h4" sx={{ mb: 2 }}>
-                  My Dogs
-                </Typography>
-                {dogInfo.length === 0 && (
-                  <Typography variant="h6">
-                    Add your dogs to see their details here
-                  </Typography>
-                )}
-                <br />
-                {addingDog && (
-                  <AddDog
-                    close={() => {
-                      setAddingDog(false);
-                    }}
-                  />
-                )}
-                <Box sx={{ display: "flex", flexWrap: "wrap" }}>
-                  {dogInfo.length !== 0 &&
-                    dogInfo.map((dog, index) => (
-                      <Box key={index} sx={{ mr: 2, mb: 2 }}>
-                        <Button
-                          variant="contained"
-                          onClick={() =>
-                            setVisibleDogDetails(
-                              visibleDogDetails === index ? null : index
-                            )
-                          }
-                          sx={{ minWidth: 150 }}
-                        >
-                          {dog.name}
-                        </Button>
-                        {visibleDogDetails === index && (
-                          <Box sx={{ mt: 2 }}>
-                            <Typography variant="h6">
-                              Name: {dog.name}
-                            </Typography>
-                            <Typography variant="h6">Age: {dog.age}</Typography>
-                            <Typography variant="h6">
-                              Race: {dog.race}
-                            </Typography>
-                            <Typography variant="h6">
-                              Weight: {dog.weight}
-                            </Typography>
-
-                            <Button
-                              variant="outlined"
-                              color="primary"
-                              onClick={() =>
-                                setLoadedVaccines(
-                                  index === loadedVaccines ? -1 : index
-                                )
-                              }
-                              sx={{ mt: 2, mr: 2 }}
-                            >
-                              {index === loadedVaccines
-                                ? "Hide Vaccination Info"
-                                : "Show Vaccination Info"}
-                            </Button>
-
-                            {index === loadedVaccines && (
-                              <TableContainer
-                                component={Paper}
-                                style={{ marginTop: 10 }}
-                              >
-                                <Table>
-                                  <TableHead>
-                                    <TableRow>
-                                      <TableCell>Vaccine Name</TableCell>
-                                      <TableCell>Next Due Date</TableCell>
-                                      <TableCell>Status</TableCell>
-                                    </TableRow>
-                                  </TableHead>
-                                  <TableBody>
-                                    {Object.values(
-                                      vaccinationData[index].vacs
-                                    ).map((value, key) => (
-                                      <TableRow key={key}>
-                                        <TableCell>{value.vaccine}</TableCell>
-                                        <TableCell>{value.date}</TableCell>
-                                        <TableCell>{value.status}</TableCell>
-                                      </TableRow>
-                                    ))}
-                                  </TableBody>
-                                </Table>
-                              </TableContainer>
-                            )}
-                          </Box>
-                        )}
-                      </Box>
-                    ))}
-                </Box>
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  onClick={() => {
-                    setAddingDog(true);
-                  }}
-                  sx={{ mt: 2 }}
-                >
-                  Add Dog
-                </Button>
-              </Box>
-            )}
           </Box>
         ) : (
           <Box
@@ -596,6 +431,85 @@ const Profile = () => {
             <Button variant="outlined" color="primary" onClick={handleCancel}>
               Cancel
             </Button>
+          </Box>
+        )}
+
+        {/* Vaccination Table */}
+        {userData.dogs && (
+          <Box
+            sx={{ backgroundColor: "white", mt: 4, p: 2, borderRadius: "10px" }}
+          >
+            {userData.dogs && userData.dogs.length === 0 && (
+              <Typography variant="h4">
+                Add your dogs to see their vaccinations here
+              </Typography>
+            )}
+            <Button
+              variant="contained"
+              onClick={() => setAddingDog(!addingDog)}
+            >
+              Add Dog
+            </Button>
+            <br></br>
+            {addingDog && (
+              <AddDog
+                close={() => {
+                  setAddingDog(false);
+                }}
+              />
+            )}
+            {userData.dogs &&
+              userData.dogs.length !== 0 &&
+              vaccinationData &&
+              vaccinationData.map((dogVacs, index) => (
+                <>
+                  <Typography
+                    variant="h4"
+                    component="h2"
+                    gutterBottom
+                    style={{ marginTop: 20 }}
+                  >
+                    {dogVacs.name}'s Vaccination Table
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => {
+                      setShowVacTable((prevArray) => {
+                        const newArray = [...prevArray];
+                        newArray[index] = !prevArray[index];
+                        return newArray;
+                      });
+                    }}
+                  >
+                    Show Table
+                  </Button>
+
+                  {/* here */}
+                  {showVacTable[index] && (
+                    <TableContainer component={Paper} style={{ marginTop: 10 }}>
+                      <Table>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Vaccine Name</TableCell>
+                            <TableCell>Next Due Date</TableCell>
+                            <TableCell>status</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {Object.entries(dogVacs.vacs).map(([key, value]) => (
+                            <TableRow>
+                              <TableCell>{value.vaccine}</TableCell>
+                              <TableCell>{value.date}</TableCell>
+                              <TableCell>{value.status}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  )}
+                </>
+              ))}
           </Box>
         )}
       </Box>
