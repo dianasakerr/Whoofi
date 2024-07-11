@@ -1,24 +1,25 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from "react";
 import {
-  Container,
-  Typography,
-  Box,
-  TextField,
-  Button,
-  Table,
-  TableContainer,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  Paper,
+    Container,
+    Typography,
+    Box,
+    TextField,
+    Button,
+    Table,
+    TableContainer,
+    TableHead,
+    TableBody,
+    TableRow,
+    TableCell,
+    Paper,
 } from "@mui/material";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import woofiLogo from "./logosAndIcons/woofiLogo.jpeg";
 import AddDog from "./AddDog";
 
 const Profile = () => {
+
   const navigate = useNavigate();
 
   const [userData, setUserData] = useState({
@@ -63,11 +64,11 @@ const Profile = () => {
         await reverseGeocode(
           response.data.coordinates[1],
           response.data.coordinates[0]
+
         );
 
-        // Fetch profile pic if exists
-        if (response.data.profile_picture_id) {
-          getProfilePic(response.data.profile_picture_id);
+        if (!response.ok) {
+            throw new Error("Network response was not ok");
         }
 
         // Fetch vaccination data
@@ -90,96 +91,84 @@ const Profile = () => {
       } finally {
         setLoading(false);
       }
+
     };
 
-    fetchUserProfile();
-    window.addEventListener("storage", () => {
-      console.log("heard");
-      fetchUserProfile();
-    });
-  }, []);
+    const fetchDogInfo = async (token, email) => {
+        try {
+            const response = await fetch(
+                `${import.meta.env.VITE_API_URL}` +
+                "get_dogs_by_user/?token=" +
+                token +
+                "&owner_email=" +
+                email,
+                {
+                    method: "GET",
+                }
+            );
 
-  useEffect(() => {
-    if (!userData.profile_picture_id) {
-      setProfilePicture(woofiLogo);
-    }
-  }, []);
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
 
-  const arrayBufferToBase64 = (buffer) => {
-    let binary = "";
-    const bytes = new Uint8Array(buffer);
-    const len = bytes.byteLength;
-    for (let i = 0; i < len; i++) {
-      binary += String.fromCharCode(bytes[i]);
-    }
-    return btoa(binary);
-  };
-
-  const getProfilePic = async (id) => {
-    const response = await fetch(
-      import.meta.env.VITE_API_URL + "get_profile_picture/?file_id=" + id,
-      {
-        method: "GET",
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
-    }
-
-    const buffer = await response.arrayBuffer();
-
-    const base64Image = arrayBufferToBase64(buffer);
-    const imageUrl = `data:image/jpeg;base64,${base64Image}`;
-
-    setProfilePicture(imageUrl);
-  };
-
-  const reverseGeocode = async (lat, lon) => {
-    try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
-      );
-      const data = await response.json();
-      const address = data.address;
-      setAddress(
-        `${address.road ? address.road : ""}, ${
-          address.city ? address.city : ""
-        }, ${address.country ? address.country : ""}`
-      );
-    } catch (error) {
-      console.error("Error fetching address:", error);
-      setAddress("Address not found");
-    }
-  };
-
-  const fetchVaccinationData = async (token, dogName) => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}` +
-          "get_vaccination_table/?token=" +
-          token +
-          "&dog_name=" +
-          dogName,
-        {
-          method: "GET",
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error("Error fetching dog info:", error);
         }
-      );
-      const data = await response.json();
-      if (data) {
-        return data;
-      }
-    } catch (error) {
-      console.error("Error fetching vaccination data:", error);
-    }
-  };
+    };
 
-  const handleChange = (e) => {
-    const { name, value, files } = e.target;
+    const fetchVaccinationData = async (token, dogName) => {
+        try {
 
-    if (name === "profilePicture") {
-      setNewProfilePic(files[0]);
-    }
+            const response = await fetch(
+                `${import.meta.env.VITE_API_URL}` +
+                "get_vaccination_table/?token=" +
+                token +
+                "&dog_name=" +
+                dogName,
+                {
+                    method: "GET",
+                }
+            );
+            const data = await response.json();
+            if (data) {
+                return data;
+            }
+        } catch (error) {
+            console.error("Error fetching vaccination data:", error);
+        }
+    };
+
+    const handleChange = (e) => {
+        const {name, value, files} = e.target;
+
+        if (name === "profilePicture") {
+            setNewProfilePic(files[0]);
+        }
+
+        setUserData((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
+    };
+
+    const setNewProfilePic = async (file) => {
+        const formData = new FormData();
+        formData.append("file", file, file.name);
+        console.log(formData);
+        const response = await fetch(
+            import.meta.env.VITE_API_URL +
+            "upload_profile_picture/?token=" +
+            localStorage.getItem("token"),
+            {
+                method: "PUT",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                body: formData,
+            }
+        );
 
     setUserData((prevData) => ({
       ...prevData,
@@ -515,6 +504,7 @@ const Profile = () => {
       </Box>
     </Container>
   );
+
 };
 
 export default Profile;

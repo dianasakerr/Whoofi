@@ -22,7 +22,6 @@ const Login = () => {
   const handleLogin = (event: React.FormEvent) => {
     event.preventDefault();
     setLoading(true);
-    console.log(loading);
     fetch(import.meta.env.VITE_API_URL + "sign_in/", {
       method: "POST",
       headers: {
@@ -37,11 +36,15 @@ const Login = () => {
         if (res.ok) {
           res.json().then((response) => {
             localStorage.setItem("token", response.access_token);
-            if (response.manager_type)
+            if (response.manager_type) {
               localStorage.setItem("mngr", response.manager_type);
+            }
+            if (response.user_type) {
+              localStorage.setItem("userType", response.user_type);
+            }
             window.dispatchEvent(new Event("storage"));
+            navigate("/search");
           });
-          navigate("/search");
         } else {
           handleFailedLogin();
         }
