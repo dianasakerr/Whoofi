@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 const Header = () => {
   const [isSignedIn, setIsSignedIn] = useState(false); // Corrected initialization of useState
-  const [userType, setUserType] = useState(null); // Corrected initialization of useState
+  const [userType, setUserType] = useState<string | null>(null); // Corrected initialization of useState
   const nav = useNavigate();
 
   const checkLocalStorage = () => {
