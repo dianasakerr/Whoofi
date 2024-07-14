@@ -1,6 +1,6 @@
 # routes/dog_routes.py
 from fastapi import APIRouter, status, File, UploadFile
-from security import *
+from database import *
 from gridfs import GridFS
 from pymongo.errors import *
 from models.dog import *

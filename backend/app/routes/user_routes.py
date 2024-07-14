@@ -6,7 +6,7 @@ from fastapi.responses import StreamingResponse
 from bson.objectid import ObjectId
 from pymongo.errors import *
 from utils.user_utils import *
-from database import *
+from security import *
 from gridfs import GridFS
 from datetime import datetime
 from database import get_mongo_client
