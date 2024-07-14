@@ -1,10 +1,10 @@
 # routes/dog_routes.py
 from fastapi import APIRouter, status, File, UploadFile
-from security import *
+from backend.security import *
 from gridfs import GridFS
 from pymongo.errors import *
-from models.dog import *
-from database import get_mongo_client
+from backend.models.dog import *
+from backend.database import get_mongo_client
 
 # Get the MongoDB client and GridFS setup
 client = get_mongo_client()

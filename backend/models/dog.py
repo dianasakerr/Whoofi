@@ -1,8 +1,8 @@
 # models/dog.py
 from pydantic import BaseModel
 from typing import Optional, Dict
-from utils.constants import *
-from database import get_collection
+from backend.utils.constants import *
+from backend.database import get_collection
 from fastapi import HTTPException
 from datetime import timedelta, datetime
 import logging

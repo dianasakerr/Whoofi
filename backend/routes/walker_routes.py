@@ -1,9 +1,9 @@
 # routes/walker_routes.py
-from database import *
+from backend.database import *
 from pymongo import GEOSPHERE
 from datetime import datetime, timedelta
-from security import verify_token
-from utils.user_utils import calc_data_to_users
+from backend.security import verify_token
+from backend.utils.user_utils import calc_data_to_users
 from fastapi import APIRouter, HTTPException, status
 import numpy as np
 import re
