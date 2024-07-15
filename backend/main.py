@@ -1,12 +1,11 @@
 # main.py
-import webbrowser
 import os
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routes.user_routes import user_router
-from routes.dog_routes import dog_router
-from routes.walker_routes import walker_router
+from backend.routes.user_routes import user_router
+from backend.routes.dog_routes import dog_router
+from backend.routes.walker_routes import walker_router
 from dotenv import load_dotenv
 
 # Load environment variables from a .env file
@@ -30,7 +29,6 @@ async def read_root():
     return "Welcome to the Whoofi API"
 
 if __name__ == "__main__":
-    host = os.getenv("HOST", "localhost")
+    host = os.getenv("HOST", "0.0.0.0")
     port = int(os.getenv("PORT", 8000))
     uvicorn.run("main:app", host=host, port=port, reload=True, log_level="info")
-    webbrowser.open(f"http://{host}:{port}")
