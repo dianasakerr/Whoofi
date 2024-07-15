@@ -14,6 +14,7 @@ import {
   Select,
   InputLabel,
   FormControl,
+  SelectChangeEvent,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -74,7 +75,7 @@ const Admin = () => {
     setSearchTerm(searchTerm);
   };
 
-  const handleUserTypeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+  const handleUserTypeChange = (event: SelectChangeEvent<string>) => {
     const userType = event.target.value as string;
     setUserTypeFilter(userType);
   };

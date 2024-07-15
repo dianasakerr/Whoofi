@@ -6,7 +6,6 @@ import SignupProcess from "./SignupProcess";
 import DogWalkersSearchPage from "./DogWalkersSearchPage";
 import Header from "./Header";
 import Profile from "./Profile";
-import DogWalkerProfile from "./DogWalkerProfile";
 import { useEffect, useState } from "react";
 import { Box, Fab } from "@mui/material";
 import Admin from "./Admin";
@@ -43,7 +42,6 @@ const WindowSetter = () => {
         <Route path="/signup" element={<SignupProcess />} />
         <Route path="/search" element={<DogWalkersSearchPage />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/dogWalkerProfile" element={<DogWalkerProfile />} />
         <Route path="/Admin" element={<Admin />}></Route>
       </Routes>
       {admin && (
