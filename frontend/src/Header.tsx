@@ -36,12 +36,13 @@ const Header = () => {
   }, [userType]);
 
   const handleSignOut = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userType"); // Ensure to remove userType on sign out
-    setIsSignedIn(false);
-    setUserType(null);
-    nav('/');
-    window.dispatchEvent(new Event("storage"));
+  localStorage.removeItem("token");
+  localStorage.removeItem("userType"); // Ensure to remove userType on sign out
+  localStorage.removeItem("mngr"); // Ensure to remove manager type on sign out
+  setIsSignedIn(false);
+  setUserType(null);
+  nav('/');
+  window.dispatchEvent(new Event("storage"));
   };
 
   return (

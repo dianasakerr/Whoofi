@@ -1,588 +1,115 @@
-import React, {useState, useEffect} from "react";
-import {
-    Container,
-    Typography,
-    Box,
-    TextField,
-    Button,
-    Table,
-    TableContainer,
-    TableHead,
-    TableBody,
-    TableRow,
-    TableCell,
-    Paper,
-} from "@mui/material";
-import axios from "axios";
-import {useNavigate} from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import "./styles/styles.css"; // Import your CSS styles
 import woofiLogo from "./logosAndIcons/woofiLogo.jpeg";
-import AddDog from "./AddDog";
+import backArrow from "./logosAndIcons/back-arrow.svg";
+import whatsappLogo from "./logosAndIcons/whatsapp logo.png";
+import axios from "axios";
+import {
+  Box,
+  Button,
+  Typography,
+  Card,
+  CardContent,
+  CardMedia,
+  IconButton,
+  Container,
+  Rating,
+} from "@mui/material";
 
-const Profile = () => {
-    const navigate = useNavigate();
+const DogWalkerProfile = ({ dogWalker, setCurrentDogWalker }) => {
+  const [address, setAddress] = useState("");
 
-    const [userData, setUserData] = useState({
-        username: "",
-        email: "",
-        city: "",
-        phone_number: "",
-        password: "",
-        date_of_birth: "",
-        years_of_experience: 0,
-        hourly_rate: 0,
-        longitude: 0,
-        latitude: 0,
-        profilePicture: null,
-    });
+  const resetDogWalker = () => setCurrentDogWalker(null);
 
-    const [dogInfo, setDogInfo] = useState([]);
-    const [visibleDogDetails, setVisibleDogDetails] = useState(null);
-    const [dogData, setDogData] = useState([]);
-    const [initialUserData, setInitialUserData] = useState({});
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
-    const [address, setAddress] = useState("");
-    const [profilePicture, setProfilePicture] = useState(null);
-    const [editMode, setEditMode] = useState(false);
-    const [addingDog, setAddingDog] = useState(false);
-    const [loadedVaccines, setLoadedVaccines] = useState(-1);
-    const [vaccinationData, setVaccinationData] = useState();
-
-    useEffect(() => {
-        console.log("useEffect - Fetching user profile...");
-
-        const fetchUserProfile = async () => {
-            try {
-                const storedToken = localStorage.getItem("token");
-                if (!storedToken) {
-                    setError("No token found");
-                    setLoading(false);
-                    return;
-                }
-
-                const response = await axios.get(
-                    `${import.meta.env.VITE_API_URL}get_user/?token=${storedToken}`
-                );
-
-                setUserData(response.data);
-                setInitialUserData(response.data);
-
-                await reverseGeocode(
-                    response.data.coordinates[1],
-                    response.data.coordinates[0]
-                );
-
-                if (response.data.profile_picture_id) {
-                    await getProfillePic(response.data.profile_picture_id);
-                }
-
-                if (response.data.dogs && response.data.dogs.length > 0) {
-                    const vacs = [];
-                    for (const dogName of response.data.dogs) {
-                        const vac_for_dog = await fetchVaccinationData(storedToken, dogName);
-                        console.log(dogName);
-                        vacs.push({vacs: vac_for_dog, name: dogName});
-                    }
-
-                    setVaccinationData(vacs);
-                    setLoadedVaccines(response.data.dogs.length);
-                } else {
-                    setVaccinationData([]);
-                    setLoadedVaccines(0);
-                }
-
-                console.log(response.data.email)
-                const dogData = await fetchDogInfo(storedToken, response.data.email);
-                setDogInfo(dogData);
-
-                setLoading(false); // Set loading to false after successful data fetch
-            } catch (error) {
-                setError("Error fetching user data");
-                console.error("Error fetching user data:", error);
-                setLoading(false); // Ensure loading state is reset in case of error
-            }
-        };
-
-        fetchUserProfile();
-
-        const handleStorageEvent = () => {
-            fetchUserProfile();
-        };
-
-        window.addEventListener("storage", handleStorageEvent);
-
-        return () => {
-            window.removeEventListener("storage", handleStorageEvent);
-        };
-    }, []); // Empty dependency array to run once on component mount
-
-
-    useEffect(() => {
-        if (!userData.profile_picture_id) {
-            setProfilePicture(woofiLogo);
-        }
-    }, []);
-
-    const arrayBufferToBase64 = (buffer) => {
-        let binary = "";
-        const bytes = new Uint8Array(buffer);
-        const len = bytes.byteLength;
-        for (let i = 0; i < len; i++) {
-            binary += String.fromCharCode(bytes[i]);
-        }
-        return btoa(binary);
-    };
-
-    const getProfilePic = async (id) => {
-        const response = await fetch(
-            import.meta.env.VITE_API_URL + "get_profile_picture/?file_id=" + id,
-            {
-                method: "GET",
-            }
-        );
-
-        if (!response.ok) {
-            throw new Error("Network response was not ok");
-        }
-
-        const buffer = await response.arrayBuffer();
-
-        const base64Image = arrayBufferToBase64(buffer);
-        const imageUrl = `data:image/jpeg;base64,${base64Image}`;
-
-        setProfilePicture(imageUrl);
-    };
-
-    const reverseGeocode = async (lat, lon) => {
-        try {
-            const response = await fetch(
-                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
-            );
-            const data = await response.json();
-            const address = data.address;
-            setAddress(
-                `${address.road ? address.road : ""}, ${
-                    address.city ? address.city : ""
-                }, ${address.country ? address.country : ""}`
-            );
-        } catch (error) {
-            console.error("Error fetching address:", error);
-            setAddress("Address not found");
-        }
-    };
-
-    const fetchDogInfo = async (token, email) => {
-        try {
-            const response = await fetch(
-                `${import.meta.env.VITE_API_URL}` +
-                "get_dogs_by_user/?token=" +
-                token +
-                "&owner_email=" +
-                email,
-                {
-                    method: "GET",
-                }
-            );
-
-            if (!response.ok) {
-                throw new Error("Network response was not ok");
-            }
-
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            console.error("Error fetching dog info:", error);
-        }
-    };
-
-    const fetchVaccinationData = async (token, dogName) => {
-        try {
-
-            const response = await fetch(
-                `${import.meta.env.VITE_API_URL}` +
-                "get_vaccination_table/?token=" +
-                token +
-                "&dog_name=" +
-                dogName,
-                {
-                    method: "GET",
-                }
-            );
-            const data = await response.json();
-            if (data) {
-                return data;
-            }
-        } catch (error) {
-            console.error("Error fetching vaccination data:", error);
-        }
-    };
-
-    const handleChange = (e) => {
-        const {name, value, files} = e.target;
-
-        if (name === "profilePicture") {
-            setNewProfilePic(files[0]);
-        }
-
-        setUserData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
-    };
-
-    const setNewProfilePic = async (file) => {
-        const formData = new FormData();
-        formData.append("file", file, file.name);
-        console.log(formData);
-        const response = await fetch(
-            import.meta.env.VITE_API_URL +
-            "upload_profile_picture/?token=" +
-            localStorage.getItem("token"),
-            {
-                method: "PUT",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-                body: formData,
-            }
-        );
-
-        const data = await response.json();
-        localStorage.setItem("token", data.token);
-    };
-
-    const toggleEditMode = () => {
-        setEditMode(!editMode);
-    };
-
-    const handleSave = async () => {
-        try {
-            setLoading(true);
-            if (!localStorage.getItem("token")) {
-                setError("No token found");
-                return;
-            }
-
-
-            let url = `${import.meta.env.VITE_API_URL}edit_user/?token=${localStorage.getItem("token")}`;
-
-
-            for (const [key, value] of Object.entries(userData)) {
-                url += "&" + key + "=" + value;
-            }
-
-            console.log(url);
-            const formData = new FormData();
-            const response = await fetch(url, {
-                method: "PUT",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": undefined,
-                },
-                body: formData,
-            });
-            const data = await response.json();
-
-            localStorage.setItem("token", data.token);
-            window.dispatchEvent(new Event("storage"));
-            setEditMode(false);
-        } catch (error) {
-            setError("Error updating user profile");
-            console.error("Error updating user profile:", error);
-            if (error.response) {
-                console.error("Error response data:", error.response.data);
-                console.error("Error response status:", error.response.status);
-            }
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleCancel = () => {
-        setUserData(initialUserData);
-        setEditMode(false);
-    };
-
-    if (loading) {
-        return <Typography>Loading...</Typography>;
+  const reverseGeocode = async (lat, lng) => {
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+      );
+      response.json().then((data) => {
+        console.log(data.address);
+        setAddress(data.address);
+      });
+    } catch (error) {
+      setAddress("Address not found");
     }
+  };
 
-    if (error) {
-        return <Typography color="error">{error}</Typography>;
-    }
+  useEffect(() => {
+    reverseGeocode(...dogWalker.coordinates);
+  }, []);
 
-    return (
-        <Container maxWidth="md">
-            <Box sx={{my: 4}}>
-                <Typography variant="h3" component="h1" gutterBottom>
-                    {userData.username}
-                </Typography>
-                {!editMode ? (
-                    <Box
-                        sx={{
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            mt: 4,
-                            p: 2,
-                            backgroundColor: "white",
-                            borderRadius: "10px",
-                        }}
-                    >
-                        <img
-                            src={profilePicture}
-                            alt="Profile"
-                            style={{
-                                width: "200px",
-                                height: "200px",
-                                objectFit: "cover",
-                                borderRadius: "50%",
-                            }}
-                        />
-                        <TableBody>
-                            <TableRow>
-                                <TableCell>
-                                    <Typography variant="h5" component="h3" gutterBottom>
-                                        Email:
-                                    </Typography>
-                                </TableCell>
-                                <TableCell align="right">
-                                    <Typography variant="body1">{userData.email}</Typography>
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell>
-                                    <Typography variant="h5" component="h3" gutterBottom>
-                                        City:
-                                    </Typography>
-                                </TableCell>
-                                <TableCell align="right">
-                                    <Typography variant="body1">{address}</Typography>
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell>
-                                    <Typography variant="h5" component="h3" gutterBottom>
-                                        Phone Number:
-                                    </Typography>
-                                </TableCell>
-                                <TableCell align="right">
-                                    <Typography variant="body1">
-                                        {userData.phone_number}
-                                    </Typography>
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell>
-                                    <Typography variant="h5" component="h3" gutterBottom>
-                                        Date of Birth:
-                                    </Typography>
-                                </TableCell>
-                                <TableCell align="right">
-                                    <Typography variant="body1">
-                                        {userData.date_of_birth}
-                                    </Typography>
-                                </TableCell>
-                            </TableRow>
-                            {userData.user_type === "walker" && (
-                                <>
-                                    <TableRow>
-                                        <TableCell>
-                                            <Typography variant="h5" component="h3" gutterBottom>
-                                                Years of Experience:
-                                            </Typography>
-                                        </TableCell>
-                                        <TableCell align="right">
-                                            <Typography variant="body1">
-                                                {userData.years_of_experience}
-                                            </Typography>
-                                        </TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell>
-                                            <Typography variant="h5" component="h3" gutterBottom>
-                                                Hourly Rate:
-                                            </Typography>
-                                        </TableCell>
-                                        <TableCell align="right">
-                                            <Typography variant="body1">
-                                                {userData.hourly_rate}
-                                            </Typography>
-                                        </TableCell>
-                                    </TableRow>
-                                </>
-                            )}
-                        </TableBody>
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            onClick={toggleEditMode}
-                            sx={{mt: 2}}
-                        >
-                            Edit
-                        </Button>
-                        <Box sx={{backgroundColor: "white", mt: 4, p: 2, borderRadius: "10px"}}>
-                            <Typography variant="h4" sx={{mb: 2}}>
-                                My Dogs
-                            </Typography>
-                            {dogInfo.length === 0 && (
-                                <Typography variant="h6">
-                                    Add your dogs to see their details here
-                                </Typography>
-                            )}
-                            <br/>
-                            {addingDog && (
-                                <AddDog
-                                    close={() => {
-                                        setAddingDog(false);
-                                    }}
-                                />
-                            )}
-                            <Box sx={{display: "flex", flexWrap: "wrap"}}>
-                                {dogInfo.length !== 0 &&
-                                    dogInfo.map((dog, index) => (
-                                        <Box key={index} sx={{mr: 2, mb: 2}}>
-                                            <Button
-                                                variant="contained"
-                                                onClick={() =>
-                                                    setVisibleDogDetails(
-                                                        visibleDogDetails === index ? null : index
-                                                    )
-                                                }
-                                                sx={{minWidth: 150}}
-                                            >
-                                                {dog.name}
-                                            </Button>
-                                            {visibleDogDetails === index && (
-                                                <Box sx={{mt: 2}}>
-                                                    <Typography variant="h6">Name: {dog.name}</Typography>
-                                                    <Typography variant="h6">Age: {dog.age}</Typography>
-                                                    <Typography variant="h6">Race: {dog.race}</Typography>
-                                                    <Typography variant="h6">Weight: {dog.weight}</Typography>
+  const gotoWhatsApp = () => {
+    const internetional = "+972" + dogWalker.phone_number.replace(/^0/, "");
+    window.open("https://wa.me/" + internetional);
+  };
 
-                                                    {/* Toggle button for vaccination table */}
-                                                    <Button
-                                                        variant="outlined"
-                                                        color="primary"
-                                                        onClick={() =>
-                                                            setLoadedVaccines(
-                                                                index === loadedVaccines ? -1 : index
-                                                            )
-                                                        }
-                                                        sx={{mt: 2, mr: 2}}
-                                                    >
-                                                        {index === loadedVaccines
-                                                            ? "Hide Vaccination Info"
-                                                            : "Show Vaccination Info"}
-                                                    </Button>
-
-
-                                                    {/* Vaccination table */}
-                                                    {index === loadedVaccines && (
-                                                        <TableContainer
-                                                            component={Paper}
-                                                            style={{marginTop: 10}}
-                                                        >
-                                                            <Table>
-                                                                <TableHead>
-                                                                    <TableRow>
-                                                                        <TableCell>Vaccine Name</TableCell>
-                                                                        <TableCell>Next Due Date</TableCell>
-                                                                        <TableCell>Status</TableCell>
-                                                                    </TableRow>
-                                                                </TableHead>
-                                                                <TableBody>
-                                                                    {Object.values(
-                                                                        vaccinationData[index].vacs
-                                                                    ).map((value, key) => (
-                                                                        <TableRow key={key}>
-                                                                            <TableCell>{value.vaccine}</TableCell>
-                                                                            <TableCell>{value.date}</TableCell>
-                                                                            <TableCell>{value.status}</TableCell>
-                                                                        </TableRow>
-                                                                    ))}
-                                                                </TableBody>
-                                                            </Table>
-                                                        </TableContainer>
-                                                    )}
-                                                </Box>
-                                            )}
-                                        </Box>
-                                    ))}
-                            </Box>
-                            {/* Add Dog button */}
-                            <Button
-                                variant="outlined"
-                                color="secondary"
-                                onClick={() => {
-                                    // Logic to handle adding a dog
-                                }}
-                                sx={{mt: 2}}
-                            >
-                                Add Dog
-                            </Button>
-
-
-                        </Box>
-                    </Box>
-
-                ) : (
-                    <Box
-                        component="form"
-                        sx={{display: "flex", flexDirection: "column", gap: 2}}
-                    >
-                        <TextField
-                            type="file"
-                            accept=".jpg,.png,.jpeg"
-                            name="profilePicture"
-                            onChange={handleChange}
-                            fullWidth
-                        />
-                        <TextField
-                            label="Username"
-                            name="username"
-                            value={userData.username}
-                            onChange={handleChange}
-                            fullWidth
-                        />
-                        <TextField
-                            label="Phone Number"
-                            name="phone_number"
-                            value={userData.phone_number}
-                            onChange={handleChange}
-                            fullWidth
-                        />
-                        {userData.user_type === "walker" && (
-                            <>
-                                <TextField
-                                    label="Years of Experience"
-                                    name="years_of_experience"
-                                    type="number"
-                                    value={userData.years_of_experience}
-                                    onChange={handleChange}
-                                    fullWidth
-                                />
-                                <TextField
-                                    label="Hourly Rate"
-                                    name="hourly_rate"
-                                    type="number"
-                                    value={userData.hourly_rate}
-                                    onChange={handleChange}
-                                    fullWidth
-                                />
-                            </>
-                        )}
-                        <Button variant="contained" color="primary" onClick={handleSave}>
-                            Save
-                        </Button>
-                        <Button variant="outlined" color="primary" onClick={handleCancel}>
-                            Cancel
-                        </Button>
-                    </Box>
-                )}
-            </Box>
-        </Container>
+  const handleRate = (event, value) => {
+    console.log(dogWalker, value);
+    fetch(
+      import.meta.env.VITE_API_URL +
+        "add_rating/?" +
+        new URLSearchParams({
+          token: localStorage.getItem("token"),
+          walker_email: dogWalker.email,
+          rate: value,
+        }),
+      { method: "PUT" }
     );
+  };
+
+  return (
+    <Container>
+      <Card
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          mt: 4,
+        }}
+      >
+        <CardMedia
+          component="img"
+          height="300"
+          image={woofiLogo}
+          alt={dogWalker.name}
+          sx={{ width: "300px", borderRadius: "50%" }}
+        />
+        <CardContent>
+          <Typography variant="h4" component="div" gutterBottom>
+            {dogWalker.username}
+          </Typography>
+          {address && (
+            <Typography variant="body1" color="textSecondary">
+              Location: {address.city || address.town}, {address.road}{" "}
+              {address.house_number}
+            </Typography>
+          )}
+          <Typography variant="body1" color="textSecondary">
+            Experience: {dogWalker.years_of_experience} years
+          </Typography>
+          <Typography variant="body1" color="textSecondary">
+            Price: {dogWalker.hourly_rate}₪ per hour
+          </Typography>
+          <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
+            <Typography variant="body1" color="textSecondary" sx={{ mr: 1 }}>
+              Phone: {dogWalker.phone_number}
+            </Typography>
+          </Box>
+          <IconButton color="primary" onClick={gotoWhatsApp}>
+            <img src={whatsappLogo} width={40} height={40} />
+          </IconButton>
+          <Typography variant="body1" color="textSecondary">
+            Rate dog walker
+          </Typography>
+          <Rating defaultValue={2.5} precision={0.25} onChange={handleRate} />
+        </CardContent>
+        <IconButton onClick={resetDogWalker} sx={{ mt: 2 }}>
+          <img src={backArrow} width={20} height={20} />
+        </IconButton>
+      </Card>
+    </Container>
+  );
 };
 
-export default Profile;
+export default DogWalkerProfile;

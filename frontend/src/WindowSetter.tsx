@@ -28,6 +28,9 @@ const WindowSetter = () => {
   useEffect(() => {
     window.addEventListener("storage", handleStorageChange);
     handleStorageChange();
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
   }, []);
 
   return (

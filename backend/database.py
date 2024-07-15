@@ -1,6 +1,6 @@
 # database.py
 from pymongo import MongoClient, errors
-from utils.constants import *
+from backend.utils.constants import *
 from dotenv import load_dotenv
 import os
 import logging

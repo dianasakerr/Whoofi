@@ -1,8 +1,8 @@
 # models/dog.py
 from pydantic import BaseModel
 from typing import Optional, Dict
-from utils.constants import *
-from database import get_collection
+from backend.utils.constants import *
+from backend.database import get_collection
 from fastapi import HTTPException
 from datetime import timedelta, datetime
 import logging
@@ -79,7 +79,7 @@ class Dog(BaseModel):
         for vaccine, weeks in VACCINATION_SCHEDULE_FOR_PUPPIES.items():
             due_date = self.date_of_birth + timedelta(weeks=weeks)
             key = f"{vaccine}-{due_date.strftime('%d-%m-%Y')}"
-            schedule[key] = {"vaccine": vaccine, "date": due_date.strftime('%d-%m-%Y'), "status": "לא נלקח"}
+            schedule[key] = {"vaccine": vaccine, "date": due_date.strftime('%d-%m-%Y'), "status": "not taken"}
 
         # Add repeated vaccination schedule up to one year from today
         today = datetime.today()
@@ -88,7 +88,7 @@ class Dog(BaseModel):
             due_date = self.date_of_birth + timedelta(weeks=weeks)
             while due_date <= one_year_from_today:
                 key = f"{vaccine}-{due_date.strftime('%d-%m-%Y')}"
-                schedule[key] = {"vaccine": vaccine, "date": due_date.strftime('%d-%m-%Y'), "status": "לא נלקח"}
+                schedule[key] = {"vaccine": vaccine, "date": due_date.strftime('%d-%m-%Y'), "status": "not taken"}
                 due_date += timedelta(weeks=weeks)
 
         return schedule

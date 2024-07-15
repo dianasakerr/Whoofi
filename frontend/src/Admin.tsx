@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from "react";
 import {
   TextField,
-  List,
-  ListItem,
-  ListItemText,
   ListItemAvatar,
   Avatar,
   Typography,
   Container,
   CircularProgress,
+  Card,
+  CardContent,
+  CardActions,
+  IconButton,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import DeleteIcon from "@mui/icons-material/Delete";
 import "./styles/Admin.css";
 
 interface User {
@@ -18,17 +24,27 @@ interface User {
   email: string;
   user_type: string;
   manager_type: string;
+  years_of_experience?: number;
+  hourly_rate?: number;
+  location?: string;
+  phone_number?: string;
+  coordinates?: [number, number];
 }
 
 const Admin = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false); // Loading state
+  const [userTypeFilter, setUserTypeFilter] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  useEffect(() => {
+    filterUsers(searchTerm, userTypeFilter);
+  }, [users, searchTerm, userTypeFilter]);
 
   const fetchUsers = async () => {
     try {
@@ -56,12 +72,21 @@ const Admin = () => {
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     const searchTerm = event.target.value.toLowerCase();
     setSearchTerm(searchTerm);
-    const filteredUsers = users.filter(
+  };
+
+  const handleUserTypeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    const userType = event.target.value as string;
+    setUserTypeFilter(userType);
+  };
+
+  const filterUsers = (searchTerm: string, userType: string) => {
+    const filtered = users.filter(
       (user) =>
         user.username.toLowerCase().includes(searchTerm) &&
-        user.username !== "manager"
+        user.username !== "manager" &&
+        (userType === "" || user.user_type === userType)
     );
-    setFilteredUsers(filteredUsers);
+    setFilteredUsers(filtered);
   };
 
   const deleteUser = (email: string, user_type: string) => {
@@ -84,7 +109,7 @@ const Admin = () => {
   };
 
   return (
-    <Container maxWidth="md" style={{ marginTop: "20px" }}>
+    <Container maxWidth="lg" style={{ marginTop: "20px" }}>
       <TextField
         label="Search by Name"
         variant="outlined"
@@ -96,6 +121,20 @@ const Admin = () => {
         }}
         style={{ marginBottom: "20px" }}
       />
+      <FormControl variant="outlined" fullWidth style={{ marginBottom: "20px" }}>
+        <InputLabel>User Type</InputLabel>
+        <Select
+          value={userTypeFilter}
+          onChange={handleUserTypeChange}
+          label="User Type"
+        >
+          <MenuItem value="">
+            <em>All</em>
+          </MenuItem>
+          <MenuItem value="owner">Owner</MenuItem>
+          <MenuItem value="walker">Walker</MenuItem>
+        </Select>
+      </FormControl>
       {loading ? (
         <div
           style={{
@@ -107,36 +146,58 @@ const Admin = () => {
           <CircularProgress />
         </div>
       ) : (
-        <List>
+        <div className="user-cards-container">
           {filteredUsers.map((user) => (
-            <ListItem
+            <Card
               key={user.email}
               sx={{
                 backgroundColor: "white",
-                my: "3px",
-                boxShadow: "3px 2px 2px rgb(0 0 0 / 30%)",
-                borderRadius: "20px",
+                boxShadow: "3px 3px 3px rgb(0 0 0 / 30%)",
+                borderRadius: "10px",
                 opacity: "95%",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                margin: "10px",
+                flex: "1 0 21%",
+                minWidth: "200px",
+                maxWidth: "250px",
               }}
             >
-              <ListItemAvatar>
-                <Avatar>{user.username.charAt(0)}</Avatar>
-              </ListItemAvatar>
-              <ListItemText
-                primary={user.username}
-                secondary={
-                  <Typography variant="body2">{user.email}</Typography>
-                }
-              />
-              <Typography
-                className="delete-btn"
-                onClick={() => deleteUser(user.email, user.user_type)}
-              >
-                X
-              </Typography>
-            </ListItem>
+              <CardContent>
+                <ListItemAvatar>
+                  <Avatar>{user.username.charAt(0)}</Avatar>
+                </ListItemAvatar>
+                <Typography variant="h6">{user.username}</Typography>
+                <Typography variant="body2">{user.email}</Typography>
+                <Typography variant="body2">
+                  User Type: {user.user_type}
+                </Typography>
+                {user.user_type === "walker" && (
+                  <div>
+                    <Typography variant="body2">
+                      Experience: {user.years_of_experience} years
+                    </Typography>
+                    <Typography variant="body2">
+                      Price: {user.hourly_rate}₪ per hour
+                    </Typography>
+                  </div>
+                )}
+                <Typography variant="body2">
+                  Phone: {user.phone_number || "N/A"}
+                </Typography>
+              </CardContent>
+              <CardActions>
+                <IconButton
+                  color="secondary"
+                  onClick={() => deleteUser(user.email, user.user_type)}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </CardActions>
+            </Card>
           ))}
-        </List>
+        </div>
       )}
     </Container>
   );

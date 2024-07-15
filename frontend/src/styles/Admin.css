@@ -5,3 +5,19 @@
 .delete-btn:hover {
   color: orange;
 }
+
+.user-cards-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px; /* Optional: Adds space between cards */
+}
+
+.filter-container {
+  margin-bottom: 20px;
+}
+
+.slider-container {
+  width: 100%;
+  margin-top: 10px;
+}

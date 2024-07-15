@@ -1,12 +1,11 @@
 # main.py
-import webbrowser
 import os
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routes.user_routes import user_router
-from routes.dog_routes import dog_router
-from routes.walker_routes import walker_router
+from backend.routes.user_routes import user_router
+from backend.routes.dog_routes import dog_router
+from backend.routes.walker_routes import walker_router
 from dotenv import load_dotenv
 
 # Load environment variables from a .env file
