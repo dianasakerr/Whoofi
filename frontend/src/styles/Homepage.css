@@ -1,13 +1,45 @@
+.home-page-container {
+  margin: 0; /* Remove margin */
+  padding: 0; /* Remove padding */
+  height: 100vh; /* Full viewport height */
+  overflow: hidden; /* Prevent scrolling */
+}
+
+.hero-section {
+  text-align: center;
+  margin: 0; /* Remove margin */
+  border-radius: 8px;
+  color: #fff;
+  height: 100vh; /* Full viewport height */
+  position: fixed; /* Fix the position */
+  width: 100%; /* Ensure full width */
+  top: 0; /* Align to top of the viewport */
+  left: 0; /* Align to left of the viewport */
+}
+
 .welcome-text {
-  background-color: rgb(255 255 255 / 90%);
+  background-color: rgba(255, 255, 255, 0.9);
   border-radius: 5px;
-  padding: 5px;
-  width: 35vw;
-  text-align: left;
+  padding: 10px;
+  max-width: 600px;
+  margin: 0 auto;
+  color: #000;
+}
+
+.action-button {
+  display: block;
+  margin-top: 20px;
+  background-color: #4CAF50; /* Primary Button Color */
+  color: white;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.action-button:hover {
+  background-color: #45A049; /* Hover Color */
 }
 
 @media only screen and (max-width: 600px) {
   .welcome-text {
-    width: 90vw;
+    width: 90%;
   }
 }

@@ -1,16 +1,7 @@
-<<<<<<< HEAD
-.dog-walker-card img {
-  width: 100%;
-  width: 4vw;
-  max-width: 30px;
-  height: auto;
-  border-radius: 8px;
-  margin-bottom: 10px;
-=======
 /* DogWalkersSearchPage.css */
 
-.container1 {
-  max-width: 800px;
+.container {
+  max-width: 1000px;
   margin: 0 auto;
   padding: 20px;
 }
@@ -19,6 +10,12 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 20px;
+}
+
+@media (min-width: 1200px) {
+  .dog-walker-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .dog-walker-card {
@@ -50,6 +47,7 @@
 .experience {
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 .experience p {
@@ -59,11 +57,11 @@
 
 .paw-container {
   display: flex;
+  justify-content: center;
 }
 
 .paw-img {
   width: 20px;
   height: auto;
   margin-right: 3px;
->>>>>>> 2a7eae9 (Login btn going to the searchdogwalker pag)
 }

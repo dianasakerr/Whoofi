@@ -1,3 +1,5 @@
+// DogWalkersSearchPage.jsx
+
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -11,7 +13,6 @@ import {
   Checkbox,
   FormControlLabel,
   CircularProgress,
-  Grid,
   Rating,
 } from "@mui/material";
 import DogWalkerProfile from "./DogWalkerProfile";
@@ -35,18 +36,12 @@ const DogWalkersSearchPage = () => {
   const [isFiltering, setIsFiltering] = useState(false);
 
   const checkLogIn = () => {
-    setIsLoggedIn(
-      localStorage.getItem("token") !== null &&
-        localStorage.getItem("userType") !== null
-    );
+    setIsLoggedIn(localStorage.getItem("token") !== null);
   };
 
   useEffect(() => {
     fetchDogWalkers();
-    if (
-      localStorage.getItem("token") !== null &&
-      localStorage.getItem("userType") !== null
-    ) {
+    if (localStorage.getItem("token") !== null) {
       setIsLoggedIn(true);
     }
 
@@ -111,7 +106,7 @@ const DogWalkersSearchPage = () => {
   };
 
   const renderExperiencePaws = (experience) => (
-    <Box display="flex">
+    <Box className="paw-container">
       {[...Array(experience)].map((_, index) => (
         <img key={index} src={dogPaw} alt="Paw" className="paw-img" />
       ))}
@@ -207,33 +202,28 @@ const DogWalkersSearchPage = () => {
           {loading && <CircularProgress />}
           {error && <Typography color="error">{error}</Typography>}
 
-          <Grid container spacing={3} className="dog-walker-list">
+          <div className="dog-walker-list">
             {dogWalkers.map((dogWalker, index) => (
-              <Grid key={index} item xs={12} sm={6} md={4}>
-                <Card
-                  className="dog-walker-card"
-                  onClick={() => handleProfileClick(dogWalker)}
-                >
-                  <CardContent>
-                    <Typography variant="h6">{dogWalker.username}</Typography>
-                    <Typography>{dogWalker.location}</Typography>
-                    <Box className="experience">
-                      <Typography>
-                        Experience: {dogWalker.years_of_experience} years
-                      </Typography>
-                      <Typography>
-                        <Rating
-                          readOnly
-                          defaultValue={dogWalker.avg_rate}
-                          precision={0.25}
-                        />
-                      </Typography>
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
+              <div key={index} className="dog-walker-card" onClick={() => handleProfileClick(dogWalker)}>
+                <CardContent>
+                  <Typography variant="h6">{dogWalker.username}</Typography>
+                  <Typography>{dogWalker.location}</Typography>
+                  <Box className="experience">
+                    <Typography>
+                      Experience: {dogWalker.years_of_experience} years
+                    </Typography>
+                    <Typography>
+                      <Rating
+                        readOnly
+                        defaultValue={dogWalker.avg_rate}
+                        precision={0.25}
+                      />
+                    </Typography>
+                  </Box>
+                </CardContent>
+              </div>
             ))}
-          </Grid>
+          </div>
         </Container>
       )}
     </>

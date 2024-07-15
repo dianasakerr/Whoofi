@@ -4,12 +4,15 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Header = () => {
-  const [isSignedIn, setIsSignedIn] = useState<boolean>(false);
+  const [isSignedIn, setIsSignedIn] = useState(false); // Corrected initialization of useState
+  const [userType, setUserType] = useState<string | null>(null); // Corrected initialization of useState
   const nav = useNavigate();
 
   const checkLocalStorage = () => {
-    const item = localStorage.getItem("token");
-    setIsSignedIn(!!item);
+    const token = localStorage.getItem("token");
+    const userType = localStorage.getItem("userType"); // Assume the user type is stored in local storage
+    setIsSignedIn(!!token);
+    setUserType(userType);
   };
 
   useEffect(() => {
@@ -27,12 +30,19 @@ const Header = () => {
     };
   }, []);
 
+  useEffect(() => {
+    // Debugging userType
+    console.log("userType in Header:", userType);
+  }, [userType]);
+
   const handleSignOut = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("mngr");
-    setIsSignedIn(false);
-    nav('/');
-    window.dispatchEvent(new Event("storage"));
+  localStorage.removeItem("token");
+  localStorage.removeItem("userType"); // Ensure to remove userType on sign out
+  localStorage.removeItem("mngr"); // Ensure to remove manager type on sign out
+  setIsSignedIn(false);
+  setUserType(null);
+  nav('/');
+  window.dispatchEvent(new Event("storage"));
   };
 
   return (
@@ -44,9 +54,15 @@ const Header = () => {
           </Button>
           {isSignedIn ? (
             <>
-              <Button color="inherit" component={Link} to="/profile">
-                My Profile
-              </Button>
+              {userType === "walker" ? (
+                <Button color="inherit" component={Link} to="/dogWalkerProfile">
+                  Dog Walker Profile
+                </Button>
+              ) : (
+                <Button color="inherit" component={Link} to="/profile">
+                  My Profile
+                </Button>
+              )}
               <Button color="inherit" onClick={handleSignOut}>
                 Exit
               </Button>

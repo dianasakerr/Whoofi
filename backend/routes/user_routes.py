@@ -87,6 +87,12 @@ async def delete_user(token: str, email: str, user_type: str):
     data = verify_token(token)
     manager = data.get(USER, {})
     manager_type = manager.get(USER_TYPE)
+
+    dog_owner, _, _ = get_user_by_type(email, OWNER, password=True)
+    dog_walker, _, _ = get_user_by_type(email, WALKER, password=True)
+
+    user_type = OWNER if dog_owner else WALKER
+
     if manager is None or manager_type != MANAGER or user_type == MANAGER:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized access",
                             headers={"WWW-Authenticate": "Bearer"})
@@ -99,6 +105,9 @@ async def delete_user(token: str, email: str, user_type: str):
 async def see_all_users(token: str, user_type: Optional[str] = None, max_age: Optional[int] = None):
 
     data = verify_token(token)
+    if data is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token",
+                            headers={"WWW-Authenticate": "Bearer"})
     user = data[USER]
 
     if user is None or user.get(USER_TYPE) != MANAGER:
@@ -117,7 +126,6 @@ async def see_all_users(token: str, user_type: Optional[str] = None, max_age: Op
     users_types = [OWNER, WALKER, MANAGER] if user_type is None else [user_type]
     all_users = []
     for user_type in users_types:
-
         collection, cluster = get_collection_by_user_type(user_type)
         try:
             users = list(collection.find(filter_by, {PASSWORD: False, ID: False}))

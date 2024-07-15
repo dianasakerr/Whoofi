@@ -81,7 +81,7 @@ const AddDog = ({ close }: Props) => {
         onChange={(e) => setWeight(e.target.value)}
         sx={{ mt: 1 }}
       />
-      <Button onClick={handleSubmit}>Send dog</Button>
+      <Button onClick={handleSubmit}>Add dog</Button>
     </FormControl>
   );
 };

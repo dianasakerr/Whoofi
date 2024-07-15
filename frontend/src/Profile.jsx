@@ -12,6 +12,8 @@ import {
   TableRow,
   TableCell,
   Paper,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -34,16 +36,18 @@ const Profile = () => {
     latitude: 0,
     profilePicture: null,
   });
+  const [dogInfo, setDogInfo] = useState([]);
+  const [visibleDogDetails, setVisibleDogDetails] = useState(null);
+  const [dogData, setDogData] = useState([]);
   const [initialUserData, setInitialUserData] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [address, setAddress] = useState("");
   const [profilePicture, setProfilePicture] = useState(null);
   const [editMode, setEditMode] = useState(false);
-  const [token, setToken] = useState("");
   const [addingDog, setAddingDog] = useState(false);
   const [loadedVaccines, setLoadedVaccines] = useState(-1);
-  const [vaccinationData, setVaccinationData] = useState();
+  const [vaccinationData, setVaccinationData] = useState([]);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -55,7 +59,6 @@ const Profile = () => {
           setLoading(false);
           return;
         }
-        setToken(storedToken);
         const response = await axios.get(
           `${import.meta.env.VITE_API_URL}get_user/?token=${storedToken}`
         );
@@ -72,13 +75,25 @@ const Profile = () => {
         }
 
         // Fetch vaccination data
-        const vacs = [];
-        for (const dogName of response.data.dogs) {
-          const vac_for_dog = await fetchVaccinationData(storedToken, dogName);
-          vacs.push({ vacs: vac_for_dog, name: dogName });
+        if (response.data.dogs && response.data.dogs.length > 0) {
+          const vacs = [];
+          for (const dogName of response.data.dogs) {
+            const vac_for_dog = await fetchVaccinationData(
+              storedToken,
+              dogName
+            );
+            vacs.push({ vacs: vac_for_dog, name: dogName });
+          }
+          setVaccinationData(vacs);
+          setLoadedVaccines(response.data.dogs.length);
+        } else {
+          setVaccinationData([]);
+          setLoadedVaccines(0);
         }
-        setVaccinationData(vacs);
-        setLoadedVaccines(response.data.dogs.length);
+        const dogData = await fetchDogInfo(storedToken, response.data.email);
+        setDogInfo(dogData);
+
+        setLoading(false);
       } catch (error) {
         setError("Error fetching user data");
         console.error("Error fetching user data:", error);
@@ -88,10 +103,16 @@ const Profile = () => {
     };
 
     fetchUserProfile();
-    window.addEventListener("storage", () => {
-      console.log("heard");
+
+    const handleStorageEvent = () => {
       fetchUserProfile();
-    });
+    };
+
+    window.addEventListener("storage", handleStorageEvent);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageEvent);
+    };
   }, []);
 
   useEffect(() => {
@@ -148,6 +169,28 @@ const Profile = () => {
     }
   };
 
+  const fetchDogInfo = async (token, email) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}` +
+          "get_dogs_by_user/?token=" +
+          token +
+          "&owner_email=" +
+          email,
+        {
+          method: "GET",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {}
+  };
+
   const fetchVaccinationData = async (token, dogName) => {
     try {
       const response = await fetch(
@@ -193,7 +236,7 @@ const Profile = () => {
       {
         method: "PUT",
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: formData,
       }
@@ -210,12 +253,14 @@ const Profile = () => {
   const handleSave = async () => {
     try {
       setLoading(true);
-      if (!token) {
+      if (!localStorage.getItem("token")) {
         setError("No token found");
         return;
       }
 
-      let url = `${import.meta.env.VITE_API_URL}edit_user/?token=${token}`;
+      let url = `${
+        import.meta.env.VITE_API_URL
+      }edit_user/?token=${localStorage.getItem("token")}`;
 
       for (const [key, value] of Object.entries(userData)) {
         url += "&" + key + "=" + value;
@@ -226,7 +271,7 @@ const Profile = () => {
       const response = await fetch(url, {
         method: "PUT",
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
           "Content-Type": undefined,
         },
         body: formData,
@@ -251,6 +296,47 @@ const Profile = () => {
   const handleCancel = () => {
     setUserData(initialUserData);
     setEditMode(false);
+  };
+
+  const updateVaccinationStatus = async (dogName, vaccineName, vaccineDate, vaccineStatus) => {
+    try {
+      const storedToken = localStorage.getItem("token");
+      if (!storedToken) {
+        setError("No token found");
+        return;
+      }
+
+      const response = await axios.put(
+        `${import.meta.env.VITE_API_URL}update_vaccine_status`,
+        null,
+        {
+          params: {
+            token: storedToken,
+            dog_name: dogName,
+            vaccine_name: vaccineName,
+            vaccine_date: vaccineDate,
+            vaccine_status: vaccineStatus,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        const updatedVaccinationData = vaccinationData.map((dog) => {
+          if (dog.name === dogName) {
+            return {
+              ...dog,
+              vacs: dog.vacs.map((vac) =>
+                vac.vaccine === vaccineName ? { ...vac, status: vaccineStatus } : vac
+              ),
+            };
+          }
+          return dog;
+        });
+        setVaccinationData(updatedVaccinationData);
+      }
+    } catch (error) {
+      console.error("Error updating vaccination status:", error);
+    }
   };
 
   if (loading) {
@@ -362,6 +448,105 @@ const Profile = () => {
                   </TableRow>
                 </>
               )}
+              {userData.dogs && (
+                <Box sx={{ backgroundColor: "white", mt: 4, p: 2, borderRadius: "10px" }}>
+                  <Typography variant="h4" sx={{ mb: 2 }}>
+                    My Dogs
+                  </Typography>
+                  {dogInfo.length === 0 && (
+                    <Typography variant="h6">
+                      Add your dogs to see their details here
+                    </Typography>
+                  )}
+                  <br />
+                  {addingDog && (<AddDog close={() => { setAddingDog(false); }} />)}
+
+                  <Box sx={{ display: "flex", flexWrap: "wrap" }}>
+                    {dogInfo.length !== 0 && dogInfo.map((dog, index) => (
+                    <Box key={index} sx={{ mr: 2, mb: 2 }}>
+                      <Button
+                        variant="contained"
+                        onClick={() =>
+                          setVisibleDogDetails(
+                            visibleDogDetails === index ? null : index
+                          )
+                        }
+                        sx={{ minWidth: 150 }}
+                      >
+                        {dog.name}
+                      </Button>
+                      {visibleDogDetails === index && (
+                        <Box sx={{ mt: 2 }}>
+                          <Typography variant="h6">Name: {dog.name}</Typography>
+                          <Typography variant="h6">Age: {dog.age}</Typography>
+                          <Typography variant="h6">Race: {dog.race}</Typography>
+                          <Typography variant="h6">Weight: {dog.weight}</Typography>
+
+                          {/* Toggle button for vaccination table */}
+                          <Button
+                            variant="outlined"
+                            color="primary"
+                            onClick={() =>
+                              setLoadedVaccines(
+                                index === loadedVaccines ? -1 : index
+                              )
+                            }
+                            sx={{ mt: 2, mr: 2 }}
+                          >
+                            {index === loadedVaccines
+                              ? "Hide Vaccination Info"
+                              : "Show Vaccination Info"}
+                          </Button>
+
+                          {/* Vaccination table */}
+                          {index === loadedVaccines && (
+                            <TableContainer component={Paper} style={{ marginTop: 10 }} >
+                              <Table>
+                                <TableHead>
+                                  <TableRow>
+                                    <TableCell>Vaccine Name</TableCell>
+                                    <TableCell>Next Due Date</TableCell>
+                                    <TableCell>Status</TableCell>
+                                  </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                  {Object.values( vaccinationData[index].vacs).map((value, key) => (
+                                    <TableRow key={key}>
+                                      <TableCell>{value.vaccine}</TableCell>
+                                      <TableCell>{value.date}</TableCell>
+                                      <TableCell>
+                                        <Select
+                                          value={value.status}
+                                          onChange={(e) =>
+                                            updateVaccinationStatus(
+                                              dog.name,
+                                              value.vaccine,
+                                              value.date,
+                                              e.target.value
+                                            )
+                                          }
+                                        >
+                                          <MenuItem value="not taken">Not Taken</MenuItem>
+                                          <MenuItem value="taken">Taken</MenuItem>
+                                        </Select>
+                                      </TableCell>
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </TableContainer>
+                          )}
+                        </Box>
+                      )}
+                    </Box>
+                    ))}
+                  </Box>
+                  {/* Add Dog button */}
+                  <Button variant="outlined" color="secondary" onClick={() => { setAddingDog(true); }} sx={{ mt: 2 }}>
+                    Add Dog
+                  </Button>
+                </Box>
+              )}
             </TableBody>
             <Button
               variant="contained"
@@ -426,63 +611,6 @@ const Profile = () => {
             </Button>
           </Box>
         )}
-
-        {/* Vaccination Table */}
-
-        <Box
-          sx={{ backgroundColor: "white", mt: 4, p: 2, borderRadius: "10px" }}
-        >
-          {userData.dogs.length === 0 && (
-            <Typography variant="h4">
-              Add your dogs to see their vaccinations here
-            </Typography>
-          )}
-          <Button variant="contained" onClick={() => setAddingDog(!addingDog)}>
-            Add Dog
-          </Button>
-          <br></br>
-          {addingDog && (
-            <AddDog
-              close={() => {
-                setAddingDog(false);
-              }}
-            />
-          )}
-          {userData.dogs.length !== 0 &&
-            vaccinationData &&
-            vaccinationData.map((dogVacs, index) => (
-              <>
-                <Typography
-                  variant="h4"
-                  component="h2"
-                  gutterBottom
-                  style={{ marginTop: 20 }}
-                >
-                  {dogVacs.name}'s Vaccination Table
-                </Typography>
-                <TableContainer component={Paper} style={{ marginTop: 10 }}>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Vaccine Name</TableCell>
-                        <TableCell>Next Due Date</TableCell>
-                        <TableCell>status</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {Object.entries(dogVacs.vacs).map(([key, value]) => (
-                        <TableRow>
-                          <TableCell>{value.vaccine}</TableCell>
-                          <TableCell>{value.date}</TableCell>
-                          <TableCell>{value.status}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </>
-            ))}
-        </Box>
       </Box>
     </Container>
   );

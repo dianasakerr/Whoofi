@@ -115,7 +115,7 @@ def update_vaccination_status(token: str, dog_name: str, vaccine_name: str, vacc
 
 
 @dog_router.get("/get_vaccination_table")
-def get_vaccination_table(token: str, dog_name: str):
+def get_vaccination_table(token: str, dog_name: str, start_date: str = None):
     data = verify_token(token)
     if data is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token",
@@ -129,17 +129,24 @@ def get_vaccination_table(token: str, dog_name: str):
 
     vaccination_status = dog_data[VACCINATION_STATUS]
 
-    today = datetime.today()
-    one_year_from_today = today + timedelta(days=365)
+    if start_date:
+        try:
+            start_date = datetime.strptime(start_date, "%d-%m-%Y")
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid date format. Use DD-MM-YYYY.")
+    else:
+        start_date = datetime.today()
+
+    one_year_from_today = start_date + timedelta(days=90)
 
     # Ensure all existing and upcoming vaccines within the next year are included
     for vaccine, weeks in REPEATED_VACCINATION_SCHEDULE.items():
-        due_date = dog_data[DATE_OF_BIRTH] + timedelta(weeks=weeks)
+        due_date = start_date + timedelta(weeks=weeks)
         while due_date <= one_year_from_today:
             key = f"{vaccine}-{due_date.strftime('%d-%m-%Y')}"
             if key not in vaccination_status:
                 vaccination_status[key] = {"vaccine": vaccine, "date": due_date.strftime('%Y-%m-%d'),
-                                           "status": "לא נלקח"}
+                                           "status": "not taken"}
             due_date += timedelta(weeks=weeks)
 
     updated_vaccination_status = dict(sorted(vaccination_status.items(), key=lambda item: item[1]['date']))
@@ -149,7 +156,10 @@ def get_vaccination_table(token: str, dog_name: str):
         update={"$set": {VACCINATION_STATUS: updated_vaccination_status}}
     )
     dog_cluster.close()
-    return updated_vaccination_status
+    filtered_data = {k: v for k, v in updated_vaccination_status.items()
+                     if datetime.strptime(v['date'], '%d-%m-%Y').date() >= start_date.date()}
+
+    return dict(sorted(filtered_data.items(), key=lambda item: item[1]['date']))
 
 
 @dog_router.get("/get_dogs_by_user/")

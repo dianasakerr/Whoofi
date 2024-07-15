@@ -89,7 +89,7 @@ const DogWalkerProfile = ({ dogWalker, setCurrentDogWalker }) => {
             Experience: {dogWalker.years_of_experience} years
           </Typography>
           <Typography variant="body1" color="textSecondary">
-            Price: ${dogWalker.hourly_rate} per hour
+            Price: {dogWalker.hourly_rate}₪ per hour
           </Typography>
           <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
             <Typography variant="body1" color="textSecondary" sx={{ mr: 1 }}>
