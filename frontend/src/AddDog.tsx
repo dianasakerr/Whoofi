@@ -15,6 +15,7 @@ const AddDog = ({ close }: Props) => {
   const [weight, setWeight] = useState("");
 
   const handleSubmit = async () => {
+    if (name === "" || birthDate === "" || race === "" || weight == "") return;
     try {
       const response = await fetch(
         import.meta.env.VITE_API_URL +
@@ -52,6 +53,7 @@ const AddDog = ({ close }: Props) => {
       }}
     >
       <TextField
+      required
         label="Name"
         value={name}
         sx={{ mt: 1 }}
@@ -59,6 +61,7 @@ const AddDog = ({ close }: Props) => {
       />
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <DatePicker
+        
           disableFuture
           label="Select Date"
           sx={{ mt: 1 }}
@@ -70,12 +73,14 @@ const AddDog = ({ close }: Props) => {
         />
       </LocalizationProvider>
       <TextField
+      required
         label="Race"
         value={race}
         onChange={(e) => setRace(e.target.value)}
         sx={{ mt: 1 }}
       />
       <TextField
+      required
         label="Weight"
         value={weight}
         onChange={(e) => setWeight(e.target.value)}

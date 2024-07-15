@@ -24,7 +24,7 @@ const DogWalkerProfile = ({ dogWalker, setCurrentDogWalker }) => {
   const reverseGeocode = async (lat, lng) => {
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lng}&lon=${lat}` // I know... its janky but it is what it is. need to deliver
       );
       response.json().then((data) => {
         console.log(data.address);

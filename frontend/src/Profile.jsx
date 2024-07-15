@@ -3,6 +3,7 @@ import {
   Container,
   Typography,
   Box,
+  Grid,
   TextField,
   Button,
   Table,
@@ -172,45 +173,39 @@ const Profile = () => {
   const fetchDogInfo = async (token, email) => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}` +
-          "get_dogs_by_user/?token=" +
-          token +
-          "&owner_email=" +
-          email,
-        {
-          method: "GET",
-        }
+        `${import.meta.env.VITE_API_URL}get_dogs_by_user/?token=${token}&owner_email=${email}`
       );
-
+  
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        throw new Error("Failed to fetch dog information");
       }
-
+  
       const data = await response.json();
       return data;
-    } catch (error) {}
+    } catch (error) {
+      console.error("Error fetching dog info:", error);
+      return [];
+    }
   };
-
+  
   const fetchVaccinationData = async (token, dogName) => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}` +
-          "get_vaccination_table/?token=" +
-          token +
-          "&dog_name=" +
-          dogName,
-        {
-          method: "GET",
-        }
+        `${import.meta.env.VITE_API_URL}get_vaccination_table/?token=${token}&dog_name=${dogName}`
       );
-      const data = await response.json();
-      if (data) {
-        return data;
+  
+      if (!response.ok) {
+        throw new Error("Failed to fetch vaccination data");
       }
+  
+      const data = await response.json();
+      return data;
     } catch (error) {
       console.error("Error fetching vaccination data:", error);
+      return [];
     }
   };
+  
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -306,6 +301,18 @@ const Profile = () => {
         return;
       }
 
+      const prevVaccineData = vaccinationData;
+      const updatedVaccinationData = vaccinationData.map((dog) => {
+        if (dog.name === dogName) {
+          return {
+            ...dog,
+            vacs: {...dog.vacs, [vaccineName+'-'+vaccineDate]: {...dog.vacs[vaccineName+'-'+vaccineDate], status: vaccineStatus}},
+          };
+        }
+        return dog;
+      });
+      setVaccinationData(updatedVaccinationData);
+
       const response = await axios.put(
         `${import.meta.env.VITE_API_URL}update_vaccine_status`,
         null,
@@ -320,19 +327,8 @@ const Profile = () => {
         }
       );
 
-      if (response.status === 200) {
-        const updatedVaccinationData = vaccinationData.map((dog) => {
-          if (dog.name === dogName) {
-            return {
-              ...dog,
-              vacs: dog.vacs.map((vac) =>
-                vac.vaccine === vaccineName ? { ...vac, status: vaccineStatus } : vac
-              ),
-            };
-          }
-          return dog;
-        });
-        setVaccinationData(updatedVaccinationData);
+      if (response.status !== 200) {
+        setVaccinationData(prevVaccineData);
       }
     } catch (error) {
       console.error("Error updating vaccination status:", error);
@@ -448,21 +444,37 @@ const Profile = () => {
                   </TableRow>
                 </>
               )}
-              {userData.dogs && (
+              
+            </TableBody>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={toggleEditMode}
+              sx={{ mt: 2 }}
+            >
+              Edit
+            </Button>
+
+            {userData.dogs && (
                 <Box sx={{ backgroundColor: "white", mt: 4, p: 2, borderRadius: "10px" }}>
                   <Typography variant="h4" sx={{ mb: 2 }}>
                     My Dogs
                   </Typography>
-                  {dogInfo.length === 0 && (
-                    <Typography variant="h6">
-                      Add your dogs to see their details here
+                  {userData.dogs && dogInfo?.length === 0 && (
+                    <Typography variant="h6" mb={2}>
+                      Add dogs to see their details here
                     </Typography>
                   )}
+                  {/* Add Dog button */}
+                  <Button variant="outlined" color="primary" onClick={() => { setAddingDog(prevVal => !prevVal); }} sx={{ my: 1 }}>
+                    {!addingDog ? "Add Dog" : "Cancel"}
+                  </Button>
                   <br />
+                  
                   {addingDog && (<AddDog close={() => { setAddingDog(false); }} />)}
 
-                  <Box sx={{ display: "flex", flexWrap: "wrap" }}>
-                    {dogInfo.length !== 0 && dogInfo.map((dog, index) => (
+                  <Grid mt={1} container direction="column" alignItems="center" justifyContent="center">
+                    {userData.dogs && dogInfo?.length !== 0 && dogInfo.map((dog, index) => (
                     <Box key={index} sx={{ mr: 2, mb: 2 }}>
                       <Button
                         variant="contained"
@@ -471,7 +483,7 @@ const Profile = () => {
                             visibleDogDetails === index ? null : index
                           )
                         }
-                        sx={{ minWidth: 150 }}
+                        sx={{ minWidth: 150, margin: "auto" }}
                       >
                         {dog.name}
                       </Button>
@@ -484,7 +496,7 @@ const Profile = () => {
 
                           {/* Toggle button for vaccination table */}
                           <Button
-                            variant="outlined"
+                            variant="contained"
                             color="primary"
                             onClick={() =>
                               setLoadedVaccines(
@@ -540,22 +552,10 @@ const Profile = () => {
                       )}
                     </Box>
                     ))}
-                  </Box>
-                  {/* Add Dog button */}
-                  <Button variant="outlined" color="secondary" onClick={() => { setAddingDog(true); }} sx={{ mt: 2 }}>
-                    Add Dog
-                  </Button>
+                  </Grid>
+                  
                 </Box>
               )}
-            </TableBody>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={toggleEditMode}
-              sx={{ mt: 2 }}
-            >
-              Edit
-            </Button>
           </Box>
         ) : (
           <Box

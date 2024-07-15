@@ -208,7 +208,6 @@ const DogWalkersSearchPage = () => {
                 <CardContent>
                   <Typography variant="h6">{dogWalker.username}</Typography>
                   <Typography>{dogWalker.location}</Typography>
-                  <Box className="experience">
                     <Typography>
                       Experience: {dogWalker.years_of_experience} years
                     </Typography>
@@ -219,7 +218,6 @@ const DogWalkersSearchPage = () => {
                         precision={0.25}
                       />
                     </Typography>
-                  </Box>
                 </CardContent>
               </div>
             ))}
