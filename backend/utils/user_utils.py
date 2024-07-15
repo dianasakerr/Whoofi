@@ -1,4 +1,4 @@
-from backend.models.user import *
+from models.user import *
 from datetime import datetime
 import bcrypt
 

@@ -5,11 +5,11 @@ from fastapi import APIRouter, status, File, UploadFile
 from fastapi.responses import StreamingResponse
 from bson.objectid import ObjectId
 from pymongo.errors import *
-from backend.utils.user_utils import *
-from backend.security import *
+from utils.user_utils import *
+from security import *
 from gridfs import GridFS
 from datetime import datetime
-from backend.database import get_mongo_client
+from database import get_mongo_client
 from typing import Optional
 
 user_router = APIRouter()

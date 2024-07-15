@@ -3,9 +3,9 @@ import os
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.routes.user_routes import user_router
-from backend.routes.dog_routes import dog_router
-from backend.routes.walker_routes import walker_router
+from routes.user_routes import user_router
+from routes.dog_routes import dog_router
+from routes.walker_routes import walker_router
 from dotenv import load_dotenv
 
 # Load environment variables from a .env file
@@ -13,10 +13,9 @@ load_dotenv()
 
 app = FastAPI()
 
-origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173").split(",")
 
 # Add CORS middleware to your FastAPI application
-app.add_middleware(CORSMiddleware, allow_origins=origins, allow_credentials=True,
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True,
                    allow_methods=["*"], allow_headers=["*"])
 
 app.include_router(user_router)

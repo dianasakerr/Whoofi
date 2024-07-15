@@ -4,8 +4,8 @@ import os
 import logging
 from datetime import datetime, timedelta
 from typing import Dict
-from backend.utils.constants import *
-from backend.utils.user_utils import calc_data_to_users
+from utils.constants import *
+from utils.user_utils import calc_data_to_users
 from dotenv import load_dotenv
 import bcrypt
 
