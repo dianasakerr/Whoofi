@@ -29,5 +29,5 @@ async def read_root():
 
 if __name__ == "__main__":
     host = os.getenv("HOST", "172.16.35.0")
-    port = int(os.getenv("PORT", 8000))
+    port = int(os.getenv("PORT", 4172))
     uvicorn.run("main:app", host=host, port=port, reload=True, log_level="info")
