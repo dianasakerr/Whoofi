@@ -28,6 +28,6 @@ async def read_root():
     return "Welcome to the Whoofi API"
 
 if __name__ == "__main__":
-    host = os.getenv("HOST", "172.18.0.4")
+    host = os.getenv("HOST", "10.0.0.3")
     port = int(os.getenv("PORT", 4172))
     uvicorn.run("main:app", host=host, port=port, reload=True, log_level="info")
